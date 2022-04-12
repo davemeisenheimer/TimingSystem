@@ -1,0 +1,64 @@
+﻿<Page x:Class="TrailMeister.GUI.Main.PageAllData"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:TrailMeister.GUI.Main"
+      xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+      mc:Ignorable="d" 
+      d:DesignHeight="800" d:DesignWidth="1200"
+      Title="All Data">
+    <Page.Resources>
+        <CollectionViewSource x:Key="cvsData" Source="{Binding AllParticipants}">
+            <CollectionViewSource.SortDescriptions>
+                <!-- Requires 'xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"' declaration. -->
+                <scm:SortDescription PropertyName="LapCount" Direction="Descending"/>
+                <scm:SortDescription PropertyName="TimeTotal" Direction="Ascending" />
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+    </Page.Resources>
+
+    <Grid>
+        <DataGrid x:Name="DataGridRecentLaps" ItemsSource="{Binding Source={StaticResource cvsData}}" AutoGenerateColumns="False" CanUserAddRows="False" GridLinesVisibility="All" IsSynchronizedWithCurrentItem="False" FontSize="24">
+
+            <DataGrid.CellStyle>
+                <Style/>
+            </DataGrid.CellStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="colName" FontSize="48" CanUserResize="False" Width="4*" Header="Name" Binding="{Binding Name}" MinWidth="450">
+
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn x:Name="colLapCount" Width="1*" Header="Lap" Binding="{Binding LapCount}" FontSize="48" MinWidth="50" >
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn x:Name="colLapTime" CanUserResize="False" Width="3" Header="Lap Time" Binding="{Binding TimeLap}" FontSize="48" MinWidth="300">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                            <Setter Property="Padding" Value="5, 0" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn x:Name="colTotalTime" CanUserResize="False" Width="4*" Header="Total Time" Binding="{Binding TimeTotal}" FontSize="48" MinWidth="350">
+
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                            <Setter Property="Padding" Value="5, 0" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        
+    </Grid>
+</Page>

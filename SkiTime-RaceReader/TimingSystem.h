@@ -1,0 +1,1 @@
+#define END_TIMING_MESSAGE "##$$##"

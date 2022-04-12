@@ -1,0 +1,68 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;NU1701</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Model\NewFolder1\**" />
+    <EmbeddedResource Remove="Model\NewFolder1\**" />
+    <None Remove="Model\NewFolder1\**" />
+    <Page Remove="Model\NewFolder1\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9" />
+    <PackageReference Include="System.IO.Ports" Version="6.0.0" />
+    <PackageReference Include="System.Management" Version="7.0.0-preview.2.22152.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TrailMeisterDb\TrailMeisterDb.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="GUI\Main\PageOneArrival.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="GUI\Main\PageAllData.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="GUI\Main\PageRecentArrivals.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="GUI\Main\PageOneArrival.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="GUI\Main\PageAllData.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="GUI\Main\PageRecentArrivals.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="MercuryAPI">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\ThingMagic\MercuryAPI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

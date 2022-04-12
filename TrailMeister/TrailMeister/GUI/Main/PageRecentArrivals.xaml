@@ -1,0 +1,53 @@
+﻿<Page x:Name="pageRecentArrivals" x:Class="TrailMeister.GUI.Main.PageRecentArrivals"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:TrailMeister.GUI.Main"
+      mc:Ignorable="d" 
+      d:DesignHeight="800" d:DesignWidth="1200"
+      Title="Recent Arrivals" WindowHeight="800" WindowWidth="1200" WindowTitle="Recent Arrivals">
+
+    <Grid>
+        <DataGrid x:Name="DataGridRecentLaps" AutoGenerateColumns="False" GridLinesVisibility="All" IsSynchronizedWithCurrentItem="False" ItemsSource="{Binding DataContext.RecentData, ElementName=DataGridRecentLaps}" FontSize="24">
+            <DataGrid.CellStyle>
+                <Style/>
+            </DataGrid.CellStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="colName" FontSize="48" CanUserResize="False" Width="4*" Header="Name" Binding="{Binding Name}" MinWidth="450">
+
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn x:Name="colLapCount" Width="1*" Header="Lap" Binding="{Binding LapCount}" FontSize="48" MinWidth="50" >
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn x:Name="colLapTime" CanUserResize="False" Width="3" Header="Lap Time" Binding="{Binding TimeLap}" FontSize="48" MinWidth="300">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                            <Setter Property="Padding" Value="5, 0" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn x:Name="colTotalTime" CanUserResize="False" Width="4*" Header="Total Time" Binding="{Binding TimeTotal}" FontSize="48" MinWidth="350">
+
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                            <Setter Property="Padding" Value="5, 0" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+    </Grid>
+</Page>

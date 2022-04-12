@@ -1,0 +1,65 @@
+﻿<Page x:Name="pageNewEvent" x:Class="TrailMeister.GUI.Main.PageNewEvent"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:TrailMeister.GUI.Main"
+      mc:Ignorable="d" 
+      d:DesignHeight="800" d:DesignWidth="1200"
+      Title="New Event">
+
+    <Grid>
+        <Label x:Name="lblEventName" HorizontalAlignment="Left" Margin="110,10,0,0" VerticalAlignment="Top" Height="73" Width="1019" FontSize="36" Content="Name of event:"/>
+        <TextBox x:Name="tbEventName"  Text="{Binding EventName, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="92,103,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="1020" Height="75" FontSize="48" FontFamily="Segoe UI Semibold" />
+        <Label x:Name="lblParticipants" Content="Participants" HorizontalAlignment="Center" Margin="0,207,0,0" VerticalAlignment="Top" FontSize="36" Width="1020"/>
+
+        <DataGrid x:Name="gridParticipants" ItemsSource="{Binding DataContext.AllTags, ElementName=gridParticipants}" Margin="92,270,89,0" Height="310" VerticalAlignment="Top" KeyUp="gridParticipants_KeyUp" FontSize="24" AutoGenerateColumns="False" GridLinesVisibility="All" IsSynchronizedWithCurrentItem="False" >
+
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="colID" CanUserResize="False" Width="1*" Header="ID" Binding="{Binding ID}" IsReadOnly="true" MinWidth="50">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                            <Setter Property="Padding" Value="8 0 8 0" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTemplateColumn x:Name="colName" Width="4*" Header="Name" IsReadOnly="false" MinWidth="300">
+                    <!--<DataGridTemplateColumn.ElementStyle>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="HorizontalAlignment" Value="Left" />
+                    </Style>
+                </DataGridTemplateColumn.ElementStyle>-->
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox x:Name="tbNameEdit" FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" Text="{Binding HumanName}" BorderThickness="0" Margin="8,0,8,0" GotFocus="tbNameEdit_GotFocus" Loaded="tbNameEdit_Loaded" >
+                            </TextBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <!--<DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <Border Background="LightBlue" BorderBrush="Black" BorderThickness="1">
+                                <TextBox x:Name="tbNameEdit"  Text="{Binding HumanName, UpdateSourceTrigger=LostFocus}" Margin="8,0,8,0" GotFocus="tbNameEdit_GotFocus" />
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>-->
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn x:Name="colEPC" Width="4*" Header="EPC" Binding="{Binding EPC}" IsReadOnly="true" MinWidth="300" >
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                            <Setter Property="Padding" Value="8 0 8 0" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button x:Name="btnDone" Content="Done" HorizontalAlignment="Left" Margin="885,606,0,0" VerticalAlignment="Top" Height="82" Width="226" Click="btnDone_Click"/>
+        <Slider x:Name="Antenna_Gain" Value="{Binding AntennaPower}" HorizontalAlignment="Left" Margin="98,601,0,0" VerticalAlignment="Top" Width="349" Height="41" Maximum="27" Minimum="5" TickPlacement="TopLeft"/>
+        <Label x:Name="lblAntennaPowerSlider" Content="{Binding AntennaPowerLabel}" HorizontalAlignment="Left" Margin="98,646,0,0" VerticalAlignment="Top" Width="349" Height="40" FontSize="18"/>
+        <!--<CheckBox Content="Start lap logging on 1st read" IsChecked="{Binding LogOnFirstRead}" HorizontalAlignment="Left" Margin="584,599,0,0" VerticalAlignment="Top" Height="32" Width="206" FontSize="18" VerticalContentAlignment="Center" Padding="4,-1,0,-4"/>-->
+
+    </Grid>
+</Page>

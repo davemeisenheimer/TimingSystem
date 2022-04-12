@@ -1,0 +1,8 @@
+TrailMeister/TrailMeisterDb/bin/*
+TrailMeister/TrailMeisterDb/obj/*
+TrailMeister/TrailMeister/bin/*
+TrailMeister/TrailMeister/obj/*
+TrailMeister/UpgradeLog*.htm
+TrailMeister/.vs/*
+SkiTime-RaceReader/.vscode
+build/*

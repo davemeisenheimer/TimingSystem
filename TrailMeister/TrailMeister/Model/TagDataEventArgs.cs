@@ -10,7 +10,7 @@ namespace TrailMeister.Model
     {
         internal TagDataEventArgs(TagDataSourceEventType type, string message)
         {
-            switch(type)
+            switch (type)
             {
                 case TagDataSourceEventType.LapData:
                 case TagDataSourceEventType.Connected:
@@ -33,6 +33,15 @@ namespace TrailMeister.Model
         internal TagDataEventArgs(TagDataSourceEventType type, string message, ReaderData data): this(type, message)
         {
             RecentLapData = data;
+        }
+
+        // Use this ctor for testing or seeding the UI with tags for an event
+        internal TagDataEventArgs(TagDataSourceEventType type, string message, ReaderData data, ReaderStatus readerStatus)
+        {
+            RecentLapData = data;
+            Type = type;
+            Message = message;
+            ReaderStatus = readerStatus;
         }
 
         public TagDataSourceEventType Type { get; set; }

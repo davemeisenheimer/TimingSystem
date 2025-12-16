@@ -6,16 +6,31 @@
       xmlns:local="clr-namespace:TrailMeister.GUI.Main"
       xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+      xmlns:converters="clr-namespace:TrailMeisterUtilities.Converters;assembly=TrailMeisterUtilities"
       mc:Ignorable="d" 
       d:DesignHeight="800" d:DesignWidth="1200"
       Title="All Data">
-    <Grid>
-        <Label diag:PresentationTraceSources.TraceLevel="High" x:Name="lblName" Content="{Binding MostRecent.Name}" HorizontalAlignment="Center" VerticalAlignment="Top" Width="1180" Height="160" FontSize="80"/>
-        <Label x:Name="lblLaps" Content="Laps:" HorizontalAlignment="Left" Margin="10,160,0,0" VerticalAlignment="Top" Width="324" Height="160" FontSize="80"/>
-        <Label x:Name="lblLapTime" Content="Lap Time:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="384" Height="160" FontSize="80" Margin="10,309,0,0" />
-        <Label x:Name="lblTotalTimey" Content="Total Time:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="384" Height="160" FontSize="80" Margin="10,474,0,0" />
-        <Label x:Name="lblLapCount" Content="{Binding MostRecent.LapCount}" HorizontalAlignment="Center" Margin="0,160,0,0" VerticalAlignment="Top" Width="324" Height="160" FontSize="80"/>
-        <Label x:Name="lblLapTime1" Content="{Binding MostRecent.TimeLap}" HorizontalContentAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Top" Width="620" Height="160" FontSize="80" Margin="438,309,0,0" />
-        <Label x:Name="lblTotalTimeTime" Content="{Binding MostRecent.TimeTotal}" HorizontalContentAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Top" Width="620" Height="160" FontSize="80" Margin="438,474,0,0" />
+    
+    <Page.Resources>
+        <converters:Tag2PersonConverter x:Key="Tag2PersonConverter"/>
+    </Page.Resources>
+    
+    <Grid Margin="16,16,16,16">
+        <Label diag:PresentationTraceSources.TraceLevel="High" x:Name="lblName" HorizontalAlignment="Center" VerticalAlignment="Top" Width="1180" Height="160" FontSize="80">
+            <Label.Content>
+                <MultiBinding Converter="{StaticResource Tag2PersonConverter}">
+                    <Binding Path="MostRecent.PersonId"/>
+                    <Binding Path="AllPeople" />
+                </MultiBinding>
+            </Label.Content>
+        </Label>
+        <Label x:Name="lblLapCount" Content="Laps:" HorizontalAlignment="Left" Margin="10,164,0,0" VerticalAlignment="Top" Width="324" Height="160" FontSize="80"/>
+        <Label x:Name="lblLapTime" Content="Last Lap:" HorizontalAlignment="Left" Margin="10,290,0,0" VerticalAlignment="Top" Width="384" Height="160" FontSize="80" />
+        <Label x:Name="lblAverageLapTime" Content="Avg Lap:" HorizontalAlignment="Left" Margin="10,416,0,0" VerticalAlignment="Top" Width="384" Height="160" FontSize="80" />
+        <Label x:Name="lblTotalTime" Content="Total Time:" HorizontalAlignment="Left" Margin="10,542,0,0" VerticalAlignment="Top" Width="384" Height="160" FontSize="80" />
+        <Label x:Name="lblLapCountCount" Content="{Binding MostRecent.LapCount}" HorizontalAlignment="Center" Margin="0,164,0,0" VerticalAlignment="Top" Width="324" Height="160" FontSize="80"/>
+        <Label x:Name="lblLapTimeTime" Content="{Binding MostRecent.TimeLap}" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Margin="438,290,0,0" VerticalAlignment="Top" Width="620" Height="160" FontSize="80" />
+        <Label x:Name="lblAverageLapTimeTime" Content="{Binding MostRecent.AverageLapTime}" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Margin="438,416,0,0" VerticalAlignment="Top" Width="620" Height="160" FontSize="80" />
+        <Label x:Name="lblTotalTimeTime" Content="{Binding MostRecent.TimeTotal}" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Margin="438,542,0,0" VerticalAlignment="Top" Width="620" Height="160" FontSize="80" />
     </Grid>
 </Page>

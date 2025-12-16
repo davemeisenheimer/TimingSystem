@@ -4,17 +4,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TrailMeister.GUI.Main"
-        xmlns:shared="clr-namespace:TrailMeister.GUI.Shared"
+        xmlns:converters="clr-namespace:TrailMeisterUtilities.Converters;assembly=TrailMeisterUtilities"
         xmlns:model="clr-namespace:TrailMeister.Model"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
-        Title="Trail Meister" Height="800" Width="1200" Closing="mainWindow_Closing" Loaded="mainWindow_Loaded">
+        Title="Trail Meister" Closing="mainWindow_Closing" Loaded="mainWindow_Loaded">
     <Window.Resources>
-        <shared:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-        <shared:EnumEqualConverter x:Key="EnumEqualConverter" />
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <converters:EnumEqualConverter x:Key="EnumEqualConverter" />
     </Window.Resources>
     <Grid HorizontalAlignment="Center">
-        <Frame x:Name="framePages" Content="Frame" Grid.ColumnSpan="4" Height="800" DataContextChanged="framePages_DataContextChanged" Navigated="framePages_Navigated">
+        <Frame x:Name="framePages" Content="Frame" Grid.ColumnSpan="4" DataContextChanged="framePages_DataContextChanged" Navigated="framePages_Navigated">
             <Frame.Style>
                 <Style TargetType="Frame">
                     <Setter Property="Visibility" Value="Hidden"/>

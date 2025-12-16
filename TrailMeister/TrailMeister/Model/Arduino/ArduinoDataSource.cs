@@ -7,7 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using TrailMeister.Model.Data;
-using TrailMeister.Model.Helpers;
+using TrailMeisterUtilities;
 
 namespace TrailMeister.Model.Arduino
 {

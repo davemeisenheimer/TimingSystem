@@ -1,0 +1,43 @@
+﻿
+<Window x:Class="TrailMeisterViewer.Windows.AddPersonDialog.AddPersonDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Person Information" 
+        Height="200" Width="350"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="First Name:" Grid.Row="0" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding FirstName}" Grid.Row="0" Grid.Column="1" Margin="5"/>
+
+        <TextBlock Text="Last Name:" Grid.Row="1" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding LastName}" Grid.Row="1" Grid.Column="1" Margin="5"/>
+
+        <TextBlock Text="Association:" Grid.Row="2" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding Association}" Grid.Row="2" Grid.Column="1" Margin="5"/>
+
+        <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+            <Button Content="OK" Width="70" Margin="5"
+                    Command="{Binding OkCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    IsDefault="True"/>
+            <Button Content="Cancel" Width="70" Margin="5"
+                    Command="{Binding CancelCommand}"
+                    IsCancel="True"
+                    Click="CancelButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

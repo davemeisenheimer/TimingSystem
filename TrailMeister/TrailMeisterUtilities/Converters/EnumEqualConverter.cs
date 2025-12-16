@@ -6,10 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace TrailMeister.GUI.Shared
-{
+namespace TrailMeisterUtilities.Converters
+{   
     [ValueConversion(typeof(bool), typeof(bool))]
-    internal class EnumEqualConverter: IValueConverter
+    public class EnumEqualConverter: IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter,
             System.Globalization.CultureInfo culture)

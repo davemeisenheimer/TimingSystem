@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrailMeister.Model.Helpers
+namespace TrailMeisterUtilities
 {
     public class Timers : Disposable
     {

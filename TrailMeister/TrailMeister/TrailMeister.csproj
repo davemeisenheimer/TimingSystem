@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TrailMeisterDb\TrailMeisterDb.csproj" />
+    <ProjectReference Include="..\TrailMeisterUtilities\TrailMeisterUtilities.csproj" />
   </ItemGroup>
 
   <ItemGroup>

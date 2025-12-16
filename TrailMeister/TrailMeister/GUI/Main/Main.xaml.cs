@@ -36,6 +36,7 @@ namespace TrailMeister.GUI.Main
         public Main()
         {
             this._viewModel = new MainWindowVM(this);
+            //this._viewModel = new Testing.MainWindowVmTest(this);
 
             _pageNewEventDelegate = new NavigationDelegate(this._viewModel.GotoRecentArrivalsPage);
             _pageNewEvent = new PageNewEvent(_pageNewEventDelegate);

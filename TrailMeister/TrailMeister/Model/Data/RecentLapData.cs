@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TrailMeister.Model.Helpers;
+using TrailMeisterUtilities;
 
 namespace TrailMeister.Model.Data
 {
@@ -12,25 +8,35 @@ namespace TrailMeister.Model.Data
 	{
 		int id;
 		string epc = "";
-		string name = "";
+		int? personId = 0;
 		uint lapCount = 0;
 		DateTime rfidTimeAdded;      // Timing system time (rfid reader) when this entry was added to the data
 		DateTime rfidTimeUpdated;    // Last time we got lap data expressed according to the timing system time (rfid reader) time (ms)
 		DateTime appTimeAdded;   // System time when this item was last added to the display list
 		DateTime appTimeUpdated; // Last time we got lap data expressed according to the system time we're running on
 
-		TimeSpan timeLap;
-		TimeSpan timeTotal;
+		TimeSpan averageLapTimeSpan; // Average lap time
+		string averageLapTime;
+
+		TimeSpan timeLapSpan;
+		string timeLap;
+
+		TimeSpan timeTotalSpan;
+		string timeTotal;
 		Timers _timers;
 
-		public RecentLapData(int id, string name, string epc, DateTime timeStamp)
+		public RecentLapData(int id, int? personId, string epc, DateTime timeStamp)
 		{
 			this.id = id;
 			this.epc = epc;
-			this.name = name;
-			this.timeLap = new TimeSpan(0, 0, 0, 0, 0);
+			this.personId = personId;
 
-			this.timeTotal = new TimeSpan(0, 0, 0, 0, 0);
+			this.timeLapSpan = new TimeSpan(0, 0, 0, 0, 0);
+			this.timeTotalSpan = new TimeSpan(0, 0, 0, 0, 0);
+
+			this.timeLap = "";
+			this.timeTotal = "";
+
 			this.rfidTimeAdded = timeStamp;
 			this.rfidTimeUpdated = timeStamp;
 
@@ -53,15 +59,15 @@ namespace TrailMeister.Model.Data
 			}
 		}
 
-		public string Name { 
-			get { return this.name; } 
+		public int? PersonId { 
+			get { return this.personId; } 
 			set
             {
-				if (value != this.name)
+				if (value != this.personId)
                 {
-					this.name = value;
+					this.personId = value;
 					
-					OnPropertyChanged(nameof(Name));
+					OnPropertyChanged(nameof(PersonId));
                 }
             }
 		}
@@ -85,7 +91,12 @@ namespace TrailMeister.Model.Data
 		{
 			get
 			{
-				return this.timeLap.ToString(@"hh\:mm\:ss\.ff");
+				return this.timeLap;
+			}
+			set
+			{
+				this.timeLap = value;
+				OnPropertyChanged(nameof(TimeLap));
 			}
 		}
 
@@ -93,16 +104,20 @@ namespace TrailMeister.Model.Data
 		{
 			get
 			{
-				return (ulong)this.timeLap.TotalMilliseconds;
+				return (ulong)this.timeLapSpan.TotalMilliseconds;
 			}
 		}
 
 		private TimeSpan TimeLapSpan
         {
+			get
+            {
+				return this.timeLapSpan;
+            }
 			set
             {
-				this.timeLap = value;
-				OnPropertyChanged(nameof(TimeLap));
+				this.timeLapSpan = value;
+				OnPropertyChanged(nameof(TimeLapSpan));
 			}
         }
 
@@ -110,7 +125,12 @@ namespace TrailMeister.Model.Data
 		{
 			get
 			{
-				return this.timeTotal.ToString(@"dd\.hh\:mm\:ss\.ff");
+				return this.timeTotal;
+			}
+			set
+			{
+				this.timeTotal = value;
+				OnPropertyChanged(nameof(TimeTotal));
 			}
 		}
 
@@ -118,16 +138,20 @@ namespace TrailMeister.Model.Data
 		{
 			get
 			{
-				return (ulong)this.timeTotal.TotalMilliseconds;
+				return (ulong)this.timeTotalSpan.TotalMilliseconds;
 			}
 		}
 
 		private TimeSpan TimeTotalSpan
-		{ 
+		{
+			get
+            {
+				return this.timeTotalSpan;
+            }
 			set
 			{
-				this.timeTotal = value;
-				OnPropertyChanged(nameof(TimeTotal));
+				this.timeTotalSpan = value;
+				OnPropertyChanged(nameof(TimeTotalSpan));
 			}
 		}
 
@@ -142,30 +166,82 @@ namespace TrailMeister.Model.Data
 				if (value != this.appTimeAdded)
 				{
 					this.appTimeAdded = value;
-					OnPropertyChanged("TimeAdded");
+					OnPropertyChanged(nameof(TimeAdded));
 				}
 			}
 		}
 
-		public void update(DateTime timingSystemTime)
+		public string AverageLapTime
+		{
+			get
+			{
+				return this.averageLapTime;
+			}
+			set
+			{
+				if (value != this.averageLapTime)
+				{
+					this.averageLapTime = value;
+					OnPropertyChanged(nameof(AverageLapTime));
+				}
+			}
+		}
+
+		public TimeSpan AverageLapTimeSpan
+		{
+			get
+			{
+				return this.averageLapTimeSpan;
+			}
+			set
+			{
+				if (value != this.averageLapTimeSpan)
+				{
+					this.averageLapTimeSpan = value;
+					OnPropertyChanged("AverageLapTimeSpan");
+				}
+			}
+		}
+
+		public void update(DateTime timingSystemTime, int? personId)
         {
 			TimeSpan newLapTime = timingSystemTime - this.rfidTimeUpdated;
 
 			if (newLapTime.Ticks > 0)
 			{
 				this.LapCount = this.lapCount + 1;
+
+				if (this.LapCount == 1)
+                {
+					this._timers.Abort();
+					this._timers.Dispose();
+                }
 				TimeSpan newTotalTime = timingSystemTime - this.rfidTimeAdded;
 				this.TimeLapSpan = newLapTime;
-				this.TimeTotalSpan = newTotalTime;
+				this.TimeLap = this.TimeLapSpan.ToString(@"hh\:mm\:ss");
+
+				setTimeTotal(newTotalTime);
+
+				this.AverageLapTimeSpan = newTotalTime / this.LapCount;
+				this.AverageLapTime = this.AverageLapTimeSpan.ToString(@"hh\:mm\:ss");
+
 				this.TimeAdded = DateTime.Now;
 				this.appTimeUpdated = DateTime.Now;
 				this.rfidTimeUpdated = timingSystemTime;
 			}
+
+			this.PersonId = personId;
         }
+
+		private void setTimeTotal(TimeSpan time)
+        {
+			this.TimeTotalSpan = time;
+			this.TimeTotal = this.TimeTotalSpan.ToString(@"hh\:mm\:ss");
+		}
 
 		private void timeTicker()
         {
-			this.TimeTotalSpan = new TimeSpan(this.timeTotal.Add(new TimeSpan(0, 0, 1)).Ticks);
+			setTimeTotal(new TimeSpan(this.timeTotalSpan.Add(new TimeSpan(0, 0, 1)).Ticks));
         }
 
 		public event PropertyChangedEventHandler? PropertyChanged;

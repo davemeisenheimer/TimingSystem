@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TrailMeister.Model.Arduino;
 using TrailMeister.Model.M6ENano;
-using TrailMeister.Model.Helpers;
+using TrailMeisterUtilities;
 
 namespace TrailMeister.Model
 {

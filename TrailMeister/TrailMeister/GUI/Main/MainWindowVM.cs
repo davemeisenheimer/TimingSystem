@@ -1,13 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using TrailMeister.Model;
 using TrailMeister.Model.Data;
-using TrailMeister.Model.Helpers;
+using TrailMeisterUtilities;
 using TrailMeisterDb;
 
 namespace TrailMeister.GUI.Main
@@ -15,26 +12,32 @@ namespace TrailMeister.GUI.Main
     internal class MainWindowVM : Disposable, INotifyPropertyChanged
     {
         private Timers? _recentArrivalPageTimeout;
-        private Main _mainWindow;
+        protected Main _mainWindow;
         private ReaderStatus _readerStatus;
         private ObservableKeyedCollection<int, DbTag> _allTags = new ObservableKeyedCollection<int, DbTag>(null, "TagId");
-        private ObservableKeyedCollection<int, RecentLapData> _recentData = new ObservableKeyedCollection<int, RecentLapData>(null, "ID");
+        private ObservableKeyedCollection<int, RecentLapData> _recentLapData = new ObservableKeyedCollection<int, RecentLapData>(null, "ID");
         private RecentLapData? _mostRecentData;
         private ObservableKeyedCollection<string, RecentLapData> _allParticipants = new ObservableKeyedCollection<string, RecentLapData>(null, "EPC");
-        private readonly MainWindowController _controller;
+        private ObservableKeyedCollection<int, DbPerson> _allPeople = new ObservableKeyedCollection<int, DbPerson>(null, "PersonId");
+        protected readonly MainWindowController _controller;
 
         private string _eventName = "Event " + DateOnly.FromDateTime(DateTime.Today).ToString("yyyy/MM/dd");
         private int _antennaPower = 5;
         bool _eventStarted = false;
+        bool _isEventFinished = false;
 
         internal MainWindowVM(Main mainWindow)
         {
             _mainWindow = mainWindow;
-            this._controller = new MainWindowController(this);
+            this._controller = initController();
             ButtonCommand_StartEvent = new ButtonCommand(o => this._controller.StartEvent());
             ButtonCommand_ConnectReader = new ButtonCommand(o => this._controller.ConnectReader());
             EnableArduinoConfig = true;
+        }
 
+        protected virtual MainWindowController initController()
+        {
+            return new MainWindowController(this);
         }
         public ICommand ButtonCommand_StartEvent { get; set; }
         public ICommand ButtonCommand_ConnectReader { get; set; }
@@ -48,6 +51,19 @@ namespace TrailMeister.GUI.Main
                 {
                     _eventStarted = value;
                     OnPropertyChanged(nameof(EventStarted));
+                }
+            }
+        }
+
+        public bool IsEventFinished
+        {
+            get => _isEventFinished;
+            set
+            {
+                if (value != _isEventFinished)
+                {
+                    _isEventFinished = value;
+                    OnPropertyChanged(nameof(IsEventFinished));
                 }
             }
         }
@@ -107,18 +123,18 @@ namespace TrailMeister.GUI.Main
             }
         }
 
-        public ObservableKeyedCollection<int, RecentLapData> RecentData
+        public ObservableKeyedCollection<int, RecentLapData> RecentLapData
         {
             get
             {
-                return _recentData;
+                return _recentLapData;
             }
             set
             {
-                if (_recentData != value)
+                if (_recentLapData != value)
                 {
-                    _recentData = value;
-                    OnPropertyChanged(nameof(RecentData));
+                    _recentLapData = value;
+                    OnPropertyChanged(nameof(RecentLapData));
                 }
             }
         }
@@ -155,6 +171,22 @@ namespace TrailMeister.GUI.Main
             }
         }
 
+        public ObservableKeyedCollection<int, DbPerson> AllPeople
+        {
+            get
+            {
+                return _allPeople;
+            }
+            set
+            {
+                if (_allPeople != value)
+                {
+                    _allPeople = value;
+                    OnPropertyChanged(nameof(AllPeople));
+                }
+            }
+        }
+
         public ObservableKeyedCollection<int, DbTag> AllTags
         {
             get
@@ -183,13 +215,13 @@ namespace TrailMeister.GUI.Main
                     {
                         RecentLapData? existingTag;
 
-                        if (!this._recentData.TryGetValue(lapData.ID, out existingTag))
+                        if (!this._recentLapData.TryGetValue(lapData.ID, out existingTag))
                         {
                             addTag(lapData);
                         } else
                         {
-                            this._recentData.Remove(lapData.ID);
-                            this._recentData.Insert(0, lapData);
+                            this._recentLapData.Remove(lapData.ID);
+                            this._recentLapData.Insert(0, lapData);
                         }
                         MostRecent = lapData;
                         GotoArrivalsPage();
@@ -200,13 +232,19 @@ namespace TrailMeister.GUI.Main
 
         private void GotoArrivalsPage()
         {
+            DisposeTimer(_recentArrivalPageTimeout);
             _recentArrivalPageTimeout = Timers.Delay(
-                                            7000,
+                                            12000,
                                             new Action(() =>
                                                 _mainWindow.Dispatcher.BeginInvoke(
-                                                    new Action(() => GotoAllDataPage())
-                                                    )));
-            if (RecentData.Count == 1)
+                                                    new Action(() =>
+                                                    {
+                                                        this._mostRecentData = null;
+                                                        this._recentLapData.Clear();
+                                                        GotoAllDataPage();
+                                                    })
+                                                )));
+            if (RecentLapData.Count == 1)
             {
                 GotoOneArrivalPage();
             }
@@ -258,11 +296,11 @@ namespace TrailMeister.GUI.Main
         private void addTag(RecentLapData tagData)
         {
             // Allow 10 recent arrivals at a time
-            if (this._recentData.Count > 10)
+            if (this._recentLapData.Count > 10)
             {
-                this.RecentData.Remove(this.RecentData.Last().ID);
+                this.RecentLapData.Remove(this.RecentLapData.Last().ID);
             }
-            this.RecentData.Insert(0, tagData);
+            this.RecentLapData.Insert(0, tagData);
         }
 
         // Overrides
@@ -285,6 +323,7 @@ namespace TrailMeister.GUI.Main
                     DisposeTimer(_recentArrivalPageTimeout);
                 }
             }
+
             //dispose unmanaged resources
             this._controller.Dispose();
             _disposed = true;

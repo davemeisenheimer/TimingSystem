@@ -11,7 +11,7 @@ namespace TrailMeisterDb
 {
     public class DbLap
     {
-        internal DbLap(int lapId, int tagId, int eventId, uint lapCount, ulong lapTime, ulong totalTime, string humanName)
+        internal DbLap(long lapId, long tagId, long eventId, uint lapCount, ulong lapTime, ulong totalTime, long personId)
         {
             this.LapId = lapId;
             this.TagId = tagId;
@@ -19,15 +19,15 @@ namespace TrailMeisterDb
             this.LapCount = lapCount;
             this.LapTime = lapTime;
             this.TotalTime = totalTime;
-            this.HumanName = humanName;
+            this.PersonId = personId;
         }
-        public int LapId { get; set; }
-        public int TagId { get; set; }
-        public int EventId { get; set; }
+        public long LapId { get; set; }
+        public long TagId { get; set; }
+        public long EventId { get; set; }
         public uint LapCount { get; set; }
         public ulong LapTime { get; set; }
         public ulong TotalTime { get; set; }
-        public string HumanName { get; set; }
+        public long PersonId { get; set; }
     }
 
     internal class DbLapFactory : IDbRowItem<DbLap>
@@ -41,34 +41,28 @@ namespace TrailMeisterDb
                             Convert.ToUInt32(reader["LapCount"]),
                             Convert.ToUInt64(reader["LapTime"]),
                             Convert.ToUInt64(reader["TotalTime"]),
-                            (string)reader["HumanName"]);
+                            Convert.ToInt32(reader["PersonId"]));
         }
     }
     public class DbLapsTable: DbTable<DbLap>
     {
         public DbLapsTable() : base("laps", new DbLapFactory()) { }
 
-        //public List<DbLap> getLapsForRacer(string epc)
-        //{
 
-        //}
-        //public List<DbLap> getLapsForRacer(int tagId)
-        //{
-
-        //}
-        //public List<DbLap> getEventLapsForRacer(string epc)
-        //{
-
-        //}
-
-        public List<DbLap>? getEventLapsForRacer(int tagId)
+        public List<DbLap>? getEventLapsForEvent(long eventId)
         {
-            Hashtable queryParams = new Hashtable() { { "tagId", tagId } };
+            Hashtable queryParams = new Hashtable() { { "eventId", eventId } };
 
             return base.getRowItems(queryParams);
         }
 
-        public void addLap(int tagId, long eventId, uint lapCount, ulong lapTime, ulong totalTime, string humanName)
+        public List<DbLap>? getEventLapsForRacer(long tagId, long eventId)
+        {
+            Hashtable queryParams = new Hashtable() { { "tagId", tagId }, { "eventId", eventId } };
+
+            return base.getRowItems(queryParams);
+        }
+        public void addLap(int tagId, long eventId, uint lapCount, ulong lapTime, ulong totalTime, long? personId)
         {
             Hashtable columnData = new Hashtable() {
                 { "tagId", tagId },
@@ -76,7 +70,7 @@ namespace TrailMeisterDb
                 {"LapCount", lapCount },
                 {"LapTime", lapTime },
                 {"TotalTime", totalTime },
-                {"HumanName", humanName }
+                {"PersonId", personId }
             };
             base.addRow(columnData);
         }

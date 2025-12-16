@@ -55,10 +55,12 @@ namespace TrailMeisterDb
 
         protected void ExecuteSQL(string sSQL)
         {
-            MySqlCommand cmdDate = new MySqlCommand(" SET DATEFORMAT dmy", _conn, _transaction);
-            cmdDate.ExecuteNonQuery();
+            openConnection();
+
             MySqlCommand cmd = new MySqlCommand(sSQL, _conn, _transaction);
             cmd.ExecuteNonQuery();
+
+            closeConnection();
         }
 
         protected void OnlyExecuteSQL(string sSQL)

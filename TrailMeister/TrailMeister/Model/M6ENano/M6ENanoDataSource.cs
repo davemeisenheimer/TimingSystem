@@ -12,16 +12,16 @@ using System.IO;
 using System.IO.Ports;
 using System.Management;
 using ThingMagic;
-using TrailMeister.Model.Helpers;
+using TrailMeisterUtilities;
 
 namespace TrailMeister.Model.M6ENano
 {
-    internal class M6ENanoDataSource : Helpers.Disposable, ITagDataSourceConfigurable
+    internal class M6ENanoDataSource : TrailMeisterUtilities.Disposable, ITagDataSourceConfigurable
     {
         private delegate void ReaderDataItemStateChangeEventHandler(ReaderDataItem sender, TagStateChangedEventArgs eventArgs);
         private M6ENanoConfig _config;
 
-        private class ReaderDataItem: Helpers.Disposable
+        private class ReaderDataItem: TrailMeisterUtilities.Disposable
         {
             internal event ReaderDataItemStateChangeEventHandler? ReaderDataItemChangeEvent;
 

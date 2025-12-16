@@ -72,6 +72,10 @@ namespace TrailMeisterDb
                 {
                     queryParams += " AND ";
                 }
+                else
+                {
+                    queryParams = " where ";
+                }
 
                 queryParams += param.Key + " = '" + param.Value + "'";
                 paramCount++;
@@ -82,7 +86,7 @@ namespace TrailMeisterDb
                 openConnection();
                 MySqlDataReader? conReader;
                 conReader = null;
-                cmd.CommandText = "Select * from " + tableName + " where " + queryParams;
+                cmd.CommandText = "Select * from " + tableName + queryParams;
                 cmd.Connection = _conn;
                 cmd.Transaction = _transaction;
                 cmd.CommandType = CommandType.Text;
@@ -131,6 +135,9 @@ namespace TrailMeisterDb
                 if (paramCount > 1)
                 {
                     queryParams += " AND ";
+                } else
+                {
+                    queryParams = " where ";
                 }
 
                 queryParams += param.Key + " = " + param.Value;
@@ -142,7 +149,7 @@ namespace TrailMeisterDb
                 openConnection();
                 MySqlDataReader? conReader;
                 conReader = null;
-                cmd.CommandText = "Select * from " + tableName + " where " + queryParams;
+                cmd.CommandText = "Select * from " + tableName + queryParams;
                 cmd.Connection = _conn;
                 cmd.Transaction = _transaction;
                 cmd.CommandType = CommandType.Text;
@@ -203,9 +210,9 @@ namespace TrailMeisterDb
             ExecuteSQL(sSQL);
         }
 
-        public void DeleteRecord(string tblName, string values)
+        public void DeleteRecord(string tblName, long id)
         {
-            string sSQL = "DELETE FROM " + tblName + " " + values;
+            string sSQL = "DELETE FROM " + tblName + " WHERE id = " + id.ToString();
             ExecuteSQL(sSQL);
         }
 

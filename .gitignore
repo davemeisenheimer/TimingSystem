@@ -6,3 +6,7 @@ TrailMeister/UpgradeLog*.htm
 TrailMeister/.vs/*
 SkiTime-RaceReader/.vscode
 build/*
+TrailMeister/TrailMeisterViewer/obj/
+TrailMeister/TrailMeisterViewer/bin/
+TrailMeister/TrailMeisterUtilities/obj/
+TrailMeister/TrailMeisterUtilities/bin/

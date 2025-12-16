@@ -4,10 +4,12 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:TrailMeister.GUI.Main"
+      xmlns:converters="clr-namespace:TrailMeisterUtilities.Converters;assembly=TrailMeisterUtilities"
       xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
       mc:Ignorable="d" 
       d:DesignHeight="800" d:DesignWidth="1200"
       Title="All Data">
+    
     <Page.Resources>
         <CollectionViewSource x:Key="cvsData" Source="{Binding AllParticipants}">
             <CollectionViewSource.SortDescriptions>
@@ -16,16 +18,33 @@
                 <scm:SortDescription PropertyName="TimeTotal" Direction="Ascending" />
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
+        <converters:Tag2PersonConverter x:Key="Tag2PersonConverter"/>
     </Page.Resources>
 
-    <Grid>
-        <DataGrid x:Name="DataGridRecentLaps" ItemsSource="{Binding Source={StaticResource cvsData}}" AutoGenerateColumns="False" CanUserAddRows="False" GridLinesVisibility="All" IsSynchronizedWithCurrentItem="False" FontSize="24">
+    <Grid Margin="16 16 16 16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <DataGrid x:Name="DataGridRecentLaps" ItemsSource="{Binding Source={StaticResource cvsData}}" 
+                  AutoGenerateColumns="False" CanUserAddRows="False" 
+                  Grid.Row= "0" GridLinesVisibility="All" 
+                  IsSynchronizedWithCurrentItem="False" FontSize="24">
 
             <DataGrid.CellStyle>
                 <Style/>
             </DataGrid.CellStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn x:Name="colName" FontSize="48" CanUserResize="False" Width="4*" Header="Name" Binding="{Binding Name}" MinWidth="450">
+
+                <DataGridTextColumn x:Name="colName" FontSize="48" CanUserResize="False" Width="4*" Header="Name" MinWidth="450">
+                    <DataGridTextColumn.Binding>
+                        <MultiBinding Converter="{StaticResource Tag2PersonConverter}">
+                            <Binding Path="PersonId"/>
+                            <Binding Path="DataContext.AllPeople" RelativeSource="{RelativeSource AncestorType=DataGrid}"/>
+                            <Binding Source="{x:Static converters:NameConversionType.First}" />
+                        </MultiBinding>
+                    </DataGridTextColumn.Binding>
 
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
@@ -33,6 +52,8 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+                
+                
                 <DataGridTextColumn x:Name="colLapCount" Width="1*" Header="Lap" Binding="{Binding LapCount}" FontSize="48" MinWidth="50" >
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
@@ -40,6 +61,7 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+                
                 <DataGridTextColumn x:Name="colLapTime" CanUserResize="False" Width="3" Header="Lap Time" Binding="{Binding TimeLap}" FontSize="48" MinWidth="300">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
@@ -48,8 +70,8 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn x:Name="colTotalTime" CanUserResize="False" Width="4*" Header="Total Time" Binding="{Binding TimeTotal}" FontSize="48" MinWidth="350">
-
+                
+                <DataGridTextColumn x:Name="colAvgLapTime" CanUserResize="False" Width="3" Header="Avg Lap Time" Binding="{Binding AverageLapTime}" FontSize="48" MinWidth="300">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Right" />
@@ -57,8 +79,19 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+                <DataGridTextColumn x:Name="colTotalTime" CanUserResize="False" Width="3" Header="Total Time" Binding="{Binding TimeTotal}" FontSize="48" MinWidth="300">
+
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                            <Setter Property="Padding" Value="5, 5" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
-        
+
+        <CheckBox x:Name="EventFinish" 
+                  Content="Event now finished" IsChecked="{Binding IsEventFinished}" />
     </Grid>
 </Page>

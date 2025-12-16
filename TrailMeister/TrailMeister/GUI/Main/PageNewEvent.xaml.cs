@@ -30,10 +30,10 @@ namespace TrailMeister.GUI.Main
 
         private void gridParticipants_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
-            {
-                _nextPageDelegate();
-            }
+            //if (e.Key == Key.Enter)
+            //{
+            //    _nextPageDelegate();
+            //}
         }
 
         private void btnDone_Click(object sender, RoutedEventArgs e)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TrailMeister.Model.Helpers;
+using TrailMeisterUtilities;
 
 namespace TrailMeister.Model.M6ENano
 {
@@ -49,10 +49,11 @@ namespace TrailMeister.Model.M6ENano
     internal class TagStateMachine : Disposable
     {
         internal event TagStateChangeEventHandler? TagStateChangeEvent;
-
+        private const int DelaySent = 30000;
+        //private const int DelaySent = 5000; // Use for testing
         static TagLapState StateDetect = new TagLapState(LapState.DETECT, 0);
         static TagLapState StateGathering = new TagLapState(LapState.GATHERING, 250);
-        static TagLapState StateSent = new TagLapState(LapState.SENT, 30000);
+        static TagLapState StateSent = new TagLapState(LapState.SENT, DelaySent);
 
         private TagLapState _currentState;
         private Timers _nextStateTimeout;

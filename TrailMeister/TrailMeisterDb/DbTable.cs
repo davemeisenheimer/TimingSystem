@@ -67,5 +67,10 @@ namespace TrailMeisterDb
         {
             return dbProcess.getRowItems<DbItemType>(_tableName, searchParams, _factory);
         }
+
+        protected void deleteRow(long id)
+        {
+            dbProcess.DeleteRecord(_tableName, id);
+        }
     }
 }

@@ -1,0 +1,6 @@
+C:\Users\davem\repo\TimingSystem\TimingSystem\TrailMeister\ThreeCornerUtilities\obj\Debug\ThreeCornerUtilities.csproj.AssemblyReference.cache
+C:\Users\davem\repo\TimingSystem\TimingSystem\TrailMeister\ThreeCornerUtilities\obj\Debug\ThreeCornerUtilities.csproj.CoreCompileInputs.cache
+C:\Users\davem\repo\TimingSystem\TimingSystem\TrailMeister\ThreeCornerUtilities\bin\Debug\ThreeCornerUtilities.dll
+C:\Users\davem\repo\TimingSystem\TimingSystem\TrailMeister\ThreeCornerUtilities\bin\Debug\ThreeCornerUtilities.pdb
+C:\Users\davem\repo\TimingSystem\TimingSystem\TrailMeister\ThreeCornerUtilities\obj\Debug\ThreeCornerUtilities.dll
+C:\Users\davem\repo\TimingSystem\TimingSystem\TrailMeister\ThreeCornerUtilities\obj\Debug\ThreeCornerUtilities.pdb

@@ -60,7 +60,7 @@ namespace TrailMeisterViewer
 
             if (dlgController.ShowDialog(out var person))
             {
-                long newId = this._dbPeopleTable.addPerson(person.FirstName, person.LastName, person.Association);
+                long newId = this._dbPeopleTable.addPerson(person.FirstName, person.LastName, person.NickName, person.Association);
                 DbPerson dbPerson = _dbPeopleTable.getPerson(newId);
                 this.AddPerson(dbPerson);
             }

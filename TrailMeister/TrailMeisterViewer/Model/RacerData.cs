@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using TrailMeisterDb;
 using TrailMeisterUtilities.Converters;
 
-namespace TrailMeisterViewer.Windows.EventViewer
+namespace TrailMeisterViewer.Model
 {
     public class RacerData
     {
@@ -16,11 +16,13 @@ namespace TrailMeisterViewer.Windows.EventViewer
         internal RacerData(DbPerson person, List<DbLap> eventLaps)
         {
             this.Person = person;
-            this.EventLaps = eventLaps;
+            this.Laps = eventLaps;
             this.PersonId = person.PersonId;
         }
 
-        public List<DbLap> EventLaps { get; set; }
+        // Laps is a collection that can store laps for multiple contexts:
+        //  e.g. could be for a given event, a given season, or all time
+        public List<DbLap> Laps { get; set; }
 
         public DbPerson Person { get; set; }
 
@@ -30,7 +32,7 @@ namespace TrailMeisterViewer.Windows.EventViewer
         {
             get
             {
-                return (String)laps2TimeConverter.Convert(new object[] { TimeConversionType.BestLap, EventLaps }, typeof(object), null, CultureInfo.CurrentCulture);
+                return (String)laps2TimeConverter.Convert(new object[] { TimeConversionType.BestLap, Laps }, typeof(object), null, CultureInfo.CurrentCulture);
             }
         }
 
@@ -38,7 +40,7 @@ namespace TrailMeisterViewer.Windows.EventViewer
         {
             get
             {
-                return (String)laps2TimeConverter.Convert(new object[] { TimeConversionType.TotalTime, EventLaps }, typeof(object), null, CultureInfo.CurrentCulture);
+                return (String)laps2TimeConverter.Convert(new object[] { TimeConversionType.TotalTime, Laps }, typeof(object), null, CultureInfo.CurrentCulture);
             }
         }
 
@@ -46,7 +48,7 @@ namespace TrailMeisterViewer.Windows.EventViewer
         {
             get
             {
-                return (String)laps2TimeConverter.Convert(new object[] { TimeConversionType.AverageLap, EventLaps }, typeof(object), null, CultureInfo.CurrentCulture);
+                return (String)laps2TimeConverter.Convert(new object[] { TimeConversionType.AverageLap, Laps }, typeof(object), null, CultureInfo.CurrentCulture);
             }
         }
     }

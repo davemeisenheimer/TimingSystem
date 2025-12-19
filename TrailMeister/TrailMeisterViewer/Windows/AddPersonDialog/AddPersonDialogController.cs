@@ -20,6 +20,7 @@ namespace TrailMeisterViewer.Windows.AddPersonDialog
                 result = new Person(
                     vm.FirstName,
                     vm.LastName,
+                    vm.NickName,
                     vm.Association
                 );
                 return true;

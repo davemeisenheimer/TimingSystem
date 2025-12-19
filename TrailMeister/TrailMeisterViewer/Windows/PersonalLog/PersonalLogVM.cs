@@ -5,16 +5,16 @@ using TrailMeisterUtilities;
 using TrailMeisterDb;
 using TrailMeisterViewer.Model;
 
-namespace TrailMeisterViewer.Windows.EventViewer
+namespace TrailMeisterViewer.Windows.PersonalLog
 {
-    public class EventViewerVM : ViewModelBase
+    public class PersonalLogVM : ViewModelBase
     {
         private ObservableKeyedCollection<int, RacerData> _allRacerData = new ObservableKeyedCollection<int, RacerData>(null, "PersonId");
-        private EventViewerController controller;
+        private PersonalLogController controller;
 
-        public EventViewerVM(EventViewerController c, DbEvent dbEvent)
+        public PersonalLogVM(PersonalLogController c, DbPerson dbPerson)
         {
-            Event = dbEvent;
+            Person = dbPerson;
             controller = c;
             ExportHtmlCommand = new ButtonCommand(ExecuteExportHtml, CanExecuteExportHtml);
         }
@@ -29,7 +29,7 @@ namespace TrailMeisterViewer.Windows.EventViewer
             controller.ExportHtml();
         }
 
-        public DbEvent Event { get; private set; }
+        public DbPerson Person { get; private set; }
 
         public ObservableKeyedCollection<int, RacerData> AllRacerData
         {

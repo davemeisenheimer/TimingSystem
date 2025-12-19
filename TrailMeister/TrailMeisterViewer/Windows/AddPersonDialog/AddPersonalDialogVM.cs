@@ -9,6 +9,7 @@ namespace TrailMeisterViewer.Windows.AddPersonDialog
     {
         private string _firstName;
         private string _lastName;
+        private string _nickName;
         private string _association;
 
         public AddPersonDialogVM()
@@ -27,6 +28,12 @@ namespace TrailMeisterViewer.Windows.AddPersonDialog
         {
             get => _lastName;
             set => SetProperty(ref _lastName, value);
+        }
+
+        public string NickName
+        {
+            get => _nickName;
+            set => SetProperty(ref _nickName, value);
         }
 
         public string Association

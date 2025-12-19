@@ -35,7 +35,7 @@ namespace TrailMeister.GUI.Main
             //this._vm.PropertyChanged += OnViewModelPropertyChanged;
 
             // Save default event name
-            this._eventId = _dbEventsTable.addEvent(this._vm.EventName);
+            this._eventId = _dbEventsTable.addEvent(this._vm.EventName, 800);
 
             _tagReader.TagDataSourceEvent += this.OnTagDataSourceEvent;
             this._vm.ReaderStatus = ReaderStatus.Disconnected;
@@ -260,13 +260,14 @@ namespace TrailMeister.GUI.Main
         public virtual void StartEvent()
         {
             SetAntennaPower();
-            _dbEventsTable.updateEvent(this._eventId, this._vm.EventName);
+            _dbEventsTable.updateEvent(this._eventId, this._vm.EventName, 800);
             _vm.EventStarted = true;
         }
 
         public virtual void OnFinishEvent()
         {
-            _dbEventsTable.updateEvent(this._eventId, this._vm.EventName, this._vm.IsEventFinished);
+            DbEvent dbEvent = _dbEventsTable.getEvent((uint)this._eventId);
+            _dbEventsTable.updateEvent(this._eventId, this._vm.EventName, dbEvent.LapLength, this._vm.IsEventFinished);
         }
 
         internal void SetAntennaPower()

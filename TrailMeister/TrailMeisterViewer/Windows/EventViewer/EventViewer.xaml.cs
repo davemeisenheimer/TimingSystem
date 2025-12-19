@@ -2,6 +2,8 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using TrailMeisterDb;
+using TrailMeisterViewer.Model;
+using TrailMeisterViewer.Windows.PersonalLog;
 
 namespace TrailMeisterViewer.Windows.EventViewer
 {
@@ -15,10 +17,10 @@ namespace TrailMeisterViewer.Windows.EventViewer
         private void OnRacerRowDoubleClick(object sender, RoutedEventArgs e)
         {
             var row = (DataGridRow)sender;
-            DbEvent dbEvent = (DbEvent)(row.Item);
-            // Currently a noop here, but could do something, if we want to
-            // Originally planned to open another window with laps summary for this racer, but 
-            // we're using a tooltip instead, for the time being.
+            RacerData racerData = (RacerData)(row.Item);
+
+            PersonalLogController logController = new PersonalLogController(racerData.Person);
+            logController.ShowWindow();
         }
     }
 }

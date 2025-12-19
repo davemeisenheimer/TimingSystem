@@ -62,6 +62,13 @@ namespace TrailMeisterDb
 
             return base.getRowItems(queryParams);
         }
+
+        public List<DbLap>? getAllLapsForRacer(long personId)
+        {
+            Hashtable queryParams = new Hashtable() { { "PersonId", personId } };
+
+            return base.getRowItems(queryParams);
+        }
         public void addLap(int tagId, long eventId, uint lapCount, ulong lapTime, ulong totalTime, long? personId)
         {
             Hashtable columnData = new Hashtable() {

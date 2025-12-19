@@ -10,9 +10,13 @@
   <ItemGroup>
     <None Remove="Assets\TrashIcon.png" />
     <None Remove="Windows\EventViewer\Event.xslt" />
+    <None Remove="Windows\PersonalLog\Log.xslt" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Windows\PersonalLog\Log.xslt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Windows\EventViewer\Event.xslt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

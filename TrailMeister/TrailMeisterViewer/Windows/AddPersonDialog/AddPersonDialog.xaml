@@ -3,12 +3,13 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Person Information" 
-        Height="200" Width="350"
+        Height="209" Width="350"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -26,10 +27,13 @@
         <TextBlock Text="Last Name:" Grid.Row="1" VerticalAlignment="Center"/>
         <TextBox Text="{Binding LastName}" Grid.Row="1" Grid.Column="1" Margin="5"/>
 
-        <TextBlock Text="Association:" Grid.Row="2" VerticalAlignment="Center"/>
-        <TextBox Text="{Binding Association}" Grid.Row="2" Grid.Column="1" Margin="5"/>
+        <TextBlock Text="NickName:" Grid.Row="2" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding NickName}" Grid.Row="2" Grid.Column="1" Margin="5"/>
 
-        <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+        <TextBlock Text="Association:" Grid.Row="3" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding Association}" Grid.Row="3" Grid.Column="1" Margin="5"/>
+
+        <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
             <Button Content="OK" Width="70" Margin="5"
                     Command="{Binding OkCommand}"
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"

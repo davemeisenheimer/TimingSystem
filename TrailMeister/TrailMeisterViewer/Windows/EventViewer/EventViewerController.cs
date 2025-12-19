@@ -1,10 +1,10 @@
 ﻿using System.Windows;
 using System.Collections.Generic;
 using System.Linq;
+using System.ComponentModel;
 
 using TrailMeisterDb;
-using System;
-using System.ComponentModel;
+using TrailMeisterViewer.Model;
 
 namespace TrailMeisterViewer.Windows.EventViewer
 {
@@ -25,7 +25,7 @@ namespace TrailMeisterViewer.Windows.EventViewer
 
         private void OnEventNameChanged(object? sender, PropertyChangedEventArgs e)
         {
-            this._dbEventsTable.updateEvent(_event.ID, _event.EventName);
+            this._dbEventsTable.updateEvent(_event.ID, _event.EventName, _event.LapLength);
         }
 
         public void ShowWindow()

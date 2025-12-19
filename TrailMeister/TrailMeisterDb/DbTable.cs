@@ -65,7 +65,7 @@ namespace TrailMeisterDb
 
         protected List<DbItemType>? getRowItems(Hashtable searchParams)
         {
-            return dbProcess.getRowItems<DbItemType>(_tableName, searchParams, _factory);
+             return dbProcess.getRowItems<DbItemType>(_tableName, searchParams, _factory);
         }
 
         protected void deleteRow(long id)

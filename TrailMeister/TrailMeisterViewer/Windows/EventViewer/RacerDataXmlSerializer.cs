@@ -6,6 +6,7 @@ using System.Xml.Xsl;
 using System.Xml.Linq;
 using System.Linq;
 using TrailMeisterDb;
+using TrailMeisterViewer.Model;
 
 namespace TrailMeisterViewer.Windows.EventViewer
 {
@@ -43,7 +44,7 @@ namespace TrailMeisterViewer.Windows.EventViewer
                                             new XElement("NickName", r.Person.NickName),
                                             new XElement("Association", r.Person.Association),
                                             new XElement("EventLaps",
-                                                r.EventLaps.Select(lap => new XElement("Lap",
+                                                r.Laps.Select(lap => new XElement("Lap",
                                                     new XElement("LapNumber", lap.LapCount),
                                                     new XElement("LapTime", lap.LapTime)
                                                 ))
@@ -60,8 +61,9 @@ namespace TrailMeisterViewer.Windows.EventViewer
                 doc, 
                 xsltPath, 
                 Path.Combine(
-                    @"C:\Users\davem\",
-                    ev.EventName + "_" + htmlFileName));
+                    @"C:\Users\davem\SkiTrailData\",
+                    ev.EventName,
+                    htmlFileName));
         }
 
         private static void TransformXmlToHtml(XDocument xmlDoc, string xsltPath, string outputHtmlPath)

@@ -130,11 +130,12 @@ namespace TrailMeisterDb
             return person;
         }
 
-        public long addPerson(string firstName, string lastName, string association)
+        public long addPerson(string firstName, string lastName, string nickName, string association)
         {
             Hashtable columnData = new Hashtable() {
                 { "firstName", firstName},
                 {"lastName", lastName },
+                {"nickName", nickName },
                 {"association", association }
             };
             return base.addRow(columnData);

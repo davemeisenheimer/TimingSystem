@@ -56,6 +56,15 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
 
+                            <DataGridTextColumn x:Name="colLapLength" Width="4*" Header="Event Date" Binding="{Binding LapLength}" MinWidth="300" >
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Right" />
+                                        <Setter Property="Padding" Value="8 0 8 0" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
                             <DataGridTemplateColumn x:Name="colDeleteButton" Width="4*" Header="" IsReadOnly="false" MinWidth="48">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -136,7 +145,8 @@
                                         <TextBox 
                                             x:Name="tbAssociation" 
                                             FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" 
-                                            Text="{Binding Association, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" BorderThickness="0" Margin="8,0,8,0"  >
+                                            Text="{Binding Association, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
+                                            BorderThickness="0" Margin="8,0,8,0"  >
                                         </TextBox>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>

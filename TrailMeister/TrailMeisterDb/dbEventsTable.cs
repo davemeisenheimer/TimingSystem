@@ -13,10 +13,12 @@ namespace TrailMeisterDb
     public class DbEvent : IDbRowItem<DbEvent>
     {
         private string _eventName;
-        internal DbEvent(int id, string name, DateTime date)
+        private int _lapLength;
+        internal DbEvent(int id, string name, int lapLength, DateTime date)
         {
             this.ID = id;
             this.EventName = name;
+            this.LapLength = lapLength;
             this.EventDate = date;
         }
         public int ID { get; set; }
@@ -35,6 +37,21 @@ namespace TrailMeisterDb
                 }
             }
         }
+        public int LapLength
+        {
+            get
+            {
+                return this._lapLength;
+            }
+            set
+            {
+                if (this._lapLength != value)
+                {
+                    this._lapLength = value;
+                    OnPropertyChanged(nameof(LapLength));
+                }
+            }
+        }
         public DateTime EventDate { get; set; } 
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -50,6 +67,7 @@ namespace TrailMeisterDb
             return new DbEvent(
                                Convert.ToInt32(reader["id"]),
                                (string)reader["EventName"],
+                               (int)reader["LapLength"],
                                (DateTime)reader["EventDate"]);
         }
     }
@@ -61,6 +79,7 @@ namespace TrailMeisterDb
             return new DbEvent(
                                Convert.ToInt32(reader["id"]),
                                (string)reader["EventName"],
+                               (int)reader["LapLength"],
                                (DateTime)reader["EventDate"]);
         }
     }
@@ -83,10 +102,11 @@ namespace TrailMeisterDb
             return base.getRowItems(queryParams);
         }
 
-        public long addEvent(string eventName)
+        public long addEvent(string eventName, int lapLength)
         {
             Hashtable columnData = new Hashtable() {
                 { "EventName", eventName },
+                { "LapLength", lapLength },
                 {"EventDate", DateOnly.FromDateTime(DateTime.Today).ToString("yyyy/MM/dd") }
             };
             return base.addRow(columnData);
@@ -96,9 +116,10 @@ namespace TrailMeisterDb
             base.deleteRow(eventId);
         }
 
-        public void updateEvent(long eventId, string eventName, bool isFinished = false)
+        public void updateEvent(long eventId, string eventName, int lapLength, bool isFinished = false)
         {
             base.updateColumnValue(eventId, "EventName", eventName);
+            base.updateColumnValue(eventId, "LapLength", lapLength.ToString());
             base.updateColumnValue(eventId, "EventFinished", isFinished ? "1" : "0");
         }
     }

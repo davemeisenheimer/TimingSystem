@@ -87,6 +87,21 @@ namespace TrailMeisterViewer
             return !lapsForEvent.Any();
         }
 
+        internal bool GetAreDeletableEvents()
+        {
+            bool returnVal = false;
+            List<DbEvent> events = _dbEventsTable.getEvents();
+
+            foreach(DbEvent e in events)
+            {
+                List<DbLap>? lapsForEvent = this._dbLapsTable.getEventLapsForEvent(e.ID);
+                returnVal = lapsForEvent.Any();
+                if (returnVal) break;
+            }
+
+            return returnVal;
+        }
+
         private void AddTag(DbTag tag)
         {
             if (!_vm.AllTags.TryGetValue(tag.TagId, out _))

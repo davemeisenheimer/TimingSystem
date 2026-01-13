@@ -11,7 +11,9 @@
 
     <Window.Resources>
         <converters:CanDeleteEventToVisibilityConverter x:Key="CanDeleteEventToVisibilityConverter"/>
+        <convertersUtils:Bool2VisibilityConverter x:Key="Bool2VisibilityConverter"/>
         <convertersUtils:Tag2PersonConverter x:Key="Tag2PersonConverter"/>
+        
     </Window.Resources>
     
     <Grid>
@@ -23,6 +25,11 @@
                               IsSynchronizedWithCurrentItem="False"
                               FontSize="24" AutoGenerateColumns="False" GridLinesVisibility="All" HorizontalAlignment="Stretch"
                               CanUserAddRows="False" >
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
                         <DataGrid.RowStyle>
                             <Style TargetType="DataGridRow">
                                 <EventSetter Event="MouseDoubleClick" Handler="OnEventRowDoubleClick"/>
@@ -38,7 +45,7 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
 
-                            <DataGridTextColumn x:Name="colName" CanUserResize="False" Width="4*" Header="Event Name" Binding="{Binding EventName}" IsReadOnly="true" MinWidth="50">
+                            <DataGridTextColumn x:Name="colName" CanUserResize="False" Width="10*" Header="Event Name" Binding="{Binding EventName}" IsReadOnly="true" MinWidth="200">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="HorizontalAlignment" Value="Right" />
@@ -56,7 +63,7 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
 
-                            <DataGridTextColumn x:Name="colLapLength" Width="4*" Header="Event Date" Binding="{Binding LapLength}" MinWidth="300" >
+                            <DataGridTextColumn x:Name="colLapLength" Width="1*" Header="Lap Length" Binding="{Binding LapLength}" MinWidth="150" >
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="HorizontalAlignment" Value="Right" />
@@ -65,7 +72,12 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
 
-                            <DataGridTemplateColumn x:Name="colDeleteButton" Width="4*" Header="" IsReadOnly="false" MinWidth="48">
+                            <DataGridTemplateColumn x:Name="colDeleteButton" Width="1*" Header="" IsReadOnly="false" MinWidth="48">
+                                <DataGridTemplateColumn.Visibility>
+                                    <Binding Path="DataContext.DeleteColumnIsVisible"
+                                             Converter="{StaticResource Bool2VisibilityConverter}"
+                                             RelativeSource="{RelativeSource AncestorType=DataGrid}"/>
+                                </DataGridTemplateColumn.Visibility>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Width="24" Height="24" Padding="0" BorderThickness="0" Background="Transparent"
@@ -98,6 +110,7 @@
                               ItemsSource="{Binding DataContext.AllPeople, ElementName=gridPeople}" 
                               IsSynchronizedWithCurrentItem="False"
                               FontSize="24" AutoGenerateColumns="False" GridLinesVisibility="All" HorizontalAlignment="Stretch"
+                              CanUserSortColumns="True"
                               CanUserAddRows="False" >
                         <DataGrid.Columns>
                             <DataGridTextColumn x:Name="colPeopleID" CanUserResize="False" Width="1*" Header="ID" Binding="{Binding PersonId}" IsReadOnly="true" MinWidth="50">
@@ -109,7 +122,8 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
 
-                            <DataGridTemplateColumn x:Name="colPeopleFirstName" Width="4*" Header="First Name" IsReadOnly="false" MinWidth="300">
+                            <DataGridTemplateColumn x:Name="colPeopleFirstName" Width="4*" Header="First Name" IsReadOnly="false" MinWidth="300"
+                                SortMemberPath="FirstName">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBox x:Name="tbFirstNameEdit" FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" Text="{Binding FirstName, Mode=TwoWay,
@@ -119,7 +133,9 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTemplateColumn x:Name="colPeopleLastName" Width="4*" Header="Last Name" IsReadOnly="false" MinWidth="300">
+                            <DataGridTemplateColumn 
+                                x:Name="colPeopleLastName" Width="4*" Header="Last Name" IsReadOnly="false" MinWidth="300"
+                                SortMemberPath="LastName">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBox x:Name="tbLastNameEdit" FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" Text="{Binding LastName, Mode=TwoWay,
@@ -129,7 +145,8 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTemplateColumn x:Name="colPeopleNickName" Width="4*" Header="Nickname" IsReadOnly="false" MinWidth="300">
+                            <DataGridTemplateColumn x:Name="colPeopleNickName" Width="4*" Header="Nickname" IsReadOnly="false" MinWidth="300"
+                                SortMemberPath="NickName">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBox x:Name="tbNickNameEdit" FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" Text="{Binding NickName, Mode=TwoWay,
@@ -139,7 +156,8 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTemplateColumn x:Name="colPeopleAssociation" Width="4*" Header="Association" IsReadOnly="false" MinWidth="300">
+                            <DataGridTemplateColumn x:Name="colPeopleAssociation" Width="4*" Header="Association" IsReadOnly="false" MinWidth="300"
+                                SortMemberPath="Association">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBox 

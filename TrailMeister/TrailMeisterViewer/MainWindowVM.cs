@@ -32,6 +32,13 @@ namespace TrailMeisterViewer
         public ICommand ButtonCommand_AddPerson { get; set; }
         public ICommand DeleteEventCommand { get; set; }
 
+        public bool DeleteColumnIsVisible { 
+            get
+            {
+                return _controller.GetAreDeletableEvents();
+            }                
+        }
+
         public ObservableKeyedCollection<int, DbTag> AllTags
         {
             get

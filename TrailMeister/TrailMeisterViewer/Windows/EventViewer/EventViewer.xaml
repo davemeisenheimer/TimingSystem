@@ -11,6 +11,7 @@
         <converters:Person2NameConverter x:Key="Person2NameConverter"/>
         <converters:Laps2TimeConverter x:Key="Laps2TimeConverter"/>
         <converters:Ms2TimeConverter x:Key="Ms2TimeConverter"/>
+        <converters:Laps2DistanceConverter x:Key="Laps2DistanceConverter"/>
 
         <DataTemplate x:Key="RacerLapsTooltipTemplate">
             <Border Background="LightYellow" Padding="5" CornerRadius="4">
@@ -68,6 +69,7 @@
                   ItemsSource="{Binding AllRacerData}" 
                   IsSynchronizedWithCurrentItem="False"
                   FontSize="24" AutoGenerateColumns="False" GridLinesVisibility="All" HorizontalAlignment="Stretch"
+                  CanUserSortColumns="True"
                   CanUserAddRows="False" >
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
@@ -80,7 +82,8 @@
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn x:Name="colName" CanUserResize="False" Width="1*" Header="Name" IsReadOnly="true" MinWidth="50">
+                <DataGridTextColumn x:Name="colName" CanUserResize="False" Width="1*" Header="Name" IsReadOnly="true" MinWidth="50"
+                                SortMemberPath="Person.FirstName">
                     <DataGridTextColumn.Binding>
                         <MultiBinding Converter="{StaticResource Person2NameConverter}">
                             <Binding Source="{x:Static converters:NameConversionType.FirstAndLast}" />
@@ -98,7 +101,24 @@
                 <DataGridTextColumn 
                     x:Name="colLaps" CanUserResize="False" 
                     Width="1*" Header="Total Laps" IsReadOnly="true" MinWidth="50"
-                    Binding="{Binding Laps.Count}">
+                    Binding="{Binding Laps.Count}"
+                    SortMemberPath="Laps.Count">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                            <Setter Property="Padding" Value="8 0 8 0" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn 
+                    x:Name="colDistance" CanUserResize="False" 
+                    Width="1*" Header="Total Distance" IsReadOnly="true" MinWidth="50">
+                    <DataGridTextColumn.Binding>
+                        <MultiBinding Converter="{StaticResource Laps2DistanceConverter}">
+                            <Binding Path="Laps" />
+                        </MultiBinding>
+                    </DataGridTextColumn.Binding>
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Right" />

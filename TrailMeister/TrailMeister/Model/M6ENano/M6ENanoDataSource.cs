@@ -66,12 +66,13 @@ namespace TrailMeister.Model.M6ENano
                         break;
                 
                     case LapState.GATHERING:
-                        if (data.Rssi > Data.Rssi)
+                        if (data.Rssi >= Data.Rssi)
                         {
                             _tagStateMachine.DeferNextStateChange();
                         } else
                         {
                             // We're done!
+                            data.Rssi = 0;
                             _tagStateMachine.MoveToNextState(); // Eventing will take it from here
                         }
                         break;

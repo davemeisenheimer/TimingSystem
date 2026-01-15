@@ -52,8 +52,8 @@ namespace TrailMeister.Model.M6ENano
         private const int DelaySent = 30000;
         //private const int DelaySent = 5000; // Use for testing
         static TagLapState StateDetect = new TagLapState(LapState.DETECT, 0);
-        static TagLapState StateGathering = new TagLapState(LapState.GATHERING, 250);
-        static TagLapState StateSent = new TagLapState(LapState.SENT, DelaySent);
+        static TagLapState StateGathering = new TagLapState(LapState.GATHERING, 1);
+        static TagLapState StateSent = new TagLapState(LapState.SENT, DelaySent);   
 
         private TagLapState _currentState;
         private Timers _nextStateTimeout;
@@ -73,9 +73,9 @@ namespace TrailMeister.Model.M6ENano
 
 
         // There are 2 ways to move to the next state:
-        // 1. While in DETECT state, the move to GATHERING is effect by calling moveToNextState directly from the datasource
+        // 1. While in DETECT state, the move to GATHERING is effected by calling moveToNextState directly from the datasource
         //    on account of a tag having been detected
-        // 2. For other states, it happens on the timeout we set up in here on account of a tag NOT being detect for some
+        // 2. For other states, it happens on the timeout we set up in here on account of a tag NOT being detectable for some
         //    configurable amount of time.
         internal void DeferNextStateChange()
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -72,7 +73,21 @@ namespace TrailMeisterViewer
 
             // Don't allow removal of events that have lap data
             List<DbLap>? lapsForEvent = this._dbLapsTable.getEventLapsForEvent(eventId);
-            if (lapsForEvent.Any()) return;
+            if (lapsForEvent.Any())
+            {
+                MessageBoxResult result = MessageBox.Show(
+                    "This event has racer data associated with it. Do you really want to delete this event and all its data?", 
+                    "Delete Event", 
+                    MessageBoxButton.YesNo, 
+                    MessageBoxImage.Question);
+
+                // 4. Handling the result
+                if (result == MessageBoxResult.No)
+                {
+                    return;
+                }
+                this._dbLapsTable.deleteEventLapsForEvent(eventId);
+            }
 
             this._vm.AllEvents.Remove(this._vm.AllEvents.FirstOrDefault(x => x.ID == eventId));
             this._dbEventsTable.deleteEvent(eventId);
@@ -80,11 +95,17 @@ namespace TrailMeisterViewer
 
         internal bool CanExecuteDeleteEvent(object commandParameter)
         {
-            long eventId = Convert.ToInt64(commandParameter);
+            uint eventId = Convert.ToUInt32(commandParameter);
+            DbEvent dbEvent = this._dbEventsTable.getEvent(eventId);
+            bool canExecute = dbEvent != null && !dbEvent.EventFinished;
+            bool eventFinished = dbEvent != null && dbEvent.EventFinished;
+            Debug.WriteLine("DAVEM: eventId: " + eventId + "; can execute: " + canExecute + "; EventFinished: " + eventFinished);
+            Debug.WriteLine("DAVEM: not null: " + dbEvent != null);
+            return canExecute;
 
-            // Don't allow removal of events that have lap data
-            List<DbLap>? lapsForEvent = this._dbLapsTable.getEventLapsForEvent(eventId);
-            return !lapsForEvent.Any();
+            //// Don't allow removal of events that have lap data
+            //List<DbLap>? lapsForEvent = this._dbLapsTable.getEventLapsForEvent(eventId);
+            //return !lapsForEvent.Any();
         }
 
         internal bool GetAreDeletableEvents()

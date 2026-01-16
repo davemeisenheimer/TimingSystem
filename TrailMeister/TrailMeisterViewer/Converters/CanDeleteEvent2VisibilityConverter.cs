@@ -20,9 +20,9 @@ namespace TrailMeisterViewer.Converters
                 return Visibility.Collapsed;
 
             // Same logic as CanExecute
-            return !_dbLapsTable.getEventLapsForEvent(dbEvent.ID).Any()
-                ? Visibility.Visible
-                : Visibility.Collapsed;
+            return dbEvent.EventFinished
+                ? Visibility.Collapsed
+                : Visibility.Visible;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,8 +52,8 @@ namespace TrailMeister.Model.M6ENano
         internal event TagStateChangeEventHandler? TagStateChangeEvent;
         private const int DelaySent = 30000;
         //private const int DelaySent = 5000; // Use for testing
-        static TagLapState StateDetect = new TagLapState(LapState.DETECT, 0);
-        static TagLapState StateGathering = new TagLapState(LapState.GATHERING, 1);
+        static TagLapState StateDetect = new TagLapState(LapState.DETECT, 1);
+        static TagLapState StateGathering = new TagLapState(LapState.GATHERING, 250);
         static TagLapState StateSent = new TagLapState(LapState.SENT, DelaySent);   
 
         private TagLapState _currentState;
@@ -84,9 +85,10 @@ namespace TrailMeister.Model.M6ENano
 
         internal void MoveToNextState()
         {
+            Debug.WriteLine("DAVEM: MoveToNextState: CurrentState: " + this.CurrentState.State.ToString());
             AbortNextStateTimeout();
 
-            switch (_currentState.State)
+            switch(_currentState.State)
             {
                 case LapState.DETECT:
                     _currentState = StateGathering;

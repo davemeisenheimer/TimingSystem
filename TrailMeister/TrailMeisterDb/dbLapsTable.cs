@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Data;
 using MySql.Data.MySqlClient;
 using System.Collections;
+using System.Text.Json;
 
 namespace TrailMeisterDb
 {
@@ -49,6 +50,16 @@ namespace TrailMeisterDb
         public DbLapsTable() : base("laps", new DbLapFactory()) { }
 
 
+        public void deleteEventLapsForEvent(long eventId)
+        {
+            List<DbLap> dbLaps = this.getEventLapsForEvent(eventId);
+            foreach(DbLap dbLap in dbLaps)
+            {
+                base.deleteRow(dbLap.LapId);
+            }
+        }
+
+
         public List<DbLap>? getEventLapsForEvent(long eventId)
         {
             Hashtable queryParams = new Hashtable() { { "eventId", eventId } };
@@ -79,7 +90,16 @@ namespace TrailMeisterDb
                 {"TotalTime", totalTime },
                 {"PersonId", personId }
             };
-            base.addRow(columnData);
+
+            try
+            {
+                base.addRow(columnData);
+            } catch (Exception ex)
+            {
+                string lapDataJson = JsonSerializer.Serialize(columnData, new JsonSerializerOptions { WriteIndented = true });
+                string msg = "Tried to add lap data for event, but something went wrong. " + lapDataJson;
+                throw new Exception(msg, ex);   
+            }
         }
     }
 }

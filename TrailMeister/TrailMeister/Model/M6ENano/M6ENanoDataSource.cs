@@ -54,7 +54,10 @@ namespace TrailMeister.Model.M6ENano
             // Returns true if the tag data should be sent now
             internal bool updateOnRead(ReaderData data)
             {
-                switch(_tagStateMachine.CurrentState.State) {
+                Debug.WriteLine("DAVEM: updateOnRead: EPC: " + data.EPC + "; RSSI in: " + data.Rssi + "; RSSI old: " + Data.Rssi);
+                Debug.WriteLine("DAVEM: updateOnRead: STATE: " + _tagStateMachine.CurrentState.State);
+
+                switch (_tagStateMachine.CurrentState.State) {
                     case LapState.DETECT:
                         bool delayElapsed = data.TimeStamp - Data.TimeStamp > _tagStateMachine.CurrentState.DelayToNextState;
 
@@ -72,7 +75,6 @@ namespace TrailMeister.Model.M6ENano
                         } else
                         {
                             // We're done!
-                            data.Rssi = 0;
                             _tagStateMachine.MoveToNextState(); // Eventing will take it from here
                         }
                         break;
@@ -148,6 +150,13 @@ namespace TrailMeister.Model.M6ENano
             {
                 TagDataSourceEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.Disconnected, "Tag reader connect failed!"));
             }
+            catch (System.Exception ex)
+            {
+                if (! ex.Message.Contains("Connect Successful"))
+                {
+                    throw ex;
+                }
+            }
 
             TagDataSourceEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.Connected, "Tag reader connected!"));
 
@@ -155,8 +164,8 @@ namespace TrailMeister.Model.M6ENano
 
             // Region
             string[] list = reader.ParamList();
-            Reader.Region[] regions = (Reader.Region[])reader.ParamGet("/reader/region/supportedRegions");
-            reader.ParamSet(list[9], Reader.Region.NA2);
+            //Reader.Region[] regions = (Reader.Region[])reader.ParamGet("/reader/region/supportedRegions");
+            reader.ParamSet(list[9], Reader.Region.NA);
 
             // Antenna
             int[] antennaList;
@@ -175,7 +184,7 @@ namespace TrailMeister.Model.M6ENano
 
             //int powerMax = (int)reader.ParamGet("/reader/radio/powerMax");
 
-            Config.SetAntennaPower(500);
+            //Config.SetAntennaPower(500);
             //reader.ParamSet("/reader/radio/writePower", 0);
 
 

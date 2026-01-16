@@ -14,12 +14,14 @@ namespace TrailMeisterDb
     {
         private string _eventName;
         private int _lapLength;
-        internal DbEvent(int id, string name, int lapLength, DateTime date)
+        private bool _eventFinished;
+        internal DbEvent(int id, string name, int lapLength, DateTime date, bool eventFinished)
         {
             this.ID = id;
             this.EventName = name;
             this.LapLength = lapLength;
             this.EventDate = date;
+            this.EventFinished = eventFinished;
         }
         public int ID { get; set; }
         public string EventName
@@ -52,7 +54,23 @@ namespace TrailMeisterDb
                 }
             }
         }
-        public DateTime EventDate { get; set; } 
+        public DateTime EventDate { get; set; }
+
+        public bool EventFinished
+        {
+            get
+            {
+                return this._eventFinished;
+            }
+            set
+            {
+                if (this._eventFinished != value)
+                {
+                    this._eventFinished = value;
+                    OnPropertyChanged(nameof(EventFinished));
+                }
+            }
+        }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -68,7 +86,8 @@ namespace TrailMeisterDb
                                Convert.ToInt32(reader["id"]),
                                (string)reader["EventName"],
                                (int)reader["LapLength"],
-                               (DateTime)reader["EventDate"]);
+                               (DateTime)reader["EventDate"],
+                               Convert.ToBoolean(reader["EventFinished"]));
         }
     }
 
@@ -80,7 +99,8 @@ namespace TrailMeisterDb
                                Convert.ToInt32(reader["id"]),
                                (string)reader["EventName"],
                                (int)reader["LapLength"],
-                               (DateTime)reader["EventDate"]);
+                               (DateTime)reader["EventDate"],
+                               Convert.ToBoolean(reader["EventFinished"]));
         }
     }
 

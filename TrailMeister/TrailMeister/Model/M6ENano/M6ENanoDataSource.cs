@@ -21,24 +21,28 @@ namespace TrailMeister.Model.M6ENano
         private delegate void ReaderDataItemStateChangeEventHandler(ReaderDataItem sender, TagStateChangedEventArgs eventArgs);
         private M6ENanoConfig _config;
 
+        /* ReaderDataItem is a wrapper class for the ReaderData and adds state management */
         private class ReaderDataItem: TrailMeisterUtilities.Disposable
         {
             internal event ReaderDataItemStateChangeEventHandler? ReaderDataItemChangeEvent;
 
 
-            private ReaderData _readerData;
+            private ReaderData _lastData;
+            private ReaderData _peakData;
             private TagStateMachine _tagStateMachine;
 
             internal ReaderDataItem(ReaderData data)
             {
-                _readerData = data;
+                _lastData = data;
                 _tagStateMachine = new TagStateMachine();
                 _tagStateMachine.TagStateChangeEvent += OnTagStateChanged;
             }
 
-            public ReaderData Data { 
-                get { 
-                    return _readerData;
+            public ReaderData Data
+            {
+                get
+                {
+                    return _peakData;
                 }
             }
 
@@ -52,14 +56,15 @@ namespace TrailMeister.Model.M6ENano
 
             // Called when a the tag is read
             // Returns true if the tag data should be sent now
-            internal bool updateOnRead(ReaderData data)
+            internal bool updateOnRead(ReaderData newData)
             {
-                Debug.WriteLine("DAVEM: updateOnRead: EPC: " + data.EPC + "; RSSI in: " + data.Rssi + "; RSSI old: " + Data.Rssi);
+                Debug.WriteLine("DAVEM: updateOnRead: EPC: " + newData.EPC + "; timeStamp: " + (newData.TimeStamp.Ticks / TimeSpan.TicksPerMillisecond) + "; RSSI in: " + newData.Rssi + "; RSSI old: " + _lastData.Rssi);
                 Debug.WriteLine("DAVEM: updateOnRead: STATE: " + _tagStateMachine.CurrentState.State);
 
                 switch (_tagStateMachine.CurrentState.State) {
                     case LapState.DETECT:
-                        bool delayElapsed = data.TimeStamp - Data.TimeStamp > _tagStateMachine.CurrentState.DelayToNextState;
+                        bool delayElapsed = newData.TimeStamp - _lastData.TimeStamp > _tagStateMachine.CurrentState.DelayToNextState;
+                        _peakData = newData; // First read, so it has to be peaky
 
                         if (delayElapsed)
                         {
@@ -69,8 +74,9 @@ namespace TrailMeister.Model.M6ENano
                         break;
                 
                     case LapState.GATHERING:
-                        if (data.Rssi >= Data.Rssi)
+                        if (newData.Rssi >= _lastData.Rssi)
                         {
+                            _peakData = newData;
                             _tagStateMachine.DeferNextStateChange();
                         } else
                         {
@@ -83,7 +89,7 @@ namespace TrailMeister.Model.M6ENano
                         break;
                 }
 
-                _readerData = data;  // Update our timestamp from the read data
+                _lastData = newData;  // Update our timestamp, rssi, etc from the read data
                 return false;
             }
 
@@ -162,35 +168,39 @@ namespace TrailMeister.Model.M6ENano
 
             _config.setReader(reader);
 
-            // Region
-            string[] list = reader.ParamList();
-            //Reader.Region[] regions = (Reader.Region[])reader.ParamGet("/reader/region/supportedRegions");
-            reader.ParamSet(list[9], Reader.Region.NA);
+            string model = (string)reader.ParamGet("/reader/version/model");
 
             // Antenna
             int[] antennaList;
             string str = "1,1";
             antennaList = Array.ConvertAll<string, int>(str.Split(','), int.Parse);
-            SimpleReadPlan plan = new SimpleReadPlan(antennaList, TagProtocol.GEN2, null, null, 1000);
+            SimpleReadPlan plan = new SimpleReadPlan(antennaList, TagProtocol.GEN2, null, null, 1);
             reader.ParamSet("/reader/read/plan", plan);
 
-            // Single read example
-            //int timeout = 1000;
-            //TagReadData[] tags = new TagReadData[1];
-            //tags = reader.Read(timeout);
-
-            reader.ParamSet("/reader/read/asyncOffTime", 0);
             reader.ParamSet("/reader/tagReadData/recordHighestRssi", true);
+            reader.ParamSet("/reader/gen2/session", Gen2.Session.S0);
+            reader.ParamSet("/reader/tagReadData/enableReadFilter", false);
+            reader.ParamSet("/reader/read/asyncOffTime", 0);
 
-            //int powerMax = (int)reader.ParamGet("/reader/radio/powerMax");
+            // Region
+            if (model.ToLower() == "m7e hecto")
+            {
+                reader.ParamSet("/reader/region/id", Reader.Region.NA);
+            }
+            else if (model.ToLower() == "m6e nano")
+            {
+                reader.ParamSet("/reader/region/id", Reader.Region.NA2);
+            } else
+            {
+                throw new Exception("Unknown reader.");
+            }
 
-            //Config.SetAntennaPower(500);
-            //reader.ParamSet("/reader/radio/writePower", 0);
+            int powerMax = (int)reader.ParamGet("/reader/radio/powerMax");
+            Debug.WriteLine("DEBUG: powerMax: " + powerMax);
 
 
             TagDataSourceEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.ReaderReady, "Reader is ready"));
 
-            reader.StartReading();
             reader.TagRead += OnTagRead;        
         }
 
@@ -201,33 +211,39 @@ namespace TrailMeister.Model.M6ENano
         private void OnTagRead(object? sender, TagReadDataEventArgs e)
         {
             ReaderData tag = new ReaderData(e.TagReadData);
+            ReaderDataItem? existingDataItem;
+            bool isNew = false;
 
             lock (_syncLock)
             {
-                ReaderDataItem? existingDataItem;
-                if (_reads.TryGetValue(tag.EPC, out existingDataItem)) {
-                    existingDataItem.updateOnRead(tag);
-                } else
+                if (!_reads.TryGetValue(tag.EPC, out existingDataItem))
                 {
                     // First time reading this tag
                     ReaderDataItem newItem = new ReaderDataItem(new ReaderData(tag.EPC, tag.TimeStamp, tag.Rssi));
                     newItem.ReaderDataItemChangeEvent += OnTagStateChanged;
                     _reads.Add(tag.EPC, newItem);
+                    return;
                 }
             }
+
+            existingDataItem.updateOnRead(tag);
         }
+
 
         private void OnTagStateChanged(ReaderDataItem data, TagStateChangedEventArgs e)
         {
             if (e.State == LapState.SENT)
             {
+                // One way to kick the reader and make it keep reporting tags. But not great to have it here in the path of an existing tag read.
+                //_config.Reader.StopReading();
+                //_config.Reader.StartReading();
                 TagDataSourceEvent?.Invoke(
                     this, new TagDataEventArgs(
                         TagDataSourceEventType.LapData,
                         "Tag read from M6ENano",
                         data.Data)
                     );
-                BackgroundBeep.Beep(800);
+                //BackgroundBeep.Beep(800);
             }
         }
 
@@ -297,6 +313,7 @@ namespace TrailMeister.Model.M6ENano
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects)
+                    _config.StopReader();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer

@@ -269,7 +269,6 @@ namespace TrailMeister.GUI.Main
                 // _controller.stopArduinoListener();
             }
             _mainWindow.gotoRecentArrivalsPage();
-            this._controller.StartEvent();
         }
 
         internal void GotoOneArrivalPage()

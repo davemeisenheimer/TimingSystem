@@ -88,7 +88,7 @@ namespace TrailMeisterDb
                 {"LapCount", lapCount },
                 {"LapTime", lapTime },
                 {"TotalTime", totalTime },
-                {"PersonId", personId }
+                {"PersonId", personId != null ? personId : 23 }
             };
 
             try

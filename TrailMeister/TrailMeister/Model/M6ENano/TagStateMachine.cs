@@ -50,9 +50,9 @@ namespace TrailMeister.Model.M6ENano
     internal class TagStateMachine : Disposable
     {
         internal event TagStateChangeEventHandler? TagStateChangeEvent;
-        private const int DelaySent = 30000;
-        //private const int DelaySent = 5000; // Use for testing
-        static TagLapState StateDetect = new TagLapState(LapState.DETECT, 1);
+        //private const int DelaySent = 30000;
+        private const int DelaySent = 5000; // Use for testing
+        static TagLapState StateDetect = new TagLapState(LapState.DETECT, 0);
         static TagLapState StateGathering = new TagLapState(LapState.GATHERING, 250);
         static TagLapState StateSent = new TagLapState(LapState.SENT, DelaySent);   
 
@@ -101,9 +101,11 @@ namespace TrailMeister.Model.M6ENano
                     SetNextStateTimeout();
                     break;
                 case LapState.SENT:
-                default:
                     _currentState = StateDetect;
                     TagStateChangeEvent?.Invoke(this, new TagStateChangedEventArgs(LapState.DETECT));
+                    break;
+                default:
+                    throw new InvalidOperationException("Trying to move to an unknown state: " + _currentState.State);
                     break;
             }
         }

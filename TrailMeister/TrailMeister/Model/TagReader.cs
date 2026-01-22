@@ -18,12 +18,12 @@ namespace TrailMeister.Model
         {
             switch(dataSource) {
                 case TagReaderDataSourceType.Arduino:
-                _dataSource = ArduinoDataSource.Instance;
-                break;
-            case TagReaderDataSourceType.M6ENano:
-            default:
-                _dataSource = new M6ENanoDataSource();
-                break;
+                    _dataSource = ArduinoDataSource.Instance;
+                    break;
+                case TagReaderDataSourceType.M6ENano:
+                default:
+                    _dataSource = new M6ENanoDataSource();
+                    break;
             }
         }
 

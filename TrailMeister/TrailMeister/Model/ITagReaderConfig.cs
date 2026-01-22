@@ -8,6 +8,6 @@ namespace TrailMeister.Model
 {
     public interface ITagReaderConfig
     {
-        public bool SetAntennaPower(int power);
+        public bool StartReader(int power);
     }
 }

@@ -39,6 +39,11 @@ namespace TrailMeister.GUI.Main
         private void btnDone_Click(object sender, RoutedEventArgs e)
         {
             _nextPageDelegate();
+
+            if (this.DataContext is MainWindowVM viewModel)
+            {
+                viewModel.ButtonCommand_StartEvent.Execute(new object());
+            }
         }
 
         private void tbNameEdit_GotFocus(object sender, RoutedEventArgs e)

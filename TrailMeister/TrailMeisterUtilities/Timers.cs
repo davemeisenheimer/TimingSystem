@@ -28,7 +28,7 @@ namespace TrailMeisterUtilities
             return new Timers(millisecondsInterval, planAction, true);
         }
 
-        internal bool IsDisposed {  get { return _disposed; } }
+        public bool IsDisposed {  get { return _disposed; } }
 
         private void GenericTimerCallback(object? sender, System.Timers.ElapsedEventArgs e)
         {

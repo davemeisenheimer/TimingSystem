@@ -16,6 +16,7 @@ namespace TrailMeister.GUI.Main
         private object _locker = new object();
         long _eventId;
         ITagDataSource _tagReader = new TagReader(TagReaderDataSourceType.M6ENano);
+        //ITagDataSource _tagReader = new TagReader(TagReaderDataSourceType.Arduino);
         DbPeopleTable _dbPeopleTable = new DbPeopleTable();
         DbTagsTable _dbTagsTable = new DbTagsTable();
         DbLapsTable _dbLapsTable = new DbLapsTable();
@@ -272,7 +273,7 @@ namespace TrailMeister.GUI.Main
 
         internal void SetAntennaPower()
         {
-            _tagReader.Config.SetAntennaPower(_vm.AntennaPower * 100);
+            _tagReader.Config.StartReader(_vm.AntennaPower * 100);
         }
 
         private RecentLapData? AddNewReaderData(ReaderData data)
@@ -341,7 +342,7 @@ namespace TrailMeister.GUI.Main
                 // Putting this here instead of the init function, so that the connection screens can do their thing.
                 if (this._vm.AllTags.Count == 0)
                 {
-                    AddTagsToEvent();
+                    //AddTagsToEvent();
                 }
             }
             else if (args.Type == TagDataSourceEventType.Disconnected)

@@ -34,6 +34,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="MercuryAPI">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\ThingMagic 1.37\mercuryapi-1.37.3.29\cs\MercuryAPI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="GUI\Main\PageOneArrival.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -58,12 +64,6 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="MercuryAPI">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\ThingMagic\MercuryAPI.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

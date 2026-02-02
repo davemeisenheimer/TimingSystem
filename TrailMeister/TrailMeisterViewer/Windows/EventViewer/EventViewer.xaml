@@ -49,20 +49,38 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBox x:Name="tbNameEdit" 
-                Grid.Row="0"
+        <Grid VerticalAlignment="Top" Height="32">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBox x:Name="tbNameEdit" 
+                Grid.Row="0" Grid.Column="0"
                 FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" 
                 Text="{Binding Event.EventName, UpdateSourceTrigger=LostFocus}" 
-                BorderThickness="0" Margin="8,0,8,0"
-                FontSize="24" Width="650" HorizontalAlignment="Left" />
+                BorderThickness="0"
+                FontSize="24" Width="650" HorizontalAlignment="Center" />
 
-        <Label x:Name="lblLapLength" Content="Lap Length (m)" HorizontalAlignment="Left" Margin="992,0,0,668" Grid.RowSpan="2" />
-        <TextBox x:Name="tbLapLength" 
-                Grid.Row="0"
-                FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" 
-                Text="{Binding Event.LapLength, UpdateSourceTrigger=LostFocus}" 
-                BorderThickness="0" Margin="8,0,8,0"
-                FontSize="24" HorizontalAlignment="Right" Width="92" />
+            <CheckBox x:Name="chkEventFinished"  
+                      Content="Event finished:" 
+                      IsChecked="{Binding Event.EventFinished, Mode=TwoWay}"
+                      Grid.Row="0" Grid.Column="1" VerticalAlignment="Center"/>
+
+            <Label x:Name="lblLapLength" Content="Lap Length (m)" 
+                   Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right"/>
+            <TextBox x:Name="tbLapLength" 
+                    Grid.Row="0" Grid.Column="3"
+                    FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" 
+                    Text="{Binding Event.LapLength, UpdateSourceTrigger=LostFocus}" 
+                    BorderThickness="0" Margin="0,0,10,0"
+                    FontSize="24" HorizontalAlignment="Right" Width="92" />
+        </Grid>
 
         <DataGrid x:Name="gridParticipants" 
                   Grid.Row="1"

@@ -8,13 +8,26 @@ namespace TrailMeister.Model.Arduino
 {
     internal class ArduinoConfig: ITagReaderConfig
     {
-        public bool SetAntennaPower(int power)
+
+        public void Reset()
+        {
+            SocketClient.SendCommand("Reset");
+        }
+
+        public void StartReader(int power)
+        {
+            SetAntennaPower(power);
+        }
+        public void StopReader()
+        {
+            SocketClient.SendCommand(String.Format("StopReader"));
+        }
+        private void SetAntennaPower(int power)
         {
             if (power < 0 || power > 27000) { throw new ArgumentException("power is outside range of 0-27000"); }
 
+            // SetAntennaGain will automatically stop and restart the reader
             SocketClient.SendCommand(String.Format("SetAntennaGain,{0}", power));
-
-            return true;
         }
     }
 }

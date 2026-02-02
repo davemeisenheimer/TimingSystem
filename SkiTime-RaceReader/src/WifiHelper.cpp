@@ -1,81 +1,91 @@
 #include "WifiHelper.h"
+#include "Config.h"
 
 const IPAddress GATEWAY_IP(192, 168, 0, 1);
 const IPAddress MY_IP(192, 168, 0, MY_IP_OCTET);
 const IPAddress DNS_IP(206, 248, 154, 22);
 const IPAddress SUBNET_IP(255, 255, 255, 0);
 
-WifiHelper::WifiHelper() : lastWdogCheckSecs(0),
-                           currentSecs(0),
-                           wifiRestarts(0),
-                           serverRestarts(0),
-                           lastCharWifiMs(0),
-                           lastWifiMsgSecs(0),
-                           status(WL_IDLE_STATUS),
-                           serverStatus(0),
-                           server(80),
-                           keepValidating(true)
+WifiHelper::WifiHelper(SocketClient *socketClient) : 
+    socketClient(socketClient),
+    lastWdogCheckSecs(0),
+    currentSecs(0),
+    wifiRestarts(0),
+    serverRestarts(0),
+    lastCharWifiMs(0),
+    lastWifiMsgSecs(0),
+    status(WL_IDLE_STATUS),
+    serverStatus(0),
+    server(WIFI_CONTROL_PORT),
+    keepValidating(true)
 {
 }
 
 void WifiHelper::init()
 {
-    char ssid[] = SECRET_SSID; // your network SSID (name)
-    char pass[] = SECRET_PASS; // your network password (use for WPA, or use as key for WEP)
+    char ssid[] = SECRET_SSID;
+    char pass[] = SECRET_PASS;
 
-    // check for the WiFi module:
-    if (WiFi.status() == WL_NO_MODULE)
+    Serial.println("\n[WiFi] Initializing");
+
+    WiFi.mode(WIFI_STA);
+    WiFi.disconnect(true);
+    delay(200);
+
+    // Static IP configuration
+    if (!WiFi.config(MY_IP, GATEWAY_IP, SUBNET_IP, DNS_IP))
     {
-        Serial.println("Comms with WiFi module failed!");
-        // don't continue
-        while (true)
-            ;
+        Serial.println("[WiFi] Static IP config failed");
     }
 
-    WiFi.config(MY_IP, DNS_IP, GATEWAY_IP, SUBNET_IP);
+    status = WL_IDLE_STATUS;
 
-    // attempt to connect to Wifi network:
-    // WiFi.config(MY_IP, DNS_IP, GATEWAY_IP, SUBNET_IP);
-    while (this->status != WL_CONNECTED)
+    Serial.println("[WiFi] Connecting to " + String(ssid));
+
+    WiFi.begin(ssid, pass);
+
+    unsigned long startAttempt = millis();
+    const unsigned long timeoutMs = 15000;
+
+    while (WiFi.status() != WL_CONNECTED &&
+           millis() - startAttempt < timeoutMs)
     {
-        Serial.print("Try connect to: ");
-        Serial.println(ssid); // print the network name (SSID);
-
-        // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
-        this->status = WiFi.begin(ssid, pass);
-        // wait 10 seconds for connection:
-        delay(10000);
+        delay(500);
+        Serial.print(".");
     }
-    this->printWifiStatus(); // you're connected now, so print out the status
 
-    this->server.begin();    // start the web server on port 80
-    this->printWifiStatus(); // you're connected now, so print out the status
+    Serial.println("Checking WiFi status...");
+
+    if (WiFi.status() == WL_CONNECTED)
+    {
+        status = WL_CONNECTED;
+        Serial.println("[WiFi] Connected");
+        printWifiStatus();
+
+        server.begin();
+        socketClient->sendDebugMessage("[WiFi] Server started");
+    }
+    else
+    {
+        Serial.println("[WiFi] Connection failed – watchdog will retry");
+        status = WiFi.status();
+    }
+
+    lastWifiMsgSecs = millis() / 1000;
 }
 
 unsigned long WifiHelper::getWifiEpoch()
 {
-    unsigned long epoch;
-    int numberOfTries = 0, maxTries = 6;
+    time_t now;
+    time(&now);
 
-    do
-    {
-        epoch = WiFi.getTime();
-        numberOfTries++;
-    } while ((epoch == 0) && (numberOfTries < maxTries));
-
-    if (numberOfTries == maxTries)
-    {
+    if (now < 100000) {   // time not synced yet
         this->invalidTimeSyncs++;
-        Serial.print("NTP unreachable!!");
-    }
-    else
-    {
-        Serial.print("Epoch received: ");
-        Serial.println(epoch);
-        Serial.println();
+        if (DO_SERIAL) socketClient->sendDebugMessage("NTP not synced");
+        return 0;
     }
 
-    return epoch;
+    return (unsigned long)now;
 }
 
 void WifiHelper::recordMessage()
@@ -96,29 +106,24 @@ void WifiHelper::recordElapsedWifi()
     // check if delay has timed out after 10sec == 10000mS
     if (elapsedWifiMs >= 30000)
     {
-        Serial.println("Wait too long for next client character");
+        if (DO_SERIAL) socketClient->sendDebugMessage("Wait too long for next client character");
     }
 }
 
 void WifiHelper::printWifiStatus()
 {
     // print the SSID of the network you're attached to:
-    Serial.print("SSID: ");
-    Serial.println(WiFi.SSID());
+    if (DO_SERIAL) socketClient->sendDebugMessage("SSID: " + WiFi.SSID());
 
     // print your board's IP address:
     IPAddress ip = WiFi.localIP();
-    Serial.print("IP Address: ");
-    Serial.println(ip);
+    if (DO_SERIAL) socketClient->sendDebugMessage("IP Address: " + ip.toString());
 
     // print the received signal strength:
     long rssi = WiFi.RSSI();
-    Serial.print("RSSI:");
-    Serial.print(rssi);
-    Serial.println(" dBm");
+    if (DO_SERIAL) socketClient->sendDebugMessage("RSSI:" + String(rssi) + " dBm");
     // print where to go in a browser:
-    Serial.print("IP: ");
-    Serial.println(ip);
+    if (DO_SERIAL) socketClient->sendDebugMessage("IP: " + ip.toString());
 }
 
 void WifiHelper::validateWifiConnection()
@@ -126,123 +131,83 @@ void WifiHelper::validateWifiConnection()
     if (!keepValidating)
         return;
 
-    char ROUTER_IP[] = "192.168.0.1"; // Our local router for pinging.
-    this->currentSecs = millis() / 1000;
-    if ((this->currentSecs / 30) != (this->lastWdogCheckSecs / 30))
-    {                      // Every ten seconds.
-        Serial.print("."); // debug serial monitor heartbeat
-        this->lastWdogCheckSecs = this->currentSecs;
-        this->serverStatus = server.status();
+    unsigned long nowSecs = millis() / 1000;
 
-        // Watchdog - check for no wifi action for too long.
-        if ((this->currentSecs - this->lastWifiMsgSecs) > WATCHDOG_NO_MSG_SECS)
-        {
-            Serial.print("?"); // Indicate watchdog is looking
-            this->serverStatus = server.status();
+    // Run watchdog once every 30 seconds
+    if ((nowSecs / 30) == (lastWdogCheckSecs / 30))
+        return;
 
-            // If the wifi is down, Disconnect and Restart the wifi
-            if (WiFi.status() != WL_CONNECTED)
-            {
-                Serial.println("Wifi noconn. ");
-                this->status = restartWifi();
-            }
-            else if (this->serverStatus != 1)
-            { // Server status is no good
-                // The Wifi is up, but the server is not ok
-                // It might  be not non-idle if we are receiving or txing data, so be a bit patient
-                // by setting client kick watchdog a bit longer than no msg timeout.
-                // but we are here because of no polling messages, so chances are we have a problem.
-                Serial.print("Server down.");
-                Serial.print(this->serverStatus);
-                if ((millis() / 1000 - this->lastWifiMsgSecs) > WATCHDOG_KICK_SERVER_SECS)
-                { // WatchdogKickServer Timeout
-                    Serial.println("Try server.begin");
-                    this->serverRestarts += 1;
-                    server.begin();
-                    delay(1000); // wait 1 sec
-                    if (server.status() != 1)
-                    {
-                        // server begin didn't fix server.status
-                        Serial.println("Server begin didn't work Try wifiRestart");
-                        this->status = restartWifi();
-                    }
-                    if (server.status() != 1)
-                    {
-                        Serial.print(server.status());
-                        Serial.println("wifiRestart didn't fix svr. reboot");
-                        WifiHelper::reboot();
-                    }
-                    this->lastWifiMsgSecs = (millis() / 1000); // start watchdog again.
-                }
-            }
-            else
-            { // Server status is good, but no messages and we don't know why. Try pinging the router.
-                // If the ping fails restart wifi.
-                // If we can't restart for a very long time, reset the board.
-                Serial.print("Pinging ");
-                Serial.print(ROUTER_IP);
-                Serial.print(": ");
-                this->status = WiFi.ping(ROUTER_IP);
-                if (this->status >= 0)
-                {
-                    Serial.print("SUCCESS! RTT = ");
-                    Serial.print(this->status);
-                    Serial.println(" ms");
-                    this->lastWifiMsgSecs = (millis() / 1000); // Network is ok. start watchdog again.
-                }
-                else
-                { // ping failed
-                    Serial.print("FAILED! Error code: ");
-                    Serial.println(this->status);
-                    //  The network seems to be down.  Try re-initializing it.
-                    Serial.println(" Restarting Wifi");
-                    this->status = restartWifi();
+    lastWdogCheckSecs = nowSecs;
+    if (DO_SERIAL) socketClient->sendDebugMessage("."); // heartbeat
 
-                    if ((millis() / 1000 - this->lastWifiMsgSecs) > WATCHDOG_FULL_REBOOT_TIME)
-                    {
-                        // This timer is long to avoid  rebooting just because the power is out in the house
-                        // and takes out the router, for instance.
-                        Serial.println(" No ping timeout. Reboot");
-                        WifiHelper::reboot();
-                    } // end full watchdog reboot
-                }     // end ping failed
-            }         // server status good but no messages, try ping
-        }             // no wifi message timeout
-    }                 // end every N secs examine watchdog
+    // Check WiFi connection first (authoritative on ESP32)
+    if (WiFi.status() != WL_CONNECTED)
+    {
+        if (DO_SERIAL) socketClient->sendDebugMessage("\nWiFi disconnected – restarting WiFi");
+        restartWifi();
+        return;
+    }
+
+    // Check for client activity
+    WiFiClient client = server.available();
+    if (client)
+    {
+        // Client connected – mark activity
+        lastWifiMsgSecs = nowSecs;
+        return;
+    }
+
+    // No traffic watchdog
+    if ((nowSecs - lastWifiMsgSecs) > WATCHDOG_NO_MSG_SECS)
+    {
+        if (DO_SERIAL) socketClient->sendDebugMessage("\nNo WiFi traffic – restarting WiFi");
+        restartWifi();
+    }
 }
 
 int WifiHelper::restartWifi()
 {
-    char ssid[] = SECRET_SSID; // your network SSID (name)
-    char pass[] = SECRET_PASS; // your network password (use for WPA, or use as key for WEP)
+    char ssid[] = SECRET_SSID;
+    char pass[] = SECRET_PASS;
 
-    Serial.println("WIFI Con. Restarting");
-    WiFi.disconnect();
-    WiFi.end();
-    Serial.println("WiFi restart");
-    this->status = WL_IDLE_STATUS;
-    this->wifiRestarts += 1;
-    for (int n = 10; n > 0; n--)
+    if (DO_SERIAL) socketClient->sendDebugMessage("Restarting WiFi");
+
+    wifiRestarts++;
+
+    // Fully reset WiFi subsystem
+    WiFi.disconnect(true);
+    WiFi.mode(WIFI_OFF);
+    delay(500);
+    WiFi.mode(WIFI_STA);
+
+    status = WL_IDLE_STATUS;
+
+    // Attempt reconnect (max 5 tries)
+    for (int attempt = 1; attempt <= 5; attempt++)
     {
-        // WiFi.config(MY_IP, DNS_IP, GATEWAY_IP, SUBNET_IP);
-        Serial.print("Trying to connect to: ");
-        Serial.println(ssid); // print the network name (SSID);
+        if (DO_SERIAL) socketClient->sendDebugMessage("WiFi connect attempt " + String(attempt));
 
-        // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
-        this->status = WiFi.begin(ssid, pass);
-        // wait 10 seconds for connection:
-        delay(10000);
-        if (this->status = WL_CONNECTED)
+        WiFi.begin(ssid, pass);
+
+        unsigned long start = millis();
+        while (millis() - start < 10000)
         {
-            break;
+            if (WiFi.status() == WL_CONNECTED)
+            {
+                status = WL_CONNECTED;
+                if (DO_SERIAL) socketClient->sendDebugMessage("WiFi reconnected");
+
+                server.begin();
+                lastWifiMsgSecs = millis() / 1000;
+                printWifiStatus();
+                return status;
+            }
+            delay(250);
         }
     }
-    WiFi.setDNS(DNS_IP);
 
-    this->server.begin();
-    delay(10000);
-    this->printWifiStatus();
-    return (this->status);
+    if (DO_SERIAL) socketClient->sendDebugMessage("WiFi restart failed");
+    return status;
 }
 
 void WifiHelper::stopValidation()

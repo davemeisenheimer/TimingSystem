@@ -18,6 +18,9 @@ namespace TrailMeister.Model.Data
 		TimeSpan averageLapTimeSpan; // Average lap time
 		string averageLapTime;
 
+		TimeSpan bestLapTimeSpan;
+		string bestLapTime;
+
 		TimeSpan timeLapSpan;
 		string timeLap;
 
@@ -33,6 +36,8 @@ namespace TrailMeister.Model.Data
 
 			this.timeLapSpan = new TimeSpan(0, 0, 0, 0, 0);
 			this.timeTotalSpan = new TimeSpan(0, 0, 0, 0, 0);
+			this.bestLapTimeSpan = new TimeSpan(99, 0, 0, 0, 0); // Something ridiculously large
+			this.bestLapTime = "0:00.00";
 
 			this.timeLap = "";
 			this.timeTotal = "";
@@ -203,6 +208,38 @@ namespace TrailMeister.Model.Data
 			}
 		}
 
+		public string BestLapTime
+		{
+			get
+			{
+				return this.bestLapTime;
+			}
+			set
+			{
+				if (value != this.bestLapTime)
+				{
+					this.bestLapTime = value;
+					OnPropertyChanged(nameof(BestLapTime));
+				}
+			}
+		}
+
+		public TimeSpan BestLapTimeSpan
+		{
+			get
+			{
+				return this.bestLapTimeSpan;
+			}
+			set
+			{
+				if (value != this.bestLapTimeSpan)
+				{
+					this.bestLapTimeSpan = value;
+					OnPropertyChanged("BestLapTimeSpan");
+				}
+			}
+		}
+
 		public void update(DateTime timingSystemTime, int? personId)
         {
 			TimeSpan newLapTime = timingSystemTime - this.rfidTimeUpdated;
@@ -218,12 +255,18 @@ namespace TrailMeister.Model.Data
                 }
 				TimeSpan newTotalTime = timingSystemTime - this.rfidTimeAdded;
 				this.TimeLapSpan = newLapTime;
-				this.TimeLap = this.TimeLapSpan.ToString(@"hh\:mm\:ss");
+				this.TimeLap = this.TimeLapSpan.ToString(@"mm\:ss\.ff");
+
+				if (newLapTime < this.BestLapTimeSpan)
+                {
+					this.BestLapTimeSpan = newLapTime;
+					this.BestLapTime = this.BestLapTimeSpan.ToString(@"mm\:ss\.ff");
+                }
 
 				setTimeTotal(newTotalTime);
 
 				this.AverageLapTimeSpan = newTotalTime / this.LapCount;
-				this.AverageLapTime = this.AverageLapTimeSpan.ToString(@"hh\:mm\:ss");
+				this.AverageLapTime = this.AverageLapTimeSpan.ToString(@"mm\:ss");
 
 				this.TimeAdded = DateTime.Now;
 				this.appTimeUpdated = DateTime.Now;

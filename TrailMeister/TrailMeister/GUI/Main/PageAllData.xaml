@@ -61,8 +61,8 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                
-                <DataGridTextColumn x:Name="colLapTime" CanUserResize="False" Width="3" Header="Lap Time" Binding="{Binding TimeLap}" FontSize="48" MinWidth="300">
+
+                <DataGridTextColumn x:Name="colLapTime" CanUserResize="False" Width="3" Header="Last Lap" Binding="{Binding TimeLap}" FontSize="48" MinWidth="300">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Right" />
@@ -70,7 +70,16 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                
+
+                <DataGridTextColumn x:Name="colBestLapTime" CanUserResize="False" Width="3" Header="Best Lap" Binding="{Binding BestLapTime}" FontSize="48" MinWidth="300">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                            <Setter Property="Padding" Value="5, 0" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
                 <DataGridTextColumn x:Name="colAvgLapTime" CanUserResize="False" Width="3" Header="Avg Lap Time" Binding="{Binding AverageLapTime}" FontSize="48" MinWidth="300">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">

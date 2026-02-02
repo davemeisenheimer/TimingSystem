@@ -12,7 +12,7 @@ namespace TrailMeisterViewer
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly MainWindowVM _viewModel;
+        private MainWindowVM _viewModel;
         public MainWindow()
         {
             this._viewModel = new MainWindowVM(this);
@@ -27,6 +27,9 @@ namespace TrailMeisterViewer
 
             EventViewerController eventViewerController = new EventViewerController(dbEvent);
             eventViewerController.ShowWindow();
+
+            // FixMe: This is ugly and likely a bad pattern.
+            this._viewModel.RelayCommand_Refresh.Execute(dbEvent);
         }
     }
 }

@@ -50,9 +50,10 @@ namespace TrailMeister.Model.Arduino
         private static ReaderData getDataObect(TagLines tag)
         {
             //byte[] bytes = getEpcBytesFromTaglines(tag.Lines); 
-            string epc = getEpcString(tag.Lines);
-            string rfidLapTimeStamp = tag.Lines[tag.Lines.Count - 1];
-            return new ReaderData(epc, ulong.Parse(rfidLapTimeStamp, System.Globalization.NumberStyles.HexNumber));
+            //string epc = getEpcString(tag.Lines);
+            string epc = tag.Lines[1];
+            string rfidLapTimeStamp = tag.Lines[2];
+            return new ReaderData(epc, ulong.Parse(rfidLapTimeStamp));
         }
 
         private static string getEpcString(List<string> lines)
@@ -62,13 +63,16 @@ namespace TrailMeister.Model.Arduino
 
             string epc = "";
 
-            for (int i = 1; i <= epcByteCount; i++)
-            {
-                epc += int.Parse(lines[i].Trim(), System.Globalization.NumberStyles.HexNumber).ToString("X2");
+            //for (int i = 1; i <= epcByteCount; i++)
+            //{
+            //    epc += long.Parse(lines[i].Trim(), System.Globalization.NumberStyles.HexNumber).ToString("X2");
 
-                //byte myByte = getByte(lines[i].Trim());
-                //bytes[i - 1] = myByte;
-            }
+            //    byte myByte = getByte(lines[i].Trim());
+            //    bytes[i - 1] = myByte;
+            //}
+
+            epc = long.Parse(lines[1].Trim(), System.Globalization.NumberStyles.HexNumber).ToString("X2");
+
             return epc;
         }
 

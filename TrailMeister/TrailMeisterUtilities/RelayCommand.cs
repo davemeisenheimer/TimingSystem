@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace TrailMeisterUtilities
 {
-    internal class RelayCommand : ICommand
+    public class RelayCommand : ICommand
     {
         private readonly Action<object> _execute;
         private readonly Predicate<object> _canExecute;

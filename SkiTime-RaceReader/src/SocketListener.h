@@ -1,37 +1,38 @@
 #ifndef SOCKETLISTENER_H_
 #define SOCKETLISTENER_H_
 
-#include "SparkFun_UHF_RFID_Reader.h" //Library for controlling the M6E Nano module
-#include <WiFiNINA.h>
+#include <WiFi.h>
 #include "WifiHelper.h"
-#include "../arduino_secrets.h"
+#include "RfidReader.h"
+#include "SocketClient.h"
 
 #define SOCKET_LOCAL_PORT 13001
 
+class RFID;  // forward declaration
+
 class SocketListener
 {
-#define BUFFER_SIZE 255
-
 public:
-    SocketListener(RFID *nano, WifiHelper *wifiHelper);
+    SocketListener(WifiHelper* wifiHelper, RfidReader* rfidReader, SocketClient *socketClient);
 
     void init();
     void check();
 
 private:
-    RFID *nano;
-    WifiHelper *wifiHelper;
+    // Core collaborators
+    WifiHelper* wifiHelper;
     WiFiServer server;
+    RfidReader* rfidReader;
+    SocketClient* socketClient;
 
     bool continueListening;
-    void setAntennaGain(char *command);
 
+    // ---- Internal helpers ----
+    void handleClient(WiFiClient& client);
+    void handleCommand(const String& command);
+
+    int getCommandValue(String command);
     String getCommandValueStr(String command);
-
-    const int currentLineSize = BUFFER_SIZE;
-    const int commandRequestSize = BUFFER_SIZE;
-    char currentLine[BUFFER_SIZE];    // make a String to hold incoming data from the client
-    char commandRequest[BUFFER_SIZE]; // the actual api request
 };
 
 #endif

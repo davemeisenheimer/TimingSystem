@@ -15,8 +15,8 @@ namespace TrailMeister.GUI.Main
         TaskFactory _uiFactory;
         private object _locker = new object();
         long _eventId;
-        ITagDataSource _tagReader = new TagReader(TagReaderDataSourceType.M6ENano);
-        //ITagDataSource _tagReader = new TagReader(TagReaderDataSourceType.Arduino);
+        //ITagDataSource _tagReader = new TagReader(TagReaderDataSourceType.M6ENano);
+        ITagDataSource _tagReader = new TagReader(TagReaderDataSourceType.Arduino);
         DbPeopleTable _dbPeopleTable = new DbPeopleTable();
         DbTagsTable _dbTagsTable = new DbTagsTable();
         DbLapsTable _dbLapsTable = new DbLapsTable();

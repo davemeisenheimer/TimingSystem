@@ -55,6 +55,24 @@ namespace TrailMeisterViewer
             }
         }
 
+        // When EventViewer window is closed we refresh the events, in case any were updated
+        // This could be more targeted toward the event that was being viewed
+        internal void refresh(object commandParameter)
+        {
+            DbEvent? oldEvent = commandParameter as DbEvent;
+
+            if (oldEvent != null)
+            {
+                DbEvent? newEvent = _dbEventsTable.getEvent(oldEvent.ID);
+
+                if (newEvent != null)
+                {
+                    this._vm.AllEvents.Remove(oldEvent.ID);
+                    this._vm.AllEvents.Add(newEvent);
+                }
+            }
+        }
+
         internal void AddNewPerson()
         {
             var dlgController = new AddPersonDialogController();
@@ -99,8 +117,6 @@ namespace TrailMeisterViewer
             DbEvent dbEvent = this._dbEventsTable.getEvent(eventId);
             bool canExecute = dbEvent != null && !dbEvent.EventFinished;
             bool eventFinished = dbEvent != null && dbEvent.EventFinished;
-            Debug.WriteLine("DAVEM: eventId: " + eventId + "; can execute: " + canExecute + "; EventFinished: " + eventFinished);
-            Debug.WriteLine("DAVEM: not null: " + dbEvent != null);
             return canExecute;
 
             //// Don't allow removal of events that have lap data

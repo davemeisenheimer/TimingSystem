@@ -19,13 +19,13 @@ namespace TrailMeisterViewer.Windows.EventViewer
         internal EventViewerController(DbEvent dbEvent)
         {
             _event = dbEvent;
-            _event.PropertyChanged += OnEventNameChanged;
+            _event.PropertyChanged += OnEventPropertyChanged;
             _vm = new EventViewerVM(this, dbEvent);
         }
 
-        private void OnEventNameChanged(object? sender, PropertyChangedEventArgs e)
+        private void OnEventPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            this._dbEventsTable.updateEvent(_event.ID, _event.EventName, _event.LapLength);
+            this._dbEventsTable.updateEvent(_event.ID, _event.EventName, _event.LapLength, _event.EventFinished);
         }
 
         public void ShowWindow()

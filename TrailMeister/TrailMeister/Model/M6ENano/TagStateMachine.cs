@@ -85,7 +85,7 @@ namespace TrailMeister.Model.M6ENano
 
         internal void MoveToNextState()
         {
-            Debug.WriteLine("DAVEM: MoveToNextState: CurrentState: " + this.CurrentState.State.ToString());
+            //Debug.WriteLine("MoveToNextState: CurrentState: " + this.CurrentState.State.ToString());
             AbortNextStateTimeout();
 
             switch(_currentState.State)

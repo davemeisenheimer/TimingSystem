@@ -10,11 +10,11 @@
       mc:Ignorable="d" 
       d:DesignHeight="800" d:DesignWidth="1200"
       Title="All Data">
-    
+
     <Page.Resources>
         <converters:Tag2PersonConverter x:Key="Tag2PersonConverter"/>
     </Page.Resources>
-    
+
     <Grid Margin="16,16,16,16">
         <Label diag:PresentationTraceSources.TraceLevel="High" x:Name="lblName" HorizontalAlignment="Center" VerticalAlignment="Top" Width="1180" Height="160" FontSize="80">
             <Label.Content>
@@ -24,13 +24,15 @@
                 </MultiBinding>
             </Label.Content>
         </Label>
-        <Label x:Name="lblLapCount" Content="Laps:" HorizontalAlignment="Left" Margin="10,164,0,0" VerticalAlignment="Top" Width="324" Height="160" FontSize="80"/>
-        <Label x:Name="lblLapTime" Content="Last Lap:" HorizontalAlignment="Left" Margin="10,290,0,0" VerticalAlignment="Top" Width="384" Height="160" FontSize="80" />
-        <Label x:Name="lblAverageLapTime" Content="Avg Lap:" HorizontalAlignment="Left" Margin="10,416,0,0" VerticalAlignment="Top" Width="384" Height="160" FontSize="80" />
-        <Label x:Name="lblTotalTime" Content="Total Time:" HorizontalAlignment="Left" Margin="10,542,0,0" VerticalAlignment="Top" Width="384" Height="160" FontSize="80" />
-        <Label x:Name="lblLapCountCount" Content="{Binding MostRecent.LapCount}" HorizontalAlignment="Center" Margin="0,164,0,0" VerticalAlignment="Top" Width="324" Height="160" FontSize="80"/>
-        <Label x:Name="lblLapTimeTime" Content="{Binding MostRecent.TimeLap}" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Margin="438,290,0,0" VerticalAlignment="Top" Width="620" Height="160" FontSize="80" />
-        <Label x:Name="lblAverageLapTimeTime" Content="{Binding MostRecent.AverageLapTime}" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Margin="438,416,0,0" VerticalAlignment="Top" Width="620" Height="160" FontSize="80" />
-        <Label x:Name="lblTotalTimeTime" Content="{Binding MostRecent.TimeTotal}" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Margin="438,542,0,0" VerticalAlignment="Top" Width="620" Height="160" FontSize="80" />
+        <Label x:Name="lblLapCount" Content="Laps:" HorizontalAlignment="Left" Margin="10,164,0,0" VerticalAlignment="Top" Width="324" Height="120" FontSize="80"/>
+        <Label x:Name="lblLapTime" Content="Last Lap:" HorizontalAlignment="Left" Margin="10,274,0,0" VerticalAlignment="Top" Width="384" Height="120" FontSize="80" />
+        <Label x:Name="lblAverageLapTime" Content="Avg Lap:" HorizontalAlignment="Left" Margin="10,384,0,0" VerticalAlignment="Top" Width="384" Height="120" FontSize="80" />
+        <Label x:Name="lblTotalTime" Content="Total Time:" HorizontalAlignment="Left" Margin="10,604,0,0" VerticalAlignment="Top" Width="384" Height="120" FontSize="80" />
+        <Label x:Name="lblLapCountCount" Content="{Binding MostRecent.LapCount}" HorizontalAlignment="Center" Margin="0,164,0,0" VerticalAlignment="Top" Width="324" Height="120" FontSize="80"/>
+        <Label x:Name="lblLapTimeTime" Content="{Binding MostRecent.TimeLap}" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Margin="438,274,0,0" VerticalAlignment="Top" Width="620" Height="120" FontSize="80" />
+        <Label x:Name="lblAverageLapTimeTime" Content="{Binding MostRecent.AverageLapTime}" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Margin="438,384,0,0" VerticalAlignment="Top" Width="620" Height="120" FontSize="80" />
+        <Label x:Name="lblTotalTimeTime" Content="{Binding MostRecent.TimeTotal}" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Margin="438,604,0,0" VerticalAlignment="Top" Width="620" Height="120" FontSize="80" />
+        <Label x:Name="lblBestTime" Content="Best Lap:" HorizontalAlignment="Left" Margin="10,494,0,0" VerticalAlignment="Top" Width="384" Height="120" FontSize="80" />
+        <Label x:Name="lblBestTimeTime" Content="{Binding MostRecent.BestLapTime}" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Margin="438,494,0,0" VerticalAlignment="Top" Width="620" Height="120" FontSize="80" />
     </Grid>
 </Page>

@@ -11,13 +11,15 @@ namespace TrailMeisterViewer
         protected readonly MainWindowController _controller;
 
         private ObservableKeyedCollection<int, DbTag> _allTags = new ObservableKeyedCollection<int, DbTag>(null, "TagId");
-        private ObservableKeyedCollection<int, DbEvent> _allEvents = new ObservableKeyedCollection<int, DbEvent>(null, "ID");
+        private ObservableKeyedCollection<uint, DbEvent> _allEvents = new ObservableKeyedCollection<uint, DbEvent>(null, "ID");
         private ObservableKeyedCollection<int, DbPerson> _allPeople = new ObservableKeyedCollection<int, DbPerson>(null, "PersonId");
 
         internal MainWindowVM(MainWindow mainWindow)
         {
             _mainWindow = mainWindow;
             this._controller = initController();
+            RelayCommand_Refresh = new RelayCommand(o => this._controller.refresh(o));
+
             ButtonCommand_AddPerson = new ButtonCommand(o => this._controller.AddNewPerson());
 
             DeleteEventCommand = new ButtonCommand(
@@ -29,6 +31,7 @@ namespace TrailMeisterViewer
         {
             return new MainWindowController(this);
         }
+        public ICommand RelayCommand_Refresh { get; set; }
         public ICommand ButtonCommand_AddPerson { get; set; }
         public ICommand DeleteEventCommand { get; set; }
 
@@ -55,7 +58,7 @@ namespace TrailMeisterViewer
             }
         }
 
-        public ObservableKeyedCollection<int, DbEvent> AllEvents
+        public ObservableKeyedCollection<uint, DbEvent> AllEvents
         {
             get
             {

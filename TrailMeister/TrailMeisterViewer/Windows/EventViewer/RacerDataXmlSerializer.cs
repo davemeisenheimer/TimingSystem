@@ -61,7 +61,7 @@ namespace TrailMeisterViewer.Windows.EventViewer
                 doc, 
                 xsltPath, 
                 Path.Combine(
-                    @"C:\Users\davem\SkiTrailData\",
+                    @"D:\Users\davem\SkiTrailData\",
                     ev.EventName,
                     htmlFileName));
         }

@@ -10,7 +10,7 @@ namespace TrailMeister.Model.Arduino
 {
     internal class SocketClient
     {
-        internal static IPAddress RemoteIP = new IPAddress(new byte[] { 192, 168, 0, 19 });
+        internal static IPAddress RemoteIP = new IPAddress(new byte[] { 192, 168, 0, 94 });
         internal static int RemotePort = 13001;
 
         internal static void SendCommand(string command)
@@ -45,8 +45,8 @@ namespace TrailMeister.Model.Arduino
 
                     // Receive the response from the remote device.
                     int bytesRec = sender.Receive(bytes);
-                    Debug.WriteLine("Arduino response = {0}",
-                        Encoding.ASCII.GetString(bytes, 0, bytesRec));
+                    Debug.WriteLine(String.Format("Arduino response = {0}",
+                        Encoding.ASCII.GetString(bytes, 0, bytesRec)));
 
                     // Release the socket.
                     sender.Shutdown(SocketShutdown.Both);

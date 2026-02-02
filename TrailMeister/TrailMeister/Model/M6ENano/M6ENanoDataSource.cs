@@ -58,8 +58,8 @@ namespace TrailMeister.Model.M6ENano
             // Returns true if the tag data should be sent now
             internal bool updateOnRead(ReaderData newData)
             {
-                Debug.WriteLine("DAVEM: updateOnRead: EPC: " + newData.EPC + "; timeStamp: " + (newData.TimeStamp.Ticks / TimeSpan.TicksPerMillisecond) + "; RSSI in: " + newData.Rssi + "; RSSI old: " + _lastData.Rssi);
-                Debug.WriteLine("DAVEM: updateOnRead: STATE: " + _tagStateMachine.CurrentState.State);
+                //Debug.WriteLine("UpdateOnRead: EPC: " + newData.EPC + "; timeStamp: " + (newData.TimeStamp.Ticks / TimeSpan.TicksPerMillisecond) + "; RSSI in: " + newData.Rssi + "; RSSI old: " + _lastData.Rssi);
+                //Debug.WriteLine("UpdateOnRead: STATE: " + _tagStateMachine.CurrentState.State);
 
                 switch (_tagStateMachine.CurrentState.State) {
                     case LapState.DETECT:

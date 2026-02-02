@@ -1,10 +1,18 @@
 #include "SocketListener.h"
+#include "SocketClient.h"
+#include "Config.h"
 
-SocketListener::SocketListener(RFID *nano, WifiHelper *wifiHelper) : server(SOCKET_LOCAL_PORT),
-                                                                     nano(nano),
-                                                                     wifiHelper(wifiHelper),
-                                                                     continueListening(true)
+SocketListener::SocketListener(
+    WifiHelper *wifiHelper, 
+    RfidReader *rfidReader,
+    SocketClient *socketClient) 
+    : server(SOCKET_LOCAL_PORT),
+            wifiHelper(wifiHelper),
+            rfidReader(rfidReader),
+            socketClient(socketClient),
+            continueListening(true)
 {
+    rfidReader = rfidReader;
 }
 
 void SocketListener::init()
@@ -14,103 +22,115 @@ void SocketListener::init()
 
 void SocketListener::check()
 {
-  if (!this->continueListening)
-    return;
+    if (!continueListening)
+        return;
 
-  WiFiClient client = this->server.available();
-  if (client)
-  {
-    // String currentLine = "";
-    currentLine[0] = '\0';
-    commandRequest[0] = '\0';
-    while (client.connected())
-    {
-      if (client.available())
-      {
-        char c = client.read();
-        if (c == '\n')
-        { // if the byte is a newline character
+    WiFiClient client = server.available();
+    if (!client)
+        return;
 
-          // if the current line is blank, you got two newline characters in a row.
-          // that's the end of the client HTTP request, so send a response:
-          if (strlen(currentLine) == 0)
-          {
-            client.println("We're good");
+    handleClient(client);
 
-            Serial.print("commandRequest is: ");
-            Serial.println(commandRequest);
-
-            if (strstr(commandRequest, "SetAntennaGain") != NULL)
-            {
-              this->setAntennaGain(commandRequest);
-              Serial.println("Antenna gain was set");
-              client.println("Antenna gain was set");
-            }
-            else if (strstr(commandRequest, "StopWifiValidation") != NULL)
-            {
-              this->wifiHelper->stopValidation();
-              client.println("Arduino will no longer validate wifi connection");
-            }
-            else if (strstr(commandRequest, "StopListenting") != NULL)
-            {
-              this->continueListening = false;
-              client.println("Arduino has stopped listening.");
-            }
-            else
-            {
-              client.print("Unknown arduino command: ");
-              client.println(currentLine);
-            }
-
-            // break out of the while loop:
-            break;
-          }
-          else
-          { // if you got a newline, then clear currentLine:
-            currentLine[0] = '\0';
-          }
-        }
-        else if (c != '\r')
-        { // if you got anything else but a carriage return character,
-          int currLen = strlen(currentLine);
-          if (currLen < this->currentLineSize - 2)
-          {
-            currentLine[currLen] = c;
-            currentLine[currLen + 1] = '\0';
-
-            commandRequest[0] = '\0';
-            strcpy(commandRequest, currentLine);
-          }
-        }
-      }
-    }
-
-    client.println();
-    client.flush();
     client.stop();
-
-    Serial.println("client disconnected");
-  }
+    if (DO_SERIAL) socketClient->sendDebugMessage("SocketListener: client disconnected");
 }
 
-void SocketListener::setAntennaGain(char *command)
+void SocketListener::handleClient(WiFiClient& client)
 {
-  String gainStr = this->getCommandValueStr(command);
-  int gain = gainStr.toInt();
+    String commandBuilder = "";
+    String command = "";
 
-  if (gain < 27 && gain > 4)
-  {
-    gain = gain * 100;
-    Serial.print("Setting antenna gain to: ");
-    Serial.println(gain);
-    nano->stopReading();
-    nano->setReadPower((gain));
-    nano->startReading();
+    while (client.connected())
+    {
+        if (!client.available())
+            continue;
+
+        char c = client.read();
+
+        if (c == '\n')
+        {
+            commandBuilder.trim();   // removes \r if present
+
+            if (commandBuilder.length() == 0)
+            {
+                // Blank line = end of request
+                client.println("We're good");
+                break;
+            }
+
+            command = commandBuilder;
+            commandBuilder = "";
+        }
+        else
+        {
+            commandBuilder += c;
+        }
+    }
+
+    if (DO_SERIAL) socketClient->sendDebugMessage("SocketListener command: " + command);
+
+    handleCommand(command);
+}
+
+void SocketListener::handleCommand(const String& command)
+{
+    if (command.startsWith("SetAntennaGain"))
+    {
+        int gain = getCommandValue(command);
+        rfidReader->setAntennaGain(gain);
+    }
+    else if (command == "StartReader")
+    {
+        rfidReader->startReading();
+    }
+    else if (command == "StopReader")
+    {
+        rfidReader->stopReading();
+    }
+    else if (command == "StopWifiValidation")
+    {
+        wifiHelper->stopValidation();
+    }
+    else if (command == "StopListening")
+    {
+        continueListening = false;
+    }
+    else if (command == "Reset")
+    {
+        this->server.stop();
+        rfidReader->stopReading();
+        ESP.restart();
+    }
+    else
+    {
+        if (DO_SERIAL) socketClient->sendDebugMessage("Unknown command: " + command);
+    }
+}
+
+// Returns the integer value after the comma in the command string
+// NB: A return value of -1 indicates no value found. Kind of flaky but good enough for now.
+int SocketListener::getCommandValue(String command)
+{
+  String valueStr = getCommandValueStr(command);
+
+  if (valueStr.length() == 0) {
+    if (DO_SERIAL) socketClient->sendDebugMessage("No value found in command: " + command);
+    return -1;
   }
+
+  int value = valueStr.toInt();
+
+  return value;
 }
 
 String SocketListener::getCommandValueStr(String command)
-{
-  String value = command.substring(command.indexOf(",") + 1);
-  return value;
+{  
+  int comma = command.indexOf(',');
+  if (comma < 0 || comma == command.length() - 1)
+  {
+    if (DO_SERIAL) socketClient->sendDebugMessage("No value found in command: " + command);
+    return "";
+  }
+
+  return command.substring(comma + 1);
 }

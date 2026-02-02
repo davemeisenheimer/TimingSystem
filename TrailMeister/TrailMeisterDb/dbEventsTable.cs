@@ -15,7 +15,7 @@ namespace TrailMeisterDb
         private string _eventName;
         private int _lapLength;
         private bool _eventFinished;
-        internal DbEvent(int id, string name, int lapLength, DateTime date, bool eventFinished)
+        internal DbEvent(uint id, string name, int lapLength, DateTime date, bool eventFinished)
         {
             this.ID = id;
             this.EventName = name;
@@ -23,7 +23,7 @@ namespace TrailMeisterDb
             this.EventDate = date;
             this.EventFinished = eventFinished;
         }
-        public int ID { get; set; }
+        public uint ID { get; set; }
         public string EventName
         {
             get
@@ -83,7 +83,7 @@ namespace TrailMeisterDb
         DbEvent IDbRowItem<DbEvent>.createItem(MySqlDataReader reader)
         {
             return new DbEvent(
-                               Convert.ToInt32(reader["id"]),
+                               Convert.ToUInt32(reader["id"]),
                                (string)reader["EventName"],
                                (int)reader["LapLength"],
                                (DateTime)reader["EventDate"],
@@ -96,7 +96,7 @@ namespace TrailMeisterDb
         DbEvent IDbRowItem<DbEvent>.createItem(MySqlDataReader reader)
         {
             return new DbEvent(
-                               Convert.ToInt32(reader["id"]),
+                               Convert.ToUInt32(reader["id"]),
                                (string)reader["EventName"],
                                (int)reader["LapLength"],
                                (DateTime)reader["EventDate"],

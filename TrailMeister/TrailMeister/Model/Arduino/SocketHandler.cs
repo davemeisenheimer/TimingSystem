@@ -6,6 +6,7 @@ using System.Text;
 using System.Net;
 using System.Threading;
 using TrailMeisterUtilities;
+using System.Diagnostics;
 
 namespace TrailMeister.Model.Arduino {
 
@@ -26,6 +27,7 @@ namespace TrailMeister.Model.Arduino {
 
         internal void startListening()
         {
+            TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.Connecting, "Client connecting"));
             Socket? handlerSocket = null;
             while (true)
             {
@@ -44,7 +46,10 @@ namespace TrailMeister.Model.Arduino {
 
                     IPAddress clientAddress = endPoint.Address;
 
-                    TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.Connected, "Client connected: " + clientAddress));
+                    if (!_isListening)
+                    {
+                        TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.Connected, "Client connected: " + clientAddress));
+                    }
 
                     string? message = null;
                     _isListening = true;
@@ -59,24 +64,41 @@ namespace TrailMeister.Model.Arduino {
                         if (handlerSocket.Connected)
                         {
                             bytesRec = handlerSocket.Receive(buffer);
+
+                            //if (bytesRec > 0) Debug.WriteLine("bytesRec: " + bytesRec);
                         }
 
                         message += Encoding.ASCII.GetString(buffer, 0, bytesRec);
 
-                        // Message completed? Parse it...
-                        if (message.Contains(ITagDataSource.END_READY_MESSAGE))
+                        if (message.EndsWith(Environment.NewLine))
                         {
-                            TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.ReaderReady, message));
-                            break;
+                            // Message completed? Parse it...
+                            
+                            if (message.Contains(ITagDataSource.END_READY_MESSAGE))
+                            {
+                                //Debug.WriteLine("Socket message received: " + message);
+                                TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.ReaderReady, message));
+                                message = "";
+                                break;
+                            }
+                            else if (message.Contains(ITagDataSource.END_TAG_DATA))
+                            {
+                                //Debug.WriteLine("Socket message received: " + message);
+                                TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.LapData, message));
+                                message = "";
+                                break;
+                            }
+                            else if (message.Contains(ITagDataSource.END_DEBUG_MESSAGE))
+                            {
+                                Debug.WriteLine(message.Trim());
+                                break;
+                            }
                         }
-                        else if (message.Contains(ITagDataSource.END_TAG_DATA))
-                        {
-                            TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.LapData, message));
-                            break;
-                        }
+                        Debug.Flush();
                     }
 
-                    this.TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.Disconnected, "Client disconnected"));
+                    // I don't think we can disconnect every time we close the socket. That has the wrong effect on the UI - returns to connection page
+                    //this.TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.Disconnected, "Client disconnected"));
                     handlerSocket.Close();
                     handlerSocket.Dispose();
                 }
@@ -99,7 +121,7 @@ namespace TrailMeister.Model.Arduino {
             {
                 if (disposing)
                 {
-                    //dispose managed resources
+                    this.TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.Disconnected, "Client disconnected"));
                 }
             }
             //dispose unmanaged resources

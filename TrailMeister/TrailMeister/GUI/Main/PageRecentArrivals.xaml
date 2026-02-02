@@ -38,15 +38,15 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
                 
-                <DataGridTextColumn x:Name="colLapCount" Width="1*" Header="Laps" Binding="{Binding LapCount}" FontSize="96" MinWidth="50" >
+                <DataGridTextColumn x:Name="colLapCount" Width="1.1*" Header="Laps" Binding="{Binding LapCount}" FontSize="96" MinWidth="50" >
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Center" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                
-                <DataGridTextColumn x:Name="colLapTime" CanUserResize="False" Width="3" Header="Last Lap" Binding="{Binding TimeLap}" FontSize="96" MinWidth="400">
+
+                <DataGridTextColumn x:Name="colLapTime" CanUserResize="False" Width="3.1*" Header="Last Lap" Binding="{Binding TimeLap}" FontSize="96" MinWidth="400">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Right" />
@@ -54,8 +54,8 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                
-                <DataGridTextColumn x:Name="colAvgLapTime" CanUserResize="False" Width="3" Header="Avg Lap" Binding="{Binding AverageLapTime}" FontSize="96" MinWidth="400">
+
+                <DataGridTextColumn x:Name="colAvgLapTime" CanUserResize="False" Width="2*" Header="Avg Lap" Binding="{Binding AverageLapTime}" FontSize="96" MinWidth="400">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Right" />
@@ -63,7 +63,7 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                
+
                 <DataGridTextColumn x:Name="colTotalTime" CanUserResize="False" Width="4*" Header="Total Time" Binding="{Binding TimeTotal}" FontSize="96" MinWidth="400">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">

@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Threading;
 using TrailMeister.Model.Data;
 using TrailMeisterUtilities;
+using System.Windows.Threading;
 
 namespace TrailMeister.Model.Arduino
 {
@@ -19,9 +20,11 @@ namespace TrailMeister.Model.Arduino
 
         private Socket? _listeningSocket;
         private SocketHandler? _socketHandler;
-        private Thread? _serverThread;
+        private Thread? _serverThread; 
+        private readonly Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
 
         private static readonly ArduinoDataSource instance = new ArduinoDataSource();
+        private readonly ArduinoConfig _config;
 
         // Explicit static constructor to tell C# compiler
         // not to mark type as beforefieldinit
@@ -31,10 +34,10 @@ namespace TrailMeister.Model.Arduino
 
         private ArduinoDataSource()
         {
-            Config = new ArduinoConfig();
+            _config = new ArduinoConfig();
         }
 
-        public void init()
+        public async void init()
         {
             // Create listening socket and bind it to Any:PORT
             IPAddress listeningIp = IPAddress.Any;
@@ -46,11 +49,18 @@ namespace TrailMeister.Model.Arduino
 
             // Start thread to handle incoming connections
             _socketHandler = new SocketHandler(_listeningSocket);
-            _serverThread = new Thread(new ThreadStart(_socketHandler.startListening));
+            _socketHandler.TagReadEvent += OnTagReadEvent;
+            //_serverThread = new Thread(new ThreadStart(_socketHandler.startListening));
+            _serverThread = new Thread(_socketHandler.startListening)
+            {
+                IsBackground = true
+            };
             _serverThread.Start();
         }
 
-        public ITagReaderConfig Config { get; set; }
+        public ITagReaderConfig Config {
+            get { return _config; } 
+        }
 
         internal static ArduinoDataSource Instance
         {
@@ -78,18 +88,21 @@ namespace TrailMeister.Model.Arduino
 
         private void OnTagReadEvent(object sender, TagDataEventArgs e)
         {
-            if (e.Type == TagDataSourceEventType.LapData)
+            _dispatcher.BeginInvoke(() =>
             {
-                List<ReaderData> data = TagDataArduino.getReaderData(e.Message);
-
-                foreach (ReaderData d in data)
+                if (e.Type == TagDataSourceEventType.LapData)
                 {
-                    TagDataSourceEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.LapData, e.Message, d));
+                    List<ReaderData> data = TagDataArduino.getReaderData(e.Message);
+
+                    foreach (ReaderData d in data)
+                    {
+                        TagDataSourceEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.LapData, e.Message, d));
+                    }
+                } else
+                {
+                    TagDataSourceEvent?.Invoke(this, e);
                 }
-            } else
-            {
-                TagDataSourceEvent?.Invoke(this, e);
-            }
+            });
         }
 
 
@@ -103,8 +116,11 @@ namespace TrailMeister.Model.Arduino
                 }
             }
             //dispose unmanaged resources
+            _config.Reset();
+
             if (_socketHandler != null)
             {
+                _socketHandler.TagReadEvent -= OnTagReadEvent;
                 this._socketHandler.Dispose();
                 while (_socketHandler.IsRunning);
             }

@@ -14,6 +14,8 @@ namespace TrailMeister.Model.Arduino
 {
     internal sealed class ArduinoDataSource : Disposable, ITagDataSourceConfigurable
     {
+        public string Name => "ArduinoDataSource"; // For AppDisposables
+
         public event TagDataSourceEventHandler? TagDataSourceEvent;
 
         const int listeningPort = 13000;
@@ -37,7 +39,7 @@ namespace TrailMeister.Model.Arduino
             _config = new ArduinoConfig();
         }
 
-        public async void init()
+        public void init()
         {
             // Create listening socket and bind it to Any:PORT
             IPAddress listeningIp = IPAddress.Any;
@@ -116,6 +118,7 @@ namespace TrailMeister.Model.Arduino
                 }
             }
             //dispose unmanaged resources
+            _config.SetAntennaPower(500);
             _config.Reset();
 
             if (_socketHandler != null)

@@ -18,7 +18,7 @@ namespace TrailMeisterDb
         internal DbEvent(uint id, string name, int lapLength, DateTime date, bool eventFinished)
         {
             this.ID = id;
-            this.EventName = name;
+            this._eventName = name;
             this.LapLength = lapLength;
             this.EventDate = date;
             this.EventFinished = eventFinished;
@@ -116,7 +116,7 @@ namespace TrailMeisterDb
         {
             return base.getRowItem(id);
         }
-        public List<DbEvent>? getEvents()
+        public List<DbEvent> getEvents()
         {
             Hashtable queryParams = new Hashtable() { };
             return base.getRowItems(queryParams);

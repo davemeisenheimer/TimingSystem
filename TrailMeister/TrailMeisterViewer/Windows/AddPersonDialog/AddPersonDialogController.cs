@@ -4,7 +4,7 @@ namespace TrailMeisterViewer.Windows.AddPersonDialog
 {
     internal class AddPersonDialogController
     {
-        public bool ShowDialog(out Person result)
+        public bool ShowDialog(out Person? result)
         {
             var vm = new AddPersonDialogVM();
             var dialog = new AddPersonDialog

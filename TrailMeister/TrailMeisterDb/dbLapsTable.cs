@@ -60,7 +60,7 @@ namespace TrailMeisterDb
         }
 
 
-        public List<DbLap>? getEventLapsForEvent(long eventId)
+        public List<DbLap> getEventLapsForEvent(long eventId)
         {
             Hashtable queryParams = new Hashtable() { { "eventId", eventId } };
 
@@ -74,16 +74,16 @@ namespace TrailMeisterDb
             return base.getRowItems(queryParams);
         }
 
-        public List<DbLap>? getAllLapsForRacer(long personId)
+        public List<DbLap> getAllLapsForRacer(long? personId)
         {
             Hashtable queryParams = new Hashtable() { { "PersonId", personId } };
 
             return base.getRowItems(queryParams);
         }
-        public void addLap(int tagId, long eventId, uint lapCount, ulong lapTime, ulong totalTime, long? personId)
+        public void addLap(long tagId, long eventId, uint lapCount, ulong lapTime, ulong totalTime, long? personId)
         {
             Hashtable columnData = new Hashtable() {
-                { "tagId", tagId },
+                {"tagId", tagId },
                 {"eventId", eventId },
                 {"LapCount", lapCount },
                 {"LapTime", lapTime },
@@ -100,6 +100,11 @@ namespace TrailMeisterDb
                 string msg = "Tried to add lap data for event, but something went wrong. " + lapDataJson;
                 throw new Exception(msg, ex);   
             }
+        }
+
+        public void updateLapPerson(long lapId, long personId)
+        {
+            base.updateColumnValue(lapId, "PersonId", personId.ToString());
         }
     }
 }

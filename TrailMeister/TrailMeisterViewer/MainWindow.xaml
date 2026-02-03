@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:TrailMeisterViewer"
         xmlns:convertersUtils="clr-namespace:TrailMeisterUtilities.Converters;assembly=TrailMeisterUtilities"
         xmlns:converters="clr-namespace:TrailMeisterViewer.Converters"
+        xmlns:utils="clr-namespace:TrailMeisterUtilities;assembly=TrailMeisterUtilities"
         mc:Ignorable="d"
         Title="3 Corner Nordic Viewer" Width="1420" Height="800" WindowStartupLocation="CenterScreen">
 
@@ -25,7 +26,12 @@
                               IsSynchronizedWithCurrentItem="False"
                               FontSize="24" AutoGenerateColumns="False" GridLinesVisibility="All" HorizontalAlignment="Stretch"
                               CanUserAddRows="False" >
-                        <DataGrid.ColumnHeaderStyle>
+
+                            <DataGrid.Resources>
+                                <utils:BindingProxy x:Key="VmProxy" Data="{Binding}" />
+                            </DataGrid.Resources>
+
+                            <DataGrid.ColumnHeaderStyle>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="HorizontalContentAlignment" Value="Right"/>
                             </Style>
@@ -48,13 +54,18 @@
                             <DataGridTextColumn x:Name="colName" CanUserResize="False" Width="10*" Header="Event Name" Binding="{Binding EventName}" IsReadOnly="true" MinWidth="200">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="HorizontalAlignment" Value="Right" />
+                                        <Setter Property="HorizontalAlignment" Value="Left" />
                                         <Setter Property="Padding" Value="8 0 8 0" />
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>
 
-                            <DataGridTextColumn x:Name="colEPC" Width="4*" Header="Event Date" Binding="{Binding EventDate}" IsReadOnly="true" MinWidth="300" >
+                            <DataGridTextColumn x:Name="colDate" Width="4*" Header="Event Date" Binding="{Binding EventDate, StringFormat=d}" IsReadOnly="true" MinWidth="300" >
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="HorizontalAlignment" Value="Right" />
@@ -72,12 +83,14 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
 
+
                             <DataGridTemplateColumn x:Name="colDeleteButton" Width="1*" Header="" IsReadOnly="false" MinWidth="48">
                                 <DataGridTemplateColumn.Visibility>
-                                    <Binding Path="DataContext.DeleteColumnIsVisible"
-                                             Converter="{StaticResource Bool2VisibilityConverter}"
-                                             RelativeSource="{RelativeSource AncestorType=DataGrid}"/>
+                                    <Binding Source="{StaticResource VmProxy}"
+                                             Path="Data.DeleteColumnIsVisible"
+                                             Converter="{StaticResource Bool2VisibilityConverter}" />
                                 </DataGridTemplateColumn.Visibility>
+
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Width="24" Height="24" Padding="0" BorderThickness="0" Background="Transparent"

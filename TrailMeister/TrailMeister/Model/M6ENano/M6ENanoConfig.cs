@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace TrailMeister.Model.M6ENano
             _reader = reader;
         }
 
-        internal Reader Reader { get { return _reader; } }
+        internal Reader? Reader { get { return _reader; } }
 
         internal void setReader(Reader reader)
         {
@@ -42,11 +43,14 @@ namespace TrailMeister.Model.M6ENano
 
         public void StopReader()
         {
+            if (_reader == null) return;
+
             try
             {
                 _reader.StopReading();
             } catch (Exception ex)
             {
+                Debug.WriteLine("Exception thrown: " + ex);
                 // Nothing to do. If it throws, stopping it, then it's probably no longer connected.
             }
 

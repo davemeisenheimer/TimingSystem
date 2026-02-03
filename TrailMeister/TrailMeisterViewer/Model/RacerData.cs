@@ -26,13 +26,13 @@ namespace TrailMeisterViewer.Model
 
         public DbPerson Person { get; set; }
 
-        public int? PersonId { get; set; }
+        public long PersonId { get; set; }
 
         public string BestLap
         {
             get
             {
-                return (String)laps2TimeConverter.Convert(new object[] { TimeConversionType.BestLap, Laps }, typeof(object), null, CultureInfo.CurrentCulture);
+                return (String)laps2TimeConverter.Convert(new object[] { TimeConversionType.BestLap, Laps }, typeof(object), new object(), CultureInfo.CurrentCulture);
             }
         }
 
@@ -40,7 +40,7 @@ namespace TrailMeisterViewer.Model
         {
             get
             {
-                return (String)laps2TimeConverter.Convert(new object[] { TimeConversionType.TotalTime, Laps }, typeof(object), null, CultureInfo.CurrentCulture);
+                return (String)laps2TimeConverter.Convert(new object[] { TimeConversionType.TotalTime, Laps }, typeof(object), new object(), CultureInfo.CurrentCulture);
             }
         }
 
@@ -48,7 +48,7 @@ namespace TrailMeisterViewer.Model
         {
             get
             {
-                return (String)laps2TimeConverter.Convert(new object[] { TimeConversionType.AverageLap, Laps }, typeof(object), null, CultureInfo.CurrentCulture);
+                return (String)laps2TimeConverter.Convert(new object[] { TimeConversionType.AverageLap, Laps }, typeof(object), new object(), CultureInfo.CurrentCulture);
             }
         }
     }

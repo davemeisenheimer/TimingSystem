@@ -8,7 +8,7 @@ namespace TrailMeister.Model.Data
 	{
 		int id;
 		string epc = "";
-		int? personId = 0;
+		long? personId = 0;
 		uint lapCount = 0;
 		DateTime rfidTimeAdded;      // Timing system time (rfid reader) when this entry was added to the data
 		DateTime rfidTimeUpdated;    // Last time we got lap data expressed according to the timing system time (rfid reader) time (ms)
@@ -28,7 +28,7 @@ namespace TrailMeister.Model.Data
 		string timeTotal;
 		Timers _timers;
 
-		public RecentLapData(int id, int? personId, string epc, DateTime timeStamp)
+		public RecentLapData(int id, long? personId, string epc, DateTime timeStamp)
 		{
 			this.id = id;
 			this.epc = epc;
@@ -64,7 +64,7 @@ namespace TrailMeister.Model.Data
 			}
 		}
 
-		public int? PersonId { 
+		public long? PersonId { 
 			get { return this.personId; } 
 			set
             {
@@ -240,7 +240,7 @@ namespace TrailMeister.Model.Data
 			}
 		}
 
-		public void update(DateTime timingSystemTime, int? personId)
+		public void update(DateTime timingSystemTime, long? personId)
         {
 			TimeSpan newLapTime = timingSystemTime - this.rfidTimeUpdated;
 

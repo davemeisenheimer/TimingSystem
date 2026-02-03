@@ -33,6 +33,7 @@ namespace TrailMeister.Model.M6ENano
 
             internal ReaderDataItem(ReaderData data)
             {
+                _peakData = data;
                 _lastData = data;
                 _tagStateMachine = new TagStateMachine();
                 _tagStateMachine.TagStateChangeEvent += OnTagStateChanged;
@@ -118,6 +119,8 @@ namespace TrailMeister.Model.M6ENano
 
 
         // Begin M6ENanoDataSource Class
+        public string Name => "ArduinoDataSource"; // For AppDisposables
+
         public event TagDataSourceEventHandler? TagDataSourceEvent;
         private static object _syncLock = new object();
         private Dictionary<string, ReaderDataItem> _reads = new Dictionary<string, ReaderDataItem>();
@@ -160,7 +163,7 @@ namespace TrailMeister.Model.M6ENano
             {
                 if (! ex.Message.Contains("Connect Successful"))
                 {
-                    throw ex;
+                    throw new Exception("Exception thrown: " + ex);
                 }
             }
 
@@ -212,7 +215,6 @@ namespace TrailMeister.Model.M6ENano
         {
             ReaderData tag = new ReaderData(e.TagReadData);
             ReaderDataItem? existingDataItem;
-            bool isNew = false;
 
             lock (_syncLock)
             {

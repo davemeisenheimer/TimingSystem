@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using TrailMeisterDb;
 using TrailMeisterViewer.Model;
 using TrailMeisterViewer.Windows.PersonalLog;
@@ -14,13 +15,18 @@ namespace TrailMeisterViewer.Windows.EventViewer
             InitializeComponent();
         }
 
-        private void OnRacerRowDoubleClick(object sender, RoutedEventArgs e)
+        private void OnRacerRowDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var row = (DataGridRow)sender;
-            RacerData racerData = (RacerData)(row.Item);
+            if (sender is not DataGridRow row || row.IsEditing || row.Item is not RacerData racerData)
+                return;
 
-            PersonalLogController logController = new PersonalLogController(racerData.Person);
+            // Stop bubbling
+            e.Handled = true;
+
+            // Open the PersonalLog window
+            var logController = new PersonalLogController(racerData.Person);
             logController.ShowWindow();
         }
+
     }
 }

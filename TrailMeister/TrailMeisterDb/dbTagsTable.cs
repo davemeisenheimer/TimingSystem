@@ -12,8 +12,8 @@ using System.Diagnostics;
 namespace TrailMeisterDb
 {
     public class DbTag {
-        private int? _personId;
-        public DbTag(int id, string epc, int? personId)
+        private long? _personId;
+        public DbTag(int id, string epc, long? personId)
         {
             this.TagId = id;
             this.EPC = epc;
@@ -22,7 +22,7 @@ namespace TrailMeisterDb
         public int TagId { get; set; }
         public string EPC { get; set; }
 
-        public int? PersonId {
+        public long? PersonId {
             get
             {
                 return this._personId;
@@ -68,7 +68,7 @@ namespace TrailMeisterDb
         public DbTagsTable() : base("tags", new DbTagFactory()) { }
 
         // Returns all tags in db
-        public List<DbTag>? getTags()
+        public List<DbTag> getTags()
         {
             Hashtable queryParams = new Hashtable() { };
             return base.getRowItems(queryParams);
@@ -98,10 +98,11 @@ namespace TrailMeisterDb
             return base.addRow(columnData);
         }
 
-        public void updateTag(long id, int? personId)
+        public void updateTag(long id, long? personId)
         {
-            if (personId == null) return;
-            base.updateColumnValue(id, "PersonId", personId.ToString());
+            if (personId is long pId) { 
+                base.updateColumnValue(id, "PersonId", pId.ToString());
+            }
         }
     }
 }

@@ -104,9 +104,6 @@ namespace TrailMeister.Model.M6ENano
                     _currentState = StateDetect;
                     TagStateChangeEvent?.Invoke(this, new TagStateChangedEventArgs(LapState.DETECT));
                     break;
-                default:
-                    throw new InvalidOperationException("Trying to move to an unknown state: " + _currentState.State);
-                    break;
             }
         }
 

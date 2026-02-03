@@ -26,6 +26,7 @@ namespace TrailMeister.GUI.Main
 
         public MainWindowController(MainWindowVM vm)
         {
+            AppDisposables.Instance.Register(_tagReader);
             _uiFactory = new TaskFactory(TaskScheduler.FromCurrentSynchronizationContext());
             this._vm = vm;
             init();
@@ -267,8 +268,12 @@ namespace TrailMeister.GUI.Main
 
         public virtual void OnFinishEvent()
         {
-            DbEvent dbEvent = _dbEventsTable.getEvent((uint)this._eventId);
-            _dbEventsTable.updateEvent(this._eventId, this._vm.EventName, dbEvent.LapLength, this._vm.IsEventFinished);
+            DbEvent? dbEvent = _dbEventsTable.getEvent((uint)this._eventId);
+
+            if (dbEvent != null)
+            {
+                _dbEventsTable.updateEvent(this._eventId, this._vm.EventName, dbEvent.LapLength, this._vm.IsEventFinished);
+            }
         }
 
         internal void SetAntennaPower()
@@ -395,7 +400,7 @@ namespace TrailMeister.GUI.Main
             } else if (tagToUpdate != null)
             {
                 DbTag? dbTag = null;
-                int? personId = tagToUpdate.PersonId;
+                long? personId = tagToUpdate.PersonId;
                 lock (this._locker)
                 {
                     if (_vm.AllTags.TryGetValue(tagToUpdate.ID, out dbTag))

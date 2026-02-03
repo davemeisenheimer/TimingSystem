@@ -12,7 +12,7 @@ namespace TrailMeisterViewer
 
         private ObservableKeyedCollection<int, DbTag> _allTags = new ObservableKeyedCollection<int, DbTag>(null, "TagId");
         private ObservableKeyedCollection<uint, DbEvent> _allEvents = new ObservableKeyedCollection<uint, DbEvent>(null, "ID");
-        private ObservableKeyedCollection<int, DbPerson> _allPeople = new ObservableKeyedCollection<int, DbPerson>(null, "PersonId");
+        private ObservableKeyedCollection<long, DbPerson> _allPeople = new ObservableKeyedCollection<long, DbPerson>(null, "PersonId");
 
         internal MainWindowVM(MainWindow mainWindow)
         {
@@ -74,7 +74,7 @@ namespace TrailMeisterViewer
             }
         }
 
-        public ObservableKeyedCollection<int, DbPerson> AllPeople
+        public ObservableKeyedCollection<long, DbPerson> AllPeople
         {
             get
             {

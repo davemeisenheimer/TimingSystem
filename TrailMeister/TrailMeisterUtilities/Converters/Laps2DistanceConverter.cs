@@ -17,7 +17,6 @@ namespace TrailMeisterUtilities.Converters
         {
             double distanceMetres = 0;
             string formattedDistance = "0m";
-            TimeConversionPrecision precision = TimeConversionPrecision.ToTheHundredth;
 
             if (values.Length >= 1 &&
                     values[0] is List<DbLap> laps)

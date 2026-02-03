@@ -14,6 +14,10 @@ namespace TrailMeisterViewer.Windows.AddPersonDialog
 
         public AddPersonDialogVM()
         {
+            _firstName = "";
+            _lastName = "";
+            _nickName = "";
+            _association = "";
             OkCommand = new ButtonCommand(ExecuteOk, CanExecuteOk);
             CancelCommand = new ButtonCommand(ExecuteCancel);
         }
@@ -47,7 +51,7 @@ namespace TrailMeisterViewer.Windows.AddPersonDialog
 
         public bool? DialogResult { get; private set; }
 
-        private bool CanExecuteOk(object obj)
+        private bool CanExecuteOk(object? obj)
         {
             return !string.IsNullOrWhiteSpace(FirstName)
                 && !string.IsNullOrWhiteSpace(LastName);

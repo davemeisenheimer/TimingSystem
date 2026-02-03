@@ -4,6 +4,8 @@ using System.Windows.Input;
 
 using TrailMeisterViewer.Windows.EventViewer;
 using TrailMeisterDb;
+using System.ComponentModel;
+using System;
 
 namespace TrailMeisterViewer
 {
@@ -18,10 +20,12 @@ namespace TrailMeisterViewer
             this._viewModel = new MainWindowVM(this);
             this.DataContext = this._viewModel;
             InitializeComponent();
+            SetInitialSortOrder();
         }
 
         private void OnEventRowDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            e.Handled = true;
             var row = (DataGridRow)sender;
             DbEvent dbEvent = (DbEvent)(row.Item);
 
@@ -31,5 +35,11 @@ namespace TrailMeisterViewer
             // FixMe: This is ugly and likely a bad pattern.
             this._viewModel.RelayCommand_Refresh.Execute(dbEvent);
         }
+        private void SetInitialSortOrder()
+        {
+            gridEvents.Items.SortDescriptions.Clear();
+            gridEvents.Items.SortDescriptions.Add(new SortDescription(nameof(DbEvent.EventDate), ListSortDirection.Descending));
+        }
+
     }
 }

@@ -9,11 +9,11 @@ namespace TrailMeisterUtilities.Converters
     // Converts DbTag and DbPerson to Person's name
     public class Tag2PersonConverter : IMultiValueConverter
     {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             if (values.Length >= 2 &&
-                values[0] is int personId &&
-                values[1] is ObservableKeyedCollection<int, DbPerson> people)
+                values[0] is long personId &&
+                values[1] is ObservableKeyedCollection<long, DbPerson> people)
             {
                 NameConversionType conversiontype = NameConversionType.FirstLastAndNickName;
 

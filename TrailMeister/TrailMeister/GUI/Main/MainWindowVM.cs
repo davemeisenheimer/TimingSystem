@@ -18,7 +18,7 @@ namespace TrailMeister.GUI.Main
         private ObservableKeyedCollection<int, RecentLapData> _recentLapData = new ObservableKeyedCollection<int, RecentLapData>(null, "ID");
         private RecentLapData? _mostRecentData;
         private ObservableKeyedCollection<string, RecentLapData> _allParticipants = new ObservableKeyedCollection<string, RecentLapData>(null, "EPC");
-        private ObservableKeyedCollection<int, DbPerson> _allPeople = new ObservableKeyedCollection<int, DbPerson>(null, "PersonId");
+        private ObservableKeyedCollection<long, DbPerson> _allPeople = new ObservableKeyedCollection<long, DbPerson>(null, "PersonId");
         protected readonly MainWindowController _controller;
 
         private string _eventName = "Event " + DateOnly.FromDateTime(DateTime.Today).ToString("yyyy/MM/dd");
@@ -171,7 +171,7 @@ namespace TrailMeister.GUI.Main
             }
         }
 
-        public ObservableKeyedCollection<int, DbPerson> AllPeople
+        public ObservableKeyedCollection<long, DbPerson> AllPeople
         {
             get
             {

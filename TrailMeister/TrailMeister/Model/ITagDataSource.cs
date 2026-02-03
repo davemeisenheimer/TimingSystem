@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TrailMeisterUtilities;
 
 namespace TrailMeister.Model
 {
@@ -29,7 +30,7 @@ namespace TrailMeister.Model
     };
 
     public delegate void TagDataSourceEventHandler(object sender, TagDataEventArgs eventArgs);
-    internal interface ITagDataSource: IDisposable
+    internal interface ITagDataSource: IDisposable, IAppDisposable
     {
         const string END_TAG_DATA = "TAG_DATA_##$$##";
         const string END_READY_MESSAGE = "READER_READY_##$$##";

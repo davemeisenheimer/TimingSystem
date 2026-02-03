@@ -15,9 +15,6 @@ namespace TrailMeisterViewer
 {
     internal class MainWindowController : Disposable
     {
-        TaskFactory _uiFactory;
-        private object _locker = new object();
-        long _eventId;
         MainWindowVM _vm;
         DbTagsTable _dbTagsTable = new DbTagsTable();
         DbPeopleTable _dbPeopleTable = new DbPeopleTable();
@@ -26,7 +23,6 @@ namespace TrailMeisterViewer
 
         public MainWindowController(MainWindowVM vm)
         {
-            _uiFactory = new TaskFactory(TaskScheduler.FromCurrentSynchronizationContext());
             this._vm = vm;
             init();
         }
@@ -57,7 +53,7 @@ namespace TrailMeisterViewer
 
         // When EventViewer window is closed we refresh the events, in case any were updated
         // This could be more targeted toward the event that was being viewed
-        internal void refresh(object commandParameter)
+        internal void refresh(object? commandParameter)
         {
             DbEvent? oldEvent = commandParameter as DbEvent;
 
@@ -77,11 +73,15 @@ namespace TrailMeisterViewer
         {
             var dlgController = new AddPersonDialogController();
 
-            if (dlgController.ShowDialog(out var person))
+            if (dlgController.ShowDialog(out Person? person) && person != null)
             {
                 long newId = this._dbPeopleTable.addPerson(person.FirstName, person.LastName, person.NickName, person.Association);
-                DbPerson dbPerson = _dbPeopleTable.getPerson(newId);
-                this.AddPerson(dbPerson);
+                DbPerson? dbPerson = _dbPeopleTable.getPerson(newId);
+
+                if (dbPerson != null)
+                {
+                    this.AddPerson(dbPerson);
+                }
             }
         }
 
@@ -91,7 +91,7 @@ namespace TrailMeisterViewer
 
             // Don't allow removal of events that have lap data
             List<DbLap>? lapsForEvent = this._dbLapsTable.getEventLapsForEvent(eventId);
-            if (lapsForEvent.Any())
+            if (lapsForEvent != null && lapsForEvent.Any())
             {
                 MessageBoxResult result = MessageBox.Show(
                     "This event has racer data associated with it. Do you really want to delete this event and all its data?", 
@@ -106,17 +106,21 @@ namespace TrailMeisterViewer
                 }
                 this._dbLapsTable.deleteEventLapsForEvent(eventId);
             }
-
-            this._vm.AllEvents.Remove(this._vm.AllEvents.FirstOrDefault(x => x.ID == eventId));
+            DbEvent? clickedEvent = this._vm.AllEvents.FirstOrDefault(x => x.ID == eventId);
+            if (clickedEvent != null)
+            {
+                this._vm.AllEvents.Remove(clickedEvent);
+            }
             this._dbEventsTable.deleteEvent(eventId);
         }
 
-        internal bool CanExecuteDeleteEvent(object commandParameter)
+        internal bool CanExecuteDeleteEvent(object? commandParameter)
         {
+            if (commandParameter == null) return false;
+
             uint eventId = Convert.ToUInt32(commandParameter);
-            DbEvent dbEvent = this._dbEventsTable.getEvent(eventId);
+            DbEvent? dbEvent = this._dbEventsTable.getEvent(eventId);
             bool canExecute = dbEvent != null && !dbEvent.EventFinished;
-            bool eventFinished = dbEvent != null && dbEvent.EventFinished;
             return canExecute;
 
             //// Don't allow removal of events that have lap data
@@ -126,17 +130,14 @@ namespace TrailMeisterViewer
 
         internal bool GetAreDeletableEvents()
         {
-            bool returnVal = false;
             List<DbEvent> events = _dbEventsTable.getEvents();
 
             foreach(DbEvent e in events)
             {
-                List<DbLap>? lapsForEvent = this._dbLapsTable.getEventLapsForEvent(e.ID);
-                returnVal = lapsForEvent.Any();
-                if (returnVal) break;
+                if (!e.EventFinished) return true;
             }
 
-            return returnVal;
+            return false;
         }
 
         private void AddTag(DbTag tag)

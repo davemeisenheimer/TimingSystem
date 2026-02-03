@@ -22,7 +22,7 @@ namespace TrailMeister.Model.Arduino
         {
             SocketClient.SendCommand(String.Format("StopReader"));
         }
-        private void SetAntennaPower(int power)
+        internal void SetAntennaPower(int power)
         {
             if (power < 0 || power > 27000) { throw new ArgumentException("power is outside range of 0-27000"); }
 

@@ -11,6 +11,7 @@ namespace TrailMeister.Model
 {
     public class TagReader: Disposable, ITagDataSource
     {
+        public string Name => "ITagDataSource"; // For AppDisposables
 
         private ITagDataSource _dataSource;
 

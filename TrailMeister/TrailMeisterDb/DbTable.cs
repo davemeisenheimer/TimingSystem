@@ -63,7 +63,7 @@ namespace TrailMeisterDb
             return dbProcess.getRowItem<DbItemType>(_tableName, searchParams, _factory);
         }
 
-        protected List<DbItemType>? getRowItems(Hashtable searchParams)
+        protected List<DbItemType> getRowItems(Hashtable searchParams)
         {
              return dbProcess.getRowItems<DbItemType>(_tableName, searchParams, _factory);
         }

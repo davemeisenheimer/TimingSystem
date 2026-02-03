@@ -17,7 +17,7 @@ namespace TrailMeisterDb
         private string _lastName = "";
         private string _nickName = "";
         private string _association = "";
-        public DbPerson(int id, string first, string last = "", string nickname = "", string association = "")
+        public DbPerson(long id, string first, string last = "", string nickname = "", string association = "")
         {
             this.PersonId = id;
             this.FirstName = first;
@@ -25,7 +25,7 @@ namespace TrailMeisterDb
             this.NickName = nickname;
             this.Association = association;
         }
-        public int PersonId { get; set; }
+        public long PersonId { get; set; }
         public string FirstName
         {
             get
@@ -101,7 +101,7 @@ namespace TrailMeisterDb
         DbPerson IDbRowItem<DbPerson>.createItem(MySqlDataReader reader)
         {
             return new DbPerson(
-                Convert.ToInt32(reader["id"]),
+                Convert.ToUInt32(reader["id"]),
                 (string)reader["firstName"],
                 (string)reader["lastName"],
                 (string)reader["nickName"],
@@ -115,7 +115,7 @@ namespace TrailMeisterDb
         public DbPeopleTable() : base("people", new DbPersonFactory()) { }
 
         // Returns all tags in db
-        public List<DbPerson>? getPeople()
+        public List<DbPerson> getPeople()
         {
             Hashtable queryParams = new Hashtable() { };
             return base.getRowItems(queryParams);

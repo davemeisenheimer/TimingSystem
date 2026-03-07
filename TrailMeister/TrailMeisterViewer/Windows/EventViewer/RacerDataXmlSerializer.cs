@@ -57,13 +57,17 @@ namespace TrailMeisterViewer.Windows.EventViewer
                                 "Windows",
                                 "EventViewer",
                                 "Event.xslt");
+
+            string htmlDir = Path.Combine(
+                    @"D:\Users\davem\SkiTrailData\",
+                    ev.EventName);
+
+            Directory.CreateDirectory(htmlDir);
+
             TransformXmlToHtml(
                 doc, 
                 xsltPath, 
-                Path.Combine(
-                    @"D:\Users\davem\SkiTrailData\",
-                    ev.EventName,
-                    htmlFileName));
+                Path.Combine(htmlDir, htmlFileName));
         }
 
         private static void TransformXmlToHtml(XDocument xmlDoc, string xsltPath, string outputHtmlPath)

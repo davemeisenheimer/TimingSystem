@@ -93,7 +93,7 @@
 
                 <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
-                    <!--<EventSetter Event="MouseDoubleClick" Handler="OnRacerRowDoubleClick"/>-->
+                    <EventSetter Event="MouseDoubleClick" Handler="OnRacerRowDoubleClick"/>
                     <Setter Property="ToolTip">
                         <Setter.Value>
                             <ContentControl Content="{Binding}" ContentTemplate="{StaticResource RacerLapsTooltipTemplate}"/>
@@ -102,28 +102,8 @@
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn x:Name="colName" CanUserResize="False" Width="5*" Header="Name" IsReadOnly="true" MinWidth="50"
-                                SortMemberPath="Person.FirstName">
-                    <DataGridTextColumn.Binding>
-                        <MultiBinding Converter="{StaticResource Person2NameConverter}">
-                            <Binding Source="{x:Static converters:NameConversionType.FirstAndLast}" />
-                            <Binding Path="Person"/>
-                        </MultiBinding>
-                    </DataGridTextColumn.Binding>
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                        </Style>
-                    </DataGridTextColumn.HeaderStyle>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Left" />
-                            <Setter Property="Padding" Value="8 0 8 0" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
 
-                <DataGridTemplateColumn x:Name="colPerson" Width="4*" Header="Association" IsReadOnly="false" MinWidth="300">
+                <DataGridTemplateColumn x:Name="colPerson" Width="4*" Header="Name" IsReadOnly="false" MinWidth="300">
                     <!-- Display mode -->
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -171,6 +151,22 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
 
                 </DataGridTemplateColumn>
+                
+                <DataGridTextColumn x:Name="colName" CanUserResize="False" Width="5*" Header="Association" IsReadOnly="true" MinWidth="50"
+                                    SortMemberPath="Person.FirstName"
+                                    Binding="{Binding Person.Association}">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                            <Setter Property="Padding" Value="8 0 8 0" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
 
                 <DataGridTextColumn 
                     x:Name="colLaps" CanUserResize="False" 

@@ -81,7 +81,7 @@ unsigned long WifiHelper::getWifiEpoch()
 
     if (now < 100000) {   // time not synced yet
         this->invalidTimeSyncs++;
-        if (DO_SERIAL) socketClient->sendDebugMessage("NTP not synced");
+        this->sendDebugMessage("NTP not synced");
         return 0;
     }
 
@@ -106,24 +106,24 @@ void WifiHelper::recordElapsedWifi()
     // check if delay has timed out after 10sec == 10000mS
     if (elapsedWifiMs >= 30000)
     {
-        if (DO_SERIAL) socketClient->sendDebugMessage("Wait too long for next client character");
+        this->sendDebugMessage("Wait too long for next client character");
     }
 }
 
 void WifiHelper::printWifiStatus()
 {
     // print the SSID of the network you're attached to:
-    if (DO_SERIAL) socketClient->sendDebugMessage("SSID: " + WiFi.SSID());
+    this->sendDebugMessage("SSID: " + WiFi.SSID());
 
     // print your board's IP address:
     IPAddress ip = WiFi.localIP();
-    if (DO_SERIAL) socketClient->sendDebugMessage("IP Address: " + ip.toString());
+    this->sendDebugMessage("IP Address: " + ip.toString());
 
     // print the received signal strength:
     long rssi = WiFi.RSSI();
-    if (DO_SERIAL) socketClient->sendDebugMessage("RSSI:" + String(rssi) + " dBm");
+    this->sendDebugMessage("RSSI:" + String(rssi) + " dBm");
     // print where to go in a browser:
-    if (DO_SERIAL) socketClient->sendDebugMessage("IP: " + ip.toString());
+    this->sendDebugMessage("IP: " + ip.toString());
 }
 
 void WifiHelper::validateWifiConnection()
@@ -138,12 +138,12 @@ void WifiHelper::validateWifiConnection()
         return;
 
     lastWdogCheckSecs = nowSecs;
-    if (DO_SERIAL) socketClient->sendDebugMessage("."); // heartbeat
+    this->sendDebugMessage("."); // heartbeat
 
     // Check WiFi connection first (authoritative on ESP32)
     if (WiFi.status() != WL_CONNECTED)
     {
-        if (DO_SERIAL) socketClient->sendDebugMessage("\nWiFi disconnected – restarting WiFi");
+        this->sendDebugMessage("\nWiFi disconnected – restarting WiFi");
         restartWifi();
         return;
     }
@@ -160,7 +160,7 @@ void WifiHelper::validateWifiConnection()
     // No traffic watchdog
     if ((nowSecs - lastWifiMsgSecs) > WATCHDOG_NO_MSG_SECS)
     {
-        if (DO_SERIAL) socketClient->sendDebugMessage("\nNo WiFi traffic – restarting WiFi");
+        this->sendDebugMessage("\nNo WiFi traffic – restarting WiFi");
         restartWifi();
     }
 }
@@ -170,7 +170,7 @@ int WifiHelper::restartWifi()
     char ssid[] = SECRET_SSID;
     char pass[] = SECRET_PASS;
 
-    if (DO_SERIAL) socketClient->sendDebugMessage("Restarting WiFi");
+    this->sendDebugMessage("Restarting WiFi");
 
     wifiRestarts++;
 
@@ -185,7 +185,7 @@ int WifiHelper::restartWifi()
     // Attempt reconnect (max 5 tries)
     for (int attempt = 1; attempt <= 5; attempt++)
     {
-        if (DO_SERIAL) socketClient->sendDebugMessage("WiFi connect attempt " + String(attempt));
+        this->sendDebugMessage("WiFi connect attempt " + String(attempt));
 
         WiFi.begin(ssid, pass);
 
@@ -195,7 +195,7 @@ int WifiHelper::restartWifi()
             if (WiFi.status() == WL_CONNECTED)
             {
                 status = WL_CONNECTED;
-                if (DO_SERIAL) socketClient->sendDebugMessage("WiFi reconnected");
+                this->sendDebugMessage("WiFi reconnected");
 
                 server.begin();
                 lastWifiMsgSecs = millis() / 1000;
@@ -206,7 +206,7 @@ int WifiHelper::restartWifi()
         }
     }
 
-    if (DO_SERIAL) socketClient->sendDebugMessage("WiFi restart failed");
+    this->sendDebugMessage("WiFi restart failed");
     return status;
 }
 

@@ -47,7 +47,7 @@ namespace TrailMeisterUtilities.Converters
                                 : 0UL;
                             break;
                         case TimeConversionType.TotalTime:
-                            timeMs = laps.Max(r => r.TotalTime);
+                            timeMs = (ulong)laps.Aggregate<DbLap, decimal>(0, (sum, lap) => sum + lap.LapTime);
                             break;
                     }
                 }

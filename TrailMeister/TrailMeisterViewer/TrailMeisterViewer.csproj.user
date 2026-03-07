@@ -13,6 +13,12 @@
     <Compile Update="Windows\PersonalLog\PersonalLog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Windows\PersonalLog\SummaryGrid.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Windows\PersonalLog\SummaryItem.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Windows\AddPersonDialog\AddPersonDialog.xaml">
@@ -25,6 +31,12 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Windows\PersonalLog\PersonalLog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Windows\PersonalLog\SummaryGrid.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Windows\PersonalLog\SummaryItem.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

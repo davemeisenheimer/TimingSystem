@@ -25,7 +25,7 @@ namespace TrailMeisterUtilities.Converters
         public object Convert(object[] values, Type targetType, object parameter,
             System.Globalization.CultureInfo culture)
         {
-            ulong timeMs = (ulong)values[0];
+            ulong timeMs = values[0] != null && values[0] is ulong ? (ulong)values[0] : 0;
             TimeConversionPrecision precision = TimeConversionPrecision.ToTheHundredth;
 
             if (values.Length > 1 && values[1] != null)

@@ -8,7 +8,8 @@
         xmlns:model="clr-namespace:TrailMeister.Model"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
-        Title="Trail Meister" Closing="mainWindow_Closing" Loaded="mainWindow_Loaded">
+        Title="Trail Meister" Closing="mainWindow_Closing" Loaded="mainWindow_Loaded"
+        WindowState="Maximized">
     <Window.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <converters:EnumEqualConverter x:Key="EnumEqualConverter" />

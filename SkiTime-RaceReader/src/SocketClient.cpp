@@ -8,7 +8,7 @@ SocketClient::SocketClient()
 
 bool SocketClient::sendTag(const Tag& tag)
 {
-    if (DO_SERIAL) this->sendDebugMessage("sendTag: Connecting to client");
+    this->sendDebugMessage("sendTag: Connecting to client");
 
     // Don't use sendDebugMessage after client.connect, or we get a recursive loop!
     if (!client.connect(SOCKET_SERVER_IP, SOCKET_SERVER_PORT))
@@ -38,14 +38,14 @@ bool SocketClient::sendTag(const Tag& tag)
     client.stop();
 
     // Now we can use sendDebugMessage again
-    if (DO_SERIAL) this->sendDebugMessage("Connected to client");
-    if (DO_SERIAL) this->sendDebugMessage("EPC bytes: " + String(tag.epcBytes));
+    this->sendDebugMessage("Connected to client");
+    this->sendDebugMessage("EPC bytes: " + String(tag.epcBytes));
     return true;
 }
 
 bool SocketClient::sendReady()
 {
-  if (DO_SERIAL) this->sendDebugMessage("waitForRaceClient");
+  this->sendDebugMessage("waitForRaceClient");
   
   bool raceClientReady = false;
 
@@ -60,12 +60,13 @@ bool SocketClient::sendReady()
       raceClientReady = true;
   }
 
-  if (DO_SERIAL) this->sendDebugMessage("Found race client: " + String(raceClientReady ? "yes" : "no"));
+  this->sendDebugMessage("Found race client: " + String(raceClientReady ? "yes" : "no"));
   return raceClientReady;
 }
 
 void SocketClient::sendDebugMessage(const String& message)
 {
+  #ifdef DO_SEND_DEBUG_MSG
   if (DO_SERIAL) Serial.println("sendDebugMessage sending: " + message);
   
   bool messageSent = false;
@@ -82,6 +83,7 @@ void SocketClient::sendDebugMessage(const String& message)
   }
 
   if (DO_SERIAL) Serial.println("Debug message sent: " + String(messageSent ? "yes" : "no"));
+  #endif
 }
 
 

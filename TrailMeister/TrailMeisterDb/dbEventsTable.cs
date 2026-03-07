@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data;
+﻿
 using MySql.Data.MySqlClient;
 using System.Collections;
 using System.ComponentModel;
@@ -119,6 +114,22 @@ namespace TrailMeisterDb
         public List<DbEvent> getEvents()
         {
             Hashtable queryParams = new Hashtable() { };
+            return base.getRowItems(queryParams);
+        }
+        public List<DbEvent> getEventsByIds(List<long>? idList)
+        {
+            if (idList == null || !idList.Any()) return new List<DbEvent>();
+
+            // Create a string like "1, 2, 3"
+            string joinedIds = string.Join(", ", idList);
+
+            Hashtable queryParams = new Hashtable();
+
+            // We craft the Key so the final string becomes:
+            // WHERE EventId IN (1, 2, 3) AND 1 = 1
+            // The "1" at the end comes from the 'Value' part of the Hashtable
+            queryParams.Add($"ID IN ({joinedIds}) AND 1", "1");
+
             return base.getRowItems(queryParams);
         }
 

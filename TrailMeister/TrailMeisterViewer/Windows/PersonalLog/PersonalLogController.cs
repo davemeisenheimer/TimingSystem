@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using System.ComponentModel;
 
 using TrailMeisterDb;
@@ -25,23 +26,44 @@ namespace TrailMeisterViewer.Windows.PersonalLog
 
         public void ShowWindow()
         {
-            List<DbPerson> people = this._dbPeopleTable.getPeople();
+            List<DbLap> personLaps = _dbLapsTable.getAllLapsForRacer(_person.PersonId);
 
-            foreach (DbPerson person in people)
-            {
-                if (person != null)
+            var eventIds = personLaps.Select(l => l.EventId).Distinct().ToList();
+            var eventLookup = _dbEventsTable.getEventsByIds(eventIds)
+                                            .ToDictionary(e => e.ID);
+
+
+            _vm.RacerDataAll = new RacerData(_person, personLaps);
+            _vm.RacerDataSeason = this.getRacerDataForCurrentSeason(eventLookup, personLaps);
+
+            // Create the grouped rows
+            var eventRows = personLaps.GroupBy(lap => lap.EventId)
+                .Select(group => new RacerEventRow
                 {
-                    List<DbLap> personLaps = _dbLapsTable.getAllLapsForRacer(person.PersonId);
+                    // Use the lookup to get the full object; fallback to null if not found
+                    Event = eventLookup.TryGetValue((uint)group.Key, out var ev) ? ev : null,
 
-                    _vm.AllRacerData.Add(new
-                        RacerData(
-                            person,
-                            personLaps.Where(x => x.LapCount > 0)
-                                .ToList()
-                        )
-                    );
-                }
+                    // Pass only the laps belonging to THIS specific event group
+                    RacerData = new RacerData(
+                                    _person,
+                                    group.Where(x => x.LapCount > 0).ToList()
+                                )
+                 })
+                .OrderByDescending(row => row.Event?.EventDate ?? DateTime.MinValue)
+                .ToList();
+
+            foreach(var row in eventRows)
+            {
+                _vm.AllEventRows.Add(row);
             }
+
+            //_vm.AllRacerData.Add(new
+            //    RacerData(
+            //        _person,
+            //        personLaps.Where(x => x.LapCount > 0)
+            //            .ToList()
+            //    )
+            //);
 
             var window = new PersonalLog
             {
@@ -50,6 +72,23 @@ namespace TrailMeisterViewer.Windows.PersonalLog
             };
 
             window.ShowDialog();
+        }
+
+        private RacerData getRacerDataForCurrentSeason(Dictionary<uint, DbEvent> allEvents, List<DbLap> personLaps)
+        {
+            DateTime today = DateTime.Today;
+            int year = today.Month >= 9 ? today.Year : today.Year - 1;
+            DateTime previousSeptember = new DateTime(year, 9, 1);
+
+            var eventsThisSeason = allEvents.Values
+                                            .Where(e => e.EventDate >= previousSeptember && e.EventDate <= today);
+
+            var filteredEventIds = new HashSet<long>(eventsThisSeason.Select(e => (long)e.ID));
+
+            var seasonLaps = personLaps
+                .Where(lap => filteredEventIds.Contains(lap.EventId));
+
+            return new RacerData(_person, seasonLaps.ToList());
         }
 
         internal void ExportHtml()

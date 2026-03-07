@@ -42,7 +42,7 @@ bool RfidReader::begin(long rfidBaud)
     {
         //This happens if the baud rate is correct but the module is doing a ccontinuous read
         reader.stopReading();
-        if (DO_SERIAL) socketClient->sendDebugMessage(F("Module continuously reading. Asking it to stop..."));
+        this->sendDebugMessage(F("Module continuously reading. Asking it to stop..."));
         delay(1500);
     }
     else
@@ -78,7 +78,10 @@ bool RfidReader::begin(long rfidBaud)
     reader.setRegion(REGION_NORTHAMERICA);
     reader.setTagProtocol();
     reader.setAntennaPort();
-    reader.startReading();
+
+    // Try taking this out in favour of
+    // starting/stopping the reader when race client connects/disconnects
+    // reader.startReading();
 
     return true;
 }
@@ -92,7 +95,7 @@ RfidEvent RfidReader::poll()
 
     if (lastResponse == ERROR_CORRUPT_RESPONSE)
     {
-        if (DO_SERIAL) socketClient->sendDebugMessage("RfidReader::poll: Bad CRC returned from reader.parseResponse()");
+        this->sendDebugMessage("RfidReader::poll: Bad CRC returned from reader.parseResponse()");
         return RfidEvent::Error;
     }
 
@@ -166,7 +169,7 @@ bool RfidReader::getLastTag(Tag& tag)
             msg = msg + " ";
         }
         msg = msg + "]";
-        if (DO_SERIAL) socketClient->sendDebugMessage(msg);
+        this->sendDebugMessage(msg);
     }
 
     return true;
@@ -186,13 +189,13 @@ void RfidReader::getAbsoluteTimestamp(Tag &tag)
 void RfidReader::getReadPower() {
   reader.getReadPower();
   int powerCdBm = (reader.msg[6] << 8) | reader.msg[7]; 
-  if (DO_SERIAL) socketClient->sendDebugMessage("RfidReader: Antenna currently set to: " + String(powerCdBm) + " dBm");
+  this->sendDebugMessage("RfidReader: Antenna currently set to: " + String(powerCdBm) + " dBm");
 
   String msg = msg + " Bytes: ";
   for (int i = 0; i < 8; i++) {
     msg = msg + String(reader.msg[i], HEX) + " ";
   }
-  if (DO_SERIAL) socketClient->sendDebugMessage(msg);
+  this->sendDebugMessage(msg);
 }
 
 void RfidReader::setAntennaGain(const int gain)

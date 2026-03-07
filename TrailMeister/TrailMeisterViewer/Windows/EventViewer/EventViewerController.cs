@@ -91,7 +91,7 @@ namespace TrailMeisterViewer.Windows.EventViewer
 
             // This function relies on the racer instance having its PersonId value mutated so that
             // PersonId has a different value than Person.PersonId
-            List<DbLap> lapsForRacer = _dbLapsTable.getAllLapsForRacer(racer.Person.PersonId);
+            List<DbLap> lapsForRacer = _dbLapsTable.getEventLapsForRacer(racer.Person.PersonId, _event.ID);
 
             foreach (DbLap lap in lapsForRacer)
             {

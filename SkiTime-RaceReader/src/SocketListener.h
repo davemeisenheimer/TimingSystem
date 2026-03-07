@@ -16,7 +16,7 @@ public:
     SocketListener(WifiHelper* wifiHelper, RfidReader* rfidReader, SocketClient *socketClient);
 
     void init();
-    void check();
+    bool check();
 
 private:
     // Core collaborators
@@ -24,8 +24,6 @@ private:
     WiFiServer server;
     RfidReader* rfidReader;
     SocketClient* socketClient;
-
-    bool continueListening;
 
     // ---- Internal helpers ----
     void handleClient(WiFiClient& client);

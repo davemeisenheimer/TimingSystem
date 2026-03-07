@@ -34,7 +34,7 @@ namespace TrailMeister.GUI.Main
 
         protected virtual void init()
         {
-            //this._vm.PropertyChanged += OnViewModelPropertyChanged;
+            this._vm.PropertyChanged += OnViewModelPropertyChanged;
 
             // Save default event name
             this._eventId = _dbEventsTable.addEvent(this._vm.EventName, 800);
@@ -56,9 +56,9 @@ namespace TrailMeister.GUI.Main
             }
         }
 
-        private void OnViewModelPropertyChanged(string propertyName)
+        private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            switch(propertyName)
+            switch(e.PropertyName)
             {
                 case nameof(this._vm.IsEventFinished):
                     OnFinishEvent();

@@ -55,8 +55,13 @@ bool setupRfidAndRaceClient() {
   }
 #endif
 
-  socketClient.waitForRaceClient();
+  waitForRaceClient();
   return true;
+}
+
+void waitForRaceClient() {
+  socketClient.waitForRaceClient();
+  rfid.StartReader();
 }
 
 void loop()
@@ -73,7 +78,8 @@ void loop()
 #else 
  
   // 1. Handle incoming config / control commands
-  listener.check(); // Check for incoming configuration commands
+  bool remoteClientActive = listener.check(); // Check for incoming configuration commands
+  if (!remoteClientActive) 
   
       // Poll reader for new data
       switch (rfid.poll())

@@ -24,6 +24,9 @@ namespace TrailMeisterViewer.Model
         //  e.g. could be for a given event, a given season, or all time
         public List<DbLap> Laps { get; set; }
 
+        // Account for zero-based lap records i.e. the start is considered lap 0
+        public int LapCount { get { return this.Laps.Count - this.Laps.Select(lap => lap.EventId).Distinct().Count(); } }
+
         public DbPerson Person { get; set; }
 
         public long PersonId { get; set; }

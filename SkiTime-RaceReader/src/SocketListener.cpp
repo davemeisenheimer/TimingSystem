@@ -9,8 +9,7 @@ SocketListener::SocketListener(
     : server(SOCKET_LOCAL_PORT),
             wifiHelper(wifiHelper),
             rfidReader(rfidReader),
-            socketClient(socketClient),
-            continueListening(true)
+            socketClient(socketClient)
 {
     rfidReader = rfidReader;
 }
@@ -20,19 +19,17 @@ void SocketListener::init()
   this->server.begin();
 }
 
-void SocketListener::check()
+bool SocketListener::check()
 {
-    if (!continueListening)
-        return;
-
     WiFiClient client = server.available();
     if (!client)
-        return;
+        return false;
 
     handleClient(client);
 
     client.stop();
-    if (DO_SERIAL) socketClient->sendDebugMessage("SocketListener: client disconnected");
+    this->sendDebugMessage("SocketListener: client disconnected");
+    return true;
 }
 
 void SocketListener::handleClient(WiFiClient& client)
@@ -67,35 +64,31 @@ void SocketListener::handleClient(WiFiClient& client)
         }
     }
 
-    if (DO_SERIAL) socketClient->sendDebugMessage("SocketListener command: " + command);
+    this->sendDebugMessage("SocketListener command: " + command);
 
     handleCommand(command);
 }
 
 void SocketListener::handleCommand(const String& command)
 {
-    if (command.startsWith("SetAntennaGain"))
+    if (command.startsWith(CMD_SET_ANTENNA_GAIN))
     {
         int gain = getCommandValue(command);
         rfidReader->setAntennaGain(gain);
     }
-    else if (command == "StartReader")
+    else if (command == CMD_START_READER)
     {
         rfidReader->startReading();
     }
-    else if (command == "StopReader")
+    else if (command == CMD_STOP_READER)
     {
         rfidReader->stopReading();
     }
-    else if (command == "StopWifiValidation")
+    else if (command == CMD_STOP_WIFI)
     {
         wifiHelper->stopValidation();
     }
-    else if (command == "StopListening")
-    {
-        continueListening = false;
-    }
-    else if (command == "Reset")
+    else if (command == CMD_RESET)
     {
         this->server.stop();
         rfidReader->stopReading();
@@ -103,7 +96,7 @@ void SocketListener::handleCommand(const String& command)
     }
     else
     {
-        if (DO_SERIAL) socketClient->sendDebugMessage("Unknown command: " + command);
+        this->sendDebugMessage("Unknown command: " + command);
     }
 }
 
@@ -114,7 +107,7 @@ int SocketListener::getCommandValue(String command)
   String valueStr = getCommandValueStr(command);
 
   if (valueStr.length() == 0) {
-    if (DO_SERIAL) socketClient->sendDebugMessage("No value found in command: " + command);
+    this->sendDebugMessage("No value found in command: " + command);
     return -1;
   }
 
@@ -128,7 +121,7 @@ String SocketListener::getCommandValueStr(String command)
   int comma = command.indexOf(',');
   if (comma < 0 || comma == command.length() - 1)
   {
-    if (DO_SERIAL) socketClient->sendDebugMessage("No value found in command: " + command);
+    this->sendDebugMessage("No value found in command: " + command);
     return "";
   }
 

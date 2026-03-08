@@ -1,6 +1,7 @@
 ﻿
 using System.Windows;
 using System.Windows.Input;
+using System.Collections.ObjectModel;
 using TrailMeisterUtilities;
 using TrailMeisterDb;
 using TrailMeisterViewer.Model;
@@ -9,7 +10,8 @@ namespace TrailMeisterViewer.Windows.PersonalLog
 {
     public class PersonalLogVM : ViewModelBase
     {
-        private ObservableKeyedCollection<int, RacerData> _allRacerData = new ObservableKeyedCollection<int, RacerData>(null, "PersonId");
+        private ObservableCollection<RacerEventRow> _allEventRows = new ObservableCollection<RacerEventRow>();
+        private ObservableCollection<RacerData> _allRacerData = new ObservableCollection<RacerData>();
         private PersonalLogController controller;
 
         public PersonalLogVM(PersonalLogController c, DbPerson dbPerson)
@@ -31,20 +33,30 @@ namespace TrailMeisterViewer.Windows.PersonalLog
 
         public DbPerson Person { get; private set; }
 
-        public ObservableKeyedCollection<int, RacerData> AllRacerData
+        public ObservableCollection<RacerEventRow> AllEventRows
         {
             get
             {
-                return _allRacerData;
+                return _allEventRows;
             }
             set
             {
-                if (_allRacerData != value)
+                if (_allEventRows != value)
                 {
-                    _allRacerData = value;
-                    OnPropertyChanged(nameof(AllRacerData));
+                    _allEventRows = value;
+                    OnPropertyChanged(nameof(AllEventRows));
                 }
             }
+        }
+
+        public RacerData RacerDataAll
+        {
+            get; set;
+        }
+
+        public RacerData RacerDataSeason
+        {
+            get; set;
         }
 
         public ButtonCommand ExportHtmlCommand { get; set; }

@@ -1,0 +1,99 @@
+﻿<UserControl x:Class="TrailMeisterViewer.Windows.MainWindow.TagsTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TrailMeisterViewer.Windows.MainWindow"
+             xmlns:convertersUtils="clr-namespace:TrailMeisterUtilities.Converters;assembly=TrailMeisterUtilities"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <convertersUtils:Tag2PersonConverter x:Key="Tag2PersonConverter"/>
+    </UserControl.Resources>
+
+    <DataGrid x:Name="gridTags" 
+                              ItemsSource="{Binding DataContext.AllTags, ElementName=gridTags}" 
+                              IsSynchronizedWithCurrentItem="False"
+                              FontSize="24" AutoGenerateColumns="False" GridLinesVisibility="All" HorizontalAlignment="Stretch"
+                              CanUserAddRows="False" >
+        <DataGrid.Columns>
+            <DataGridTextColumn x:Name="colTagID" CanUserResize="False" Width="1*" Header="ID" Binding="{Binding TagId}" IsReadOnly="true" MinWidth="50">
+                <DataGridTextColumn.ElementStyle>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="HorizontalAlignment" Value="Right" />
+                        <Setter Property="Padding" Value="8 0 8 0" />
+                    </Style>
+                </DataGridTextColumn.ElementStyle>
+            </DataGridTextColumn>
+
+            <DataGridTemplateColumn x:Name="colPerson" Width="4*" Header="Association" IsReadOnly="false" MinWidth="300">
+                <!-- Display mode -->
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock Margin="8,0,8,0">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource Tag2PersonConverter}">
+                                    <Binding Path="PersonId"/>
+                                    <Binding Path="DataContext.AllPeople" RelativeSource="{RelativeSource AncestorType=Window}" />
+                                    <Binding Source="{x:Static convertersUtils:NameConversionType.PersonIdDashFirstAndLast}" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+
+                <!-- Edit mode -->
+                <DataGridTemplateColumn.CellEditingTemplate>
+                    <DataTemplate>
+                        <ComboBox ItemsSource="{Binding DataContext.AllPeople,
+                                                  RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                  SelectedValuePath="PersonId"
+                                                  SelectedValue="{Binding PersonId,
+                                                                  Mode=TwoWay,
+                                                                  UpdateSourceTrigger=PropertyChanged}" >
+
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Margin="4,0,4,0">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0} - {1} {2}">
+                                                <Binding Path="PersonId" />
+                                                <Binding Path="FirstName" />
+                                                <Binding Path="LastName" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellEditingTemplate>
+            </DataGridTemplateColumn>
+
+            <DataGridTemplateColumn x:Name="colTagCurrentName" Width="4*" Header="Name" IsReadOnly="false" MinWidth="300">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <Label Margin="4,0,4,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                            <Label.Content>
+                                <MultiBinding Converter="{StaticResource Tag2PersonConverter}">
+                                    <Binding Path="PersonId"/>
+                                    <Binding Path="DataContext.AllPeople" RelativeSource="{RelativeSource AncestorType=Window}" />
+                                    <Binding Source="{x:Static convertersUtils:NameConversionType.FirstAndLast}" />
+                                </MultiBinding>
+                            </Label.Content>
+                        </Label>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+
+            <DataGridTextColumn x:Name="colTagEPC" Width="4*" Header="EPC" Binding="{Binding EPC}" IsReadOnly="true" MinWidth="300" >
+                <DataGridTextColumn.ElementStyle>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="HorizontalAlignment" Value="Left" />
+                        <Setter Property="Padding" Value="8 0 8 0" />
+                    </Style>
+                </DataGridTextColumn.ElementStyle>
+            </DataGridTextColumn>
+        </DataGrid.Columns>
+    </DataGrid>
+</UserControl>

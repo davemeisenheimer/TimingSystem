@@ -10,6 +10,15 @@
     <Compile Update="Windows\AddPersonDialog\AddPersonDialog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Windows\MainWindow\EventsTab.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Windows\MainWindow\PeopleTab.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Windows\MainWindow\TagsTab.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Windows\PersonalLog\PersonalLog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -28,6 +37,15 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Windows\EventViewer\EventViewer.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Windows\MainWindow\EventsTab.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Windows\MainWindow\PeopleTab.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Windows\MainWindow\TagsTab.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Windows\PersonalLog\PersonalLog.xaml">

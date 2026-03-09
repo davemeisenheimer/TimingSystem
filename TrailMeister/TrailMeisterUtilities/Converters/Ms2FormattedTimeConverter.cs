@@ -52,8 +52,8 @@ namespace TrailMeisterUtilities.Converters
                     break;
                 case TimeConversionPrecision.ToTheTenth:
                     formatted = t.TotalHours >= 1
-                        ? string.Format("{0}:{1:D2}:{2:D2}.{3:D1}", (int)t.TotalHours, t.Minutes, t.Seconds, t.Milliseconds)
-                        : string.Format("{0:D2}:{1:D2}.{2:D1}", t.Minutes, t.Seconds, t.Milliseconds);
+                        ? string.Format("{0}:{1:D2}:{2:D2}.{3}", (int)t.TotalHours, t.Minutes, t.Seconds, t.Milliseconds / 100)
+                        : string.Format("{0:D2}:{1:D2}.{2}", t.Minutes, t.Seconds, t.Milliseconds / 100);
                     break;
                 case TimeConversionPrecision.ToTheMillisecond:
                     formatted = t.TotalHours >= 1

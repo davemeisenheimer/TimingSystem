@@ -122,4 +122,8 @@
         </Setter>
     </Style>
 
+    <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource GlossyBeveledButton}">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Height" Value="32"/>
+    </Style>
 </ResourceDictionary>

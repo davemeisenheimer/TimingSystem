@@ -166,7 +166,7 @@ namespace TrailMeisterViewer.Windows.EventViewer
         }
 
         /// <summary>
-        /// Returns new slices whose Laps list contains only qualifying laps (LapCount &gt; 0),
+        /// Returns new slices whose Laps list contains only qualifying laps (LapCount > 0),
         /// trimmed so every racer has the same count (the minimum across all racers).
         /// pruneEarly=true → keep the LAST N laps; pruneEarly=false → keep the FIRST N laps.
         /// </summary>

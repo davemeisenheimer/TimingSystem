@@ -1,0 +1,17 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ── App chrome ─────────────────────────────────────────────────────── -->
+    <SolidColorBrush x:Key="AppBackgroundBrush"  Color="#FFE5E5E5"/>
+
+    <!-- ── Card / summary tile palette ───────────────────────────────────── -->
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="#F0F6FF"/>
+    <SolidColorBrush x:Key="CardBorderBrush"     Color="#AACCEE"/>
+    <SolidColorBrush x:Key="CardHeaderBrush"     Color="#CCE4FF"/>
+
+    <!-- ── Text palette ───────────────────────────────────────────────────── -->
+    <SolidColorBrush x:Key="NavyBrush"           Color="#003366"/>
+    <SolidColorBrush x:Key="DarkNavyBrush"       Color="#112244"/>
+    <SolidColorBrush x:Key="MutedBlueBrush"      Color="#6688AA"/>
+
+</ResourceDictionary>

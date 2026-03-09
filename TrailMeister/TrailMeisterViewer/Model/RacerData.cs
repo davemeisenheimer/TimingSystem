@@ -92,5 +92,57 @@ namespace TrailMeisterViewer.Model
                 return (String)laps2TimeConverter.Convert(new object[] { TimeConversionType.AverageLap, Laps }, typeof(object), new object(), CultureInfo.CurrentCulture);
             }
         }
+
+        public IReadOnlyList<LapLengthStats> LapLengthBreakdown { get; private set; } = Array.Empty<LapLengthStats>();
+
+        public bool HasMultipleLapLengths => LapLengthBreakdown.Count > 0;
+
+        public void SetEventDefaults(Dictionary<long, int> eventLapLengths)
+        {
+            int EffectiveLength(DbLap l) =>
+                l.LapLength ?? (eventLapLengths.TryGetValue(l.EventId, out var def) ? def : 0);
+
+            // Real laps (excludes start marker): used for count and distance
+            var realLaps = Laps
+                .Where(l => l.LapCount > 0)
+                .Select(l => (Lap: l, Length: EffectiveLength(l)))
+                .Where(x => x.Length > 0)
+                .ToList();
+
+            // Timed real laps: used for best/avg/total time
+            var timedLaps = realLaps.Where(x => x.Lap.LapTime > 0).ToList();
+
+            var distinctLengths = timedLaps
+                .Select(x => x.Length)
+                .Distinct()
+                .OrderByDescending(l => l)
+                .Take(3)
+                .ToList();
+
+            if (distinctLengths.Count <= 1)
+            {
+                LapLengthBreakdown = Array.Empty<LapLengthStats>();
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LapLengthBreakdown)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasMultipleLapLengths)));
+                return;
+            }
+
+            LapLengthBreakdown = distinctLengths.Select(length =>
+            {
+                var real  = realLaps .Where(x => x.Length == length).ToList();
+                var timed = timedLaps.Where(x => x.Length == length).ToList();
+                return new LapLengthStats
+                {
+                    LengthM = length,
+                    Count   = real.Count,
+                    TotalMs = (ulong)timed.Aggregate<(DbLap Lap, int Length), decimal>(0, (s, x) => s + x.Lap.LapTime),
+                    BestMs  = timed.Min(x => x.Lap.LapTime),
+                    AvgMs   = (ulong)(timed.Aggregate<(DbLap Lap, int Length), decimal>(0, (s, x) => s + x.Lap.LapTime) / timed.Count)
+                };
+            }).ToList();
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LapLengthBreakdown)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasMultipleLapLengths)));
+        }
     }
 }

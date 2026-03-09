@@ -68,14 +68,15 @@ namespace TrailMeisterViewer.Windows.PersonalLog
             if (datedRows.Any())
             {
                 DateTime today = DateTime.Today;
-                int currentSeasonYear = today.Month >= 9 ? today.Year : today.Year - 1;
+                int sm = TrailMeisterDb.AppSettings.Current.SeasonStartMonth;
+                int currentSeasonYear = today.Month >= sm ? today.Year : today.Year - 1;
                 int earliestSeasonYear = datedRows.Min(r =>
-                    r.Event!.EventDate.Month >= 9 ? r.Event.EventDate.Year : r.Event.EventDate.Year - 1);
+                    r.Event!.EventDate.Month >= sm ? r.Event.EventDate.Year : r.Event.EventDate.Year - 1);
 
                 for (int year = currentSeasonYear; year >= earliestSeasonYear; year--)
                 {
-                    DateTime start = new DateTime(year, 9, 1);
-                    DateTime end = new DateTime(year + 1, 9, 1);
+                    DateTime start = new DateTime(year, sm, 1);
+                    DateTime end = new DateTime(year + 1, sm, 1);
                     var seasonRows = datedRows.Where(r => r.Event!.EventDate >= start && r.Event.EventDate < end).ToList();
                     if (!seasonRows.Any()) continue;
 

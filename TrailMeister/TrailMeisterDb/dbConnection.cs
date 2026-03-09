@@ -18,13 +18,8 @@ namespace TrailMeisterDb
 
         public dbConnection()
         {
-            //string strProject = "ERP001\\SQLR2"; //Enter your SQL server instance name
-            //string strProject = "Local instance MySQL80"; //Enter your SQL server instance name
-            string strDatabase = "skimeister"; //Enter your database name
-            string strUserID = "skimeister "; // Enter your SQL Server User Name
-            string strPassword = "@123Cole"; // Enter your SQL Server Password
-            string strconn = "Server=localhost" + ";Persist Security Info=false;database=" + strDatabase + ";user id=" + strUserID + ";password=" + strPassword + ";Connection Timeout = 2";
-            //string strconn = "data source=" + strProject + ";Persist Security Info=false;database=" + strDatabase + ";user id=" + strUserID + ";password=" + strPassword + ";Connection Timeout = 0";
+            var s = AppSettings.Current;
+            string strconn = $"Server={s.DbServer};Persist Security Info=false;database={s.DbName};user id={s.DbUserId};password={s.DbPassword};Connection Timeout=2";
             _conn = new MySqlConnection(strconn);
         }
 

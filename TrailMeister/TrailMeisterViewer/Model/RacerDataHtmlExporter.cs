@@ -8,7 +8,7 @@ namespace TrailMeisterViewer.Model
 {
     internal abstract class RacerDataHtmlExporter
     {
-        protected static readonly string OutputBaseDirectory = @"D:\Users\davem\SkiTrailData\";
+        protected static string OutputBaseDirectory => TrailMeisterDb.AppSettings.Current.ExportOutputDirectory;
 
         internal abstract void Export();
 

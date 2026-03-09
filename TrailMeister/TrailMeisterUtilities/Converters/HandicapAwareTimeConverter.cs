@@ -9,7 +9,7 @@ namespace TrailMeisterUtilities.Converters
 {
     /// <summary>
     /// Formats a lap time column, optionally applying a per-lap handicap offset.
-    /// Values: [TimeConversionType, List&lt;DbLap&gt;, long handicapPerLapMs, bool isHandicapMode]
+    /// Values: [TimeConversionType conversionType, List<DbLap> eventLaps, long handicapPerLapMs, bool isHandicapMode]
     /// </summary>
     public class HandicapAwareTimeConverter : IMultiValueConverter
     {

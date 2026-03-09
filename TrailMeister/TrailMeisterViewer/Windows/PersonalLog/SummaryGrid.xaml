@@ -8,62 +8,102 @@
              mc:Ignorable="d"
              d:DesignHeight="200" d:DesignWidth="200"
              x:Name="parent">
-    <UserControl.Resources>
-        <converters:Laps2TimeConverter x:Key="Laps2TimeConverter"/>
-        <converters:Laps2DistanceConverter x:Key="Laps2DistanceConverter"/>
-    </UserControl.Resources>
 
-    <Border CornerRadius="8" BorderBrush="#AACCEE" BorderThickness="1"
-            Background="#F0F6FF" Margin="4,0,4,4">
+    <Border CornerRadius="8"
+            BorderBrush="{StaticResource CardBorderBrush}"
+            BorderThickness="1"
+            Background="{StaticResource CardBackgroundBrush}"
+            Margin="4,0,4,4">
         <StackPanel>
 
             <!-- Header band -->
-            <Border Background="#CCE4FF" CornerRadius="8,8,0,0" Padding="10,6">
+            <Border Background="{StaticResource CardHeaderBrush}" CornerRadius="8,8,0,0" Padding="10,6">
                 <TextBlock Text="{Binding Label, ElementName=parent}"
-                           FontWeight="SemiBold" FontSize="14" Foreground="#003366"
+                           FontWeight="SemiBold" FontSize="14"
+                           Foreground="{StaticResource NavyBrush}"
                            TextAlignment="Center"/>
             </Border>
 
-            <!-- Stats -->
-            <StackPanel Margin="10,6,10,8">
-                <local:SummaryItem Label="Laps:" Data="{Binding RacerData.LapCount, ElementName=parent}" />
+            <!-- Content: totals column + optional per-length columns -->
+            <StackPanel Orientation="Horizontal">
 
-                <local:SummaryItem Label="Dist:">
-                    <local:SummaryItem.Data>
-                        <MultiBinding Converter="{StaticResource Laps2DistanceConverter}">
-                            <Binding Path="RacerData.Laps" ElementName="parent"/>
-                        </MultiBinding>
-                    </local:SummaryItem.Data>
-                </local:SummaryItem>
+                <!-- Totals column -->
+                <StackPanel Margin="10,6,10,8">
+                    <TextBlock Text="Totals"
+                                FontWeight="SemiBold" FontSize="12"
+                                Foreground="{StaticResource NavyBrush}"
+                                TextAlignment="Center" Margin="0,0,0,4"/>
+                    <local:SummaryItem Label="Laps:" Data="{Binding RacerData.LapCount, ElementName=parent}" />
 
-                <local:SummaryItem Label="Time:">
-                    <local:SummaryItem.Data>
-                        <MultiBinding Converter="{StaticResource Laps2TimeConverter}">
-                            <Binding Source="{x:Static converters:TimeConversionType.TotalTime}" />
-                            <Binding Path="RacerData.Laps" ElementName="parent"/>
-                        </MultiBinding>
-                    </local:SummaryItem.Data>
-                </local:SummaryItem>
+                    <local:SummaryItem Label="Dist:">
+                        <local:SummaryItem.Data>
+                            <MultiBinding Converter="{StaticResource Laps2DistanceConverter}">
+                                <Binding Path="RacerData.Laps" ElementName="parent"/>
+                            </MultiBinding>
+                        </local:SummaryItem.Data>
+                    </local:SummaryItem>
 
-                <local:SummaryItem Label="Best:">
-                    <local:SummaryItem.Data>
-                        <MultiBinding Converter="{StaticResource Laps2TimeConverter}">
-                            <Binding Source="{x:Static converters:TimeConversionType.BestLap}" />
-                            <Binding Path="RacerData.Laps" ElementName="parent"/>
-                        </MultiBinding>
-                    </local:SummaryItem.Data>
-                </local:SummaryItem>
+                    <local:SummaryItem Label="Time:">
+                        <local:SummaryItem.Data>
+                            <MultiBinding Converter="{StaticResource Laps2TimeConverter}">
+                                <Binding Source="{x:Static converters:TimeConversionType.TotalTime}" />
+                                <Binding Path="RacerData.Laps" ElementName="parent"/>
+                                <Binding Source="{x:Static converters:TimeConversionPrecision.ToTheTenth}"/>
+                            </MultiBinding>
+                        </local:SummaryItem.Data>
+                    </local:SummaryItem>
 
-                <local:SummaryItem Label="Avg:">
-                    <local:SummaryItem.Data>
-                        <MultiBinding Converter="{StaticResource Laps2TimeConverter}">
-                            <Binding Source="{x:Static converters:TimeConversionType.AverageLap}" />
-                            <Binding Path="RacerData.Laps" ElementName="parent"/>
-                        </MultiBinding>
-                    </local:SummaryItem.Data>
-                </local:SummaryItem>
+                    <local:SummaryItem Label="Best:">
+                        <local:SummaryItem.Data>
+                            <MultiBinding Converter="{StaticResource Laps2TimeConverter}">
+                                <Binding Source="{x:Static converters:TimeConversionType.BestLap}" />
+                                <Binding Path="RacerData.Laps" ElementName="parent"/>
+                                <Binding Source="{x:Static converters:TimeConversionPrecision.ToTheTenth}"/>
+                            </MultiBinding>
+                        </local:SummaryItem.Data>
+                    </local:SummaryItem>
+
+                    <local:SummaryItem Label="Avg:">
+                        <local:SummaryItem.Data>
+                            <MultiBinding Converter="{StaticResource Laps2TimeConverter}">
+                                <Binding Source="{x:Static converters:TimeConversionType.AverageLap}" />
+                                <Binding Path="RacerData.Laps" ElementName="parent"/>
+                                <Binding Source="{x:Static converters:TimeConversionPrecision.ToTheTenth}"/>
+                            </MultiBinding>
+                        </local:SummaryItem.Data>
+                    </local:SummaryItem>
+                </StackPanel>
+
+                <!-- Per-length breakdown columns (only shown when 2+ distinct lengths exist) -->
+                <ItemsControl ItemsSource="{Binding RacerData.LapLengthBreakdown, ElementName=parent}"
+                              Visibility="{Binding RacerData.HasMultipleLapLengths, ElementName=parent,
+                                                   Converter={StaticResource Bool2VisibilityConverter}}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1,0,0,0"
+                                    Padding="10,6,10,8">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Header}"
+                                               FontWeight="SemiBold" FontSize="12"
+                                               Foreground="{StaticResource NavyBrush}"
+                                               TextAlignment="Center" Margin="0,0,0,4"/>
+                                    <local:SummaryItem Label="Laps:" Data="{Binding Count}"/>
+                                    <local:SummaryItem Label="Dist:" Data="{Binding Dist}"/>
+                                    <local:SummaryItem Label="Time:" Data="{Binding Time}"/>
+                                    <local:SummaryItem Label="Best:" Data="{Binding Best}"/>
+                                    <local:SummaryItem Label="Avg:"  Data="{Binding Avg}"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
             </StackPanel>
-
         </StackPanel>
     </Border>
 </UserControl>

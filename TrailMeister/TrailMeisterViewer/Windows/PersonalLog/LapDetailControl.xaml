@@ -4,11 +4,6 @@
              xmlns:local="clr-namespace:TrailMeisterViewer.Windows.PersonalLog"
              xmlns:converters="clr-namespace:TrailMeisterUtilities.Converters;assembly=TrailMeisterUtilities">
 
-    <UserControl.Resources>
-        <converters:Person2NameConverter x:Key="Person2NameConverter"/>
-        <converters:Ms2TimeConverter x:Key="Ms2TimeConverter"/>
-    </UserControl.Resources>
-
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -23,19 +18,30 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,24,0">
-                <Label FontSize="24" Padding="2">
-                    <Label.Content>
-                        <MultiBinding Converter="{StaticResource Person2NameConverter}">
-                            <Binding Source="{x:Static converters:NameConversionType.FirstAndLast}" />
-                            <Binding Path="RacerData.Person"/>
-                        </MultiBinding>
-                    </Label.Content>
-                </Label>
-                <Label FontSize="14" Content="{Binding RacerData.Person.NickName}" Foreground="Gray" Padding="2,0,2,2"/>
-                <Label FontSize="18" Content="{Binding Event.EventName}" Padding="2"/>
-                <Label FontSize="14" Content="{Binding Event.EventDate, StringFormat=d}" Foreground="Gray" Padding="2"/>
-            </StackPanel>
+            <Border Grid.Column="0" CornerRadius="8"
+                    BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1"
+                    Background="{StaticResource CardBackgroundBrush}"
+                    Margin="0,0,24,0" VerticalAlignment="Stretch">
+                <StackPanel>
+                    <Border Background="{StaticResource CardHeaderBrush}" CornerRadius="8,8,0,0" Padding="10,6">
+                        <TextBlock Text="Racer / Event" FontWeight="SemiBold" FontSize="14"
+                                   Foreground="{StaticResource NavyBrush}" TextAlignment="Center"/>
+                    </Border>
+                    <StackPanel Margin="10,6,10,8">
+                        <Label FontSize="24" Padding="2">
+                            <Label.Content>
+                                <MultiBinding Converter="{StaticResource Person2NameConverter}">
+                                    <Binding Source="{x:Static converters:NameConversionType.FirstAndLast}" />
+                                    <Binding Path="RacerData.Person"/>
+                                </MultiBinding>
+                            </Label.Content>
+                        </Label>
+                        <Label FontSize="14" Content="{Binding RacerData.Person.NickName}" Foreground="{StaticResource MutedBlueBrush}" Padding="2,0,2,2"/>
+                        <Label FontSize="18" Content="{Binding Event.EventName}" Padding="2"/>
+                        <Label FontSize="14" Content="{Binding Event.EventDate, StringFormat=d}" Foreground="{StaticResource MutedBlueBrush}" Padding="2"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
 
             <local:SummaryGrid Grid.Column="2"
                                Label="Event Totals"
@@ -54,50 +60,27 @@
                 <DataGridTextColumn Header="Lap #" Width="2*" MinWidth="80"
                                     IsReadOnly="True"
                                     Binding="{Binding LapCount}"
-                                    SortMemberPath="LapCount">
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                        </Style>
-                    </DataGridTextColumn.HeaderStyle>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right"/>
-                            <Setter Property="Padding" Value="8 0 8 0"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                                    SortMemberPath="LapCount"
+                                    HeaderStyle="{StaticResource DataGridHeaderRight}"
+                                    ElementStyle="{StaticResource DataGridCellRight}"/>
 
                 <DataGridTextColumn Header="Lap Time" Width="4*" MinWidth="150"
                                     IsReadOnly="True"
-                                    SortMemberPath="LapTime">
+                                    SortMemberPath="LapTime"
+                                    HeaderStyle="{StaticResource DataGridHeaderRight}"
+                                    ElementStyle="{StaticResource DataGridCellRight}">
                     <DataGridTextColumn.Binding>
                         <MultiBinding Converter="{StaticResource Ms2TimeConverter}">
                             <Binding Path="LapTime"/>
                             <Binding Source="{x:Static converters:TimeConversionPrecision.ToTheHundredth}"/>
                         </MultiBinding>
                     </DataGridTextColumn.Binding>
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                        </Style>
-                    </DataGridTextColumn.HeaderStyle>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right"/>
-                            <Setter Property="Padding" Value="8 0 8 0"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
                 <!-- Editable per-lap length override -->
                 <DataGridTemplateColumn x:Name="colLapLength" Header="Lap Length (m)" Width="3*" MinWidth="120"
-                                        SortMemberPath="LapLength">
-                    <DataGridTemplateColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                        </Style>
-                    </DataGridTemplateColumn.HeaderStyle>
+                                        SortMemberPath="LapLength"
+                                        HeaderStyle="{StaticResource DataGridHeaderRight}">
 
                     <!-- Display: show override or event default in gray -->
                     <DataGridTemplateColumn.CellTemplate>
@@ -143,7 +126,6 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

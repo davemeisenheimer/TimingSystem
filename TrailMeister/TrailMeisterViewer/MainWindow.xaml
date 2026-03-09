@@ -5,7 +5,6 @@
        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
        xmlns:local="clr-namespace:TrailMeisterViewer"
        xmlns:utils="clr-namespace:TrailMeisterUtilities;assembly=TrailMeisterUtilities"
-       xmlns:convertersUtils="clr-namespace:TrailMeisterUtilities.Converters;assembly=TrailMeisterUtilities"
        xmlns:converters="clr-namespace:TrailMeisterViewer.Converters"
        xmlns:mainWindow="clr-namespace:TrailMeisterViewer.Windows.MainWindow"
        mc:Ignorable="d"
@@ -14,8 +13,6 @@
 
     <Window.Resources>
         <converters:CanDeleteEventToVisibilityConverter x:Key="CanDeleteEventToVisibilityConverter"/>
-        <convertersUtils:Bool2VisibilityConverter x:Key="Bool2VisibilityConverter"/>
-        <convertersUtils:Tag2PersonConverter x:Key="Tag2PersonConverter"/>
     </Window.Resources>
 
     <Grid>
@@ -34,6 +31,17 @@
                 Margin="8,4"
                 Click="OnBackClick"
                 Style="{StaticResource GlossyBeveledButton}"/>
+
+        <Button x:Name="btnSettings"
+                Grid.Row="0"
+                Content="⚙"
+                HorizontalAlignment="Right"
+                Height="36" Width="36"
+                Margin="8,4"
+                FontSize="20"
+                Click="OnSettingsClick"
+                Style="{StaticResource GlossyBeveledButton}"
+                ToolTip="Settings"/>
 
         <ContentControl Grid.Row="1" x:Name="mainContent">
             <TabControl x:Name="tbcViewer">

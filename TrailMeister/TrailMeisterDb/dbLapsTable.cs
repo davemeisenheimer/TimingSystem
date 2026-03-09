@@ -12,7 +12,7 @@ namespace TrailMeisterDb
 {
     public class DbLap
     {
-        internal DbLap(long lapId, long tagId, long eventId, uint lapCount, ulong lapTime, ulong totalTime, long personId)
+        internal DbLap(long lapId, long tagId, long eventId, uint lapCount, ulong lapTime, ulong totalTime, long personId, int? lapLength = null)
         {
             this.LapId = lapId;
             this.TagId = tagId;
@@ -21,6 +21,7 @@ namespace TrailMeisterDb
             this.LapTime = lapTime;
             this.TotalTime = totalTime;
             this.PersonId = personId;
+            this._lapLength = lapLength;
         }
         public long LapId { get; set; }
         public long TagId { get; set; }
@@ -29,12 +30,29 @@ namespace TrailMeisterDb
         public ulong LapTime { get; set; }
         public ulong TotalTime { get; set; }
         public long PersonId { get; set; }
+
+        private int? _lapLength;
+        public int? LapLength
+        {
+            get => _lapLength;
+            set
+            {
+                if (_lapLength != value)
+                {
+                    _lapLength = value;
+                    PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(LapLength)));
+                }
+            }
+        }
+
+        public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
     }
 
     internal class DbLapFactory : IDbRowItem<DbLap>
     {
         DbLap IDbRowItem<DbLap>.createItem(MySqlDataReader reader)
         {
+            int? lapLength = reader["LapLength"] == DBNull.Value ? null : (int?)Convert.ToInt32(reader["LapLength"]);
             return new DbLap(
                             Convert.ToInt32(reader["id"]),
                             Convert.ToInt32(reader["tagId"]),
@@ -42,7 +60,8 @@ namespace TrailMeisterDb
                             Convert.ToUInt32(reader["LapCount"]),
                             Convert.ToUInt64(reader["LapTime"]),
                             Convert.ToUInt64(reader["TotalTime"]),
-                            Convert.ToInt32(reader["PersonId"]));
+                            Convert.ToInt32(reader["PersonId"]),
+                            lapLength);
         }
     }
     public class DbLapsTable: DbTable<DbLap>
@@ -67,9 +86,9 @@ namespace TrailMeisterDb
             return base.getRowItems(queryParams);
         }
 
-        public List<DbLap>? getEventLapsForRacer(long tagId, long eventId)
+        public List<DbLap>? getEventLapsForRacer(long personId, long eventId)
         {
-            Hashtable queryParams = new Hashtable() { { "tagId", tagId }, { "eventId", eventId } };
+            Hashtable queryParams = new Hashtable() { { "PersonId", personId }, { "eventId", eventId } };
 
             return base.getRowItems(queryParams);
         }
@@ -105,6 +124,11 @@ namespace TrailMeisterDb
         public void updateLapPerson(long lapId, long personId)
         {
             base.updateColumnValue(lapId, "PersonId", personId.ToString());
+        }
+
+        public void updateLapLength(long lapId, int? lapLength)
+        {
+            base.updateColumnValueNullable(lapId, "LapLength", lapLength?.ToString());
         }
     }
 }

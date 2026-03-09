@@ -29,8 +29,15 @@ namespace TrailMeisterViewer.Windows.PersonalLog
             get => (string)GetValue(LabelProperty);
             set => SetValue(LabelProperty, value);
         }
-
         public static readonly DependencyProperty LabelProperty =
             DependencyProperty.Register("Label", typeof(string), typeof(SummaryGrid), new PropertyMetadata(string.Empty));
+
+        public TrailMeisterViewer.Model.RacerData? RacerData
+        {
+            get => (TrailMeisterViewer.Model.RacerData?)GetValue(RacerDataProperty);
+            set => SetValue(RacerDataProperty, value);
+        }
+        public static readonly DependencyProperty RacerDataProperty =
+            DependencyProperty.Register("RacerData", typeof(TrailMeisterViewer.Model.RacerData), typeof(SummaryGrid), new PropertyMetadata(null));
     }
 }

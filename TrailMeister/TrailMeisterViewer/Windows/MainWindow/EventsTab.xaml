@@ -7,17 +7,23 @@
              xmlns:utils="clr-namespace:TrailMeisterUtilities;assembly=TrailMeisterUtilities"
              xmlns:convertersUtils="clr-namespace:TrailMeisterUtilities.Converters;assembly=TrailMeisterUtilities"
              xmlns:converters="clr-namespace:TrailMeisterViewer.Converters"
-             mc:Ignorable="d" 
+             xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
         <converters:CanDeleteEventToVisibilityConverter x:Key="CanDeleteEventToVisibilityConverter"/>
         <convertersUtils:Bool2VisibilityConverter x:Key="Bool2VisibilityConverter"/>
+        <CollectionViewSource x:Key="SortedEvents" Source="{Binding AllEvents}">
+            <CollectionViewSource.SortDescriptions>
+                <componentModel:SortDescription PropertyName="EventDate" Direction="Descending"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
         <convertersUtils:Tag2PersonConverter x:Key="Tag2PersonConverter"/>
     </UserControl.Resources>
 
-    <DataGrid x:Name="gridEvents" 
-                ItemsSource="{Binding AllEvents}" 
+    <DataGrid x:Name="gridEvents"
+                ItemsSource="{Binding Source={StaticResource SortedEvents}}"
                 IsSynchronizedWithCurrentItem="False"
                 FontSize="24" AutoGenerateColumns="False" GridLinesVisibility="All" HorizontalAlignment="Stretch"
                 CanUserAddRows="False" >

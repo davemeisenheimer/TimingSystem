@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System;
 using System.ComponentModel;
@@ -24,7 +23,7 @@ namespace TrailMeisterViewer.Windows.PersonalLog
             _vm = new PersonalLogVM(this, dbPerson);
         }
 
-        public void ShowWindow()
+        public PersonalLogControl CreateControl()
         {
             List<DbLap> personLaps = _dbLapsTable.getAllLapsForRacer(_person.PersonId);
 
@@ -32,68 +31,69 @@ namespace TrailMeisterViewer.Windows.PersonalLog
             var eventLookup = _dbEventsTable.getEventsByIds(eventIds)
                                             .ToDictionary(e => e.ID);
 
+            _vm.Summaries = buildAllSummaries(eventLookup, personLaps);
 
-            _vm.RacerDataAll = new RacerData(_person, personLaps);
-            _vm.RacerDataSeason = this.getRacerDataForCurrentSeason(eventLookup, personLaps);
-
-            // Create the grouped rows
             var eventRows = personLaps.GroupBy(lap => lap.EventId)
                 .Select(group => new RacerEventRow
                 {
-                    // Use the lookup to get the full object; fallback to null if not found
                     Event = eventLookup.TryGetValue((uint)group.Key, out var ev) ? ev : null,
-
-                    // Pass only the laps belonging to THIS specific event group
                     RacerData = new RacerData(
                                     _person,
                                     group.Where(x => x.LapCount > 0).ToList()
                                 )
-                 })
+                })
                 .OrderByDescending(row => row.Event?.EventDate ?? DateTime.MinValue)
                 .ToList();
 
-            foreach(var row in eventRows)
+            foreach (var row in eventRows)
             {
                 _vm.AllEventRows.Add(row);
             }
 
-            //_vm.AllRacerData.Add(new
-            //    RacerData(
-            //        _person,
-            //        personLaps.Where(x => x.LapCount > 0)
-            //            .ToList()
-            //    )
-            //);
-
-            var window = new PersonalLog
-            {
-                DataContext = _vm,
-                Owner = Application.Current.MainWindow
-            };
-
-            window.ShowDialog();
+            return new PersonalLogControl { DataContext = _vm };
         }
 
-        private RacerData getRacerDataForCurrentSeason(Dictionary<uint, DbEvent> allEvents, List<DbLap> personLaps)
+        private List<SeasonSummary> buildAllSummaries(Dictionary<uint, DbEvent> allEvents, List<DbLap> personLaps)
         {
+            var summaries = new List<SeasonSummary>
+            {
+                new SeasonSummary { Label = "All Time", RacerData = new RacerData(_person, personLaps) }
+            };
+
+            if (!allEvents.Any() || !personLaps.Any())
+                return summaries;
+
             DateTime today = DateTime.Today;
-            int year = today.Month >= 9 ? today.Year : today.Year - 1;
-            DateTime previousSeptember = new DateTime(year, 9, 1);
+            int currentSeasonYear = today.Month >= 9 ? today.Year : today.Year - 1;
+            int earliestSeasonYear = allEvents.Values.Min(e =>
+                e.EventDate.Month >= 9 ? e.EventDate.Year : e.EventDate.Year - 1);
 
-            var eventsThisSeason = allEvents.Values
-                                            .Where(e => e.EventDate >= previousSeptember && e.EventDate <= today);
+            for (int year = currentSeasonYear; year >= earliestSeasonYear; year--)
+            {
+                DateTime start = new DateTime(year, 9, 1);
+                DateTime end = new DateTime(year + 1, 9, 1);
 
-            var filteredEventIds = new HashSet<long>(eventsThisSeason.Select(e => (long)e.ID));
+                var seasonEventIds = new HashSet<long>(
+                    allEvents.Values
+                        .Where(e => e.EventDate >= start && e.EventDate < end)
+                        .Select(e => (long)e.ID));
 
-            var seasonLaps = personLaps
-                .Where(lap => filteredEventIds.Contains(lap.EventId));
+                var seasonLaps = personLaps.Where(l => seasonEventIds.Contains(l.EventId)).ToList();
+                if (!seasonLaps.Any()) continue;
 
-            return new RacerData(_person, seasonLaps.ToList());
+                string label = year == currentSeasonYear
+                    ? "This Season"
+                    : $"{year}/{(year + 1) % 100:D2}";
+
+                summaries.Add(new SeasonSummary { Label = label, RacerData = new RacerData(_person, seasonLaps) });
+            }
+
+            return summaries;
         }
 
         internal void ExportHtml()
         {
-            //RacerDataXmlSerializer.ExportEventToHtml(this._event, this._vm.AllRacerData.ToList());
+            new PersonalLogHtmlExporter(_person, _vm.AllEventRows.ToList()).Export();
         }
     }
 }

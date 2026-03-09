@@ -5,6 +5,11 @@
              xmlns:converters="clr-namespace:TrailMeisterUtilities.Converters;assembly=TrailMeisterUtilities"
              StartupUri="GUI/Main/Main.xaml">
     <Application.Resources>
-        <converters:Tag2PersonConverter x:Key="Tag2PersonConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/TrailMeisterUtilities;component/Styles/ButtonStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <converters:Tag2PersonConverter x:Key="Tag2PersonConverter" />
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

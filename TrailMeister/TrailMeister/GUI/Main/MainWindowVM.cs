@@ -23,6 +23,7 @@ namespace TrailMeister.GUI.Main
 
         private string _eventName = "Event " + DateOnly.FromDateTime(DateTime.Today).ToString("yyyy/MM/dd");
         private int _antennaPower = 5;
+        private int _lapLength = 800;
         bool _eventStarted = false;
         bool _isEventFinished = false;
 
@@ -94,6 +95,19 @@ namespace TrailMeister.GUI.Main
                 {
                     this._eventName = value;
                     OnPropertyChanged(nameof(EventName));
+                }
+            }
+        }
+
+        public int LapLength
+        {
+            get => _lapLength;
+            set
+            {
+                if (_lapLength != value)
+                {
+                    _lapLength = value;
+                    OnPropertyChanged(nameof(LapLength));
                 }
             }
         }

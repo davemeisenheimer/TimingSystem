@@ -9,18 +9,20 @@
 
     <Grid Margin="0,2,0,2">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="40"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Column="0"
                    Text="{Binding Label, ElementName=parent}"
-                   Foreground="#6688AA" FontSize="13"
+                   Foreground="{StaticResource MutedBlueBrush}"
+                   FontSize="13"
                    VerticalAlignment="Center"/>
 
         <TextBlock Grid.Column="1"
                    Text="{Binding Data, ElementName=parent}"
-                   FontSize="14" FontWeight="SemiBold" Foreground="#112244"
+                   FontSize="14" FontWeight="SemiBold"
+                   Foreground="{StaticResource DarkNavyBrush}"
                    VerticalAlignment="Center"/>
     </Grid>
 </UserControl>

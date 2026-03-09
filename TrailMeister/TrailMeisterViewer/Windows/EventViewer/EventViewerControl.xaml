@@ -6,12 +6,6 @@
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase">
 
     <UserControl.Resources>
-        <converters:Person2NameConverter x:Key="Person2NameConverter"/>
-        <converters:Laps2TimeConverter x:Key="Laps2TimeConverter"/>
-        <converters:Ms2TimeConverter x:Key="Ms2TimeConverter"/>
-        <converters:Laps2DistanceConverter x:Key="Laps2DistanceConverter"/>
-        <converters:HandicapAwareTimeConverter x:Key="HandicapAwareTimeConverter"/>
-
         <DataTemplate x:Key="RacerLapsTooltipTemplate">
             <Border Background="LightYellow" Padding="5" CornerRadius="4">
                 <StackPanel>
@@ -121,7 +115,7 @@
                   CanUserAddRows="False" Margin="0,8,0,0">
 
                 <DataGrid.RowStyle>
-                <Style TargetType="DataGridRow">
+                <Style TargetType="DataGridRow" BasedOn="{StaticResource ThemedDataGridRow}">
                     <EventSetter Event="MouseDoubleClick" Handler="OnRacerRowDoubleClick"/>
                     <Setter Property="ToolTip">
                         <Setter.Value>
@@ -132,7 +126,8 @@
             </DataGrid.RowStyle>
             <DataGrid.Columns>
 
-                <DataGridTemplateColumn x:Name="colPerson" Width="4*" Header="Name" IsReadOnly="false" MinWidth="300">
+                <DataGridTemplateColumn x:Name="colPerson" Width="4*" Header="Name" IsReadOnly="false" MinWidth="300"
+                                        HeaderStyle="{StaticResource DataGridHeaderLeft}">
                     <!-- Display mode -->
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -183,62 +178,35 @@
 
                 <DataGridTextColumn x:Name="colName" CanUserResize="False" Width="5*" Header="Association" IsReadOnly="true" MinWidth="50"
                                     SortMemberPath="Person.FirstName"
-                                    Binding="{Binding Person.Association}">
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                        </Style>
-                    </DataGridTextColumn.HeaderStyle>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Left" />
-                            <Setter Property="Padding" Value="8 0 8 0" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                                    Binding="{Binding Person.Association}"
+                                    HeaderStyle="{StaticResource DataGridHeaderLeft}"
+                                    ElementStyle="{StaticResource DataGridCellLeft}"/>
 
                 <DataGridTextColumn
                     x:Name="colLaps" CanUserResize="False"
                     Width="2*" Header="Total Laps" IsReadOnly="true" MinWidth="50"
                     Binding="{Binding Laps.Count}"
-                    SortMemberPath="Laps.Count">
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                        </Style>
-                    </DataGridTextColumn.HeaderStyle>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Padding" Value="8 0 8 0" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                    SortMemberPath="Laps.Count"
+                    HeaderStyle="{StaticResource DataGridHeaderRight}"
+                    ElementStyle="{StaticResource DataGridCellRight}"/>
 
                 <DataGridTextColumn
                     x:Name="colDistance" CanUserResize="False"
-                    Width="2*" Header="Total Dist" IsReadOnly="true" MinWidth="50">
+                    Width="2*" Header="Total Dist" IsReadOnly="true" MinWidth="50"
+                    HeaderStyle="{StaticResource DataGridHeaderRight}"
+                    ElementStyle="{StaticResource DataGridCellRight}">
                     <DataGridTextColumn.Binding>
                         <MultiBinding Converter="{StaticResource Laps2DistanceConverter}">
                             <Binding Path="Laps" />
                         </MultiBinding>
                     </DataGridTextColumn.Binding>
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                        </Style>
-                    </DataGridTextColumn.HeaderStyle>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Padding" Value="8 0 8 0" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
                 <DataGridTextColumn
                     x:Name="colTotalTime" CanUserResize="False"
-                    Width="2.5*" Header="Total Time" IsReadOnly="true" MinWidth="50">
+                    Width="2.5*" Header="Total Time" IsReadOnly="true" MinWidth="50"
+                    HeaderStyle="{StaticResource DataGridHeaderRight}"
+                    ElementStyle="{StaticResource DataGridCellRight}">
                     <DataGridTextColumn.Binding>
                         <MultiBinding Converter="{StaticResource HandicapAwareTimeConverter}">
                             <Binding Source="{x:Static converters:TimeConversionType.TotalTime}" />
@@ -247,23 +215,14 @@
                             <Binding Path="DataContext.IsHandicapMode" RelativeSource="{RelativeSource AncestorType=DataGrid}"/>
                         </MultiBinding>
                     </DataGridTextColumn.Binding>
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                        </Style>
-                    </DataGridTextColumn.HeaderStyle>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Padding" Value="8 0 8 0" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
                 <DataGridTextColumn
                     x:Name="colFastestLap" CanUserResize="False"
                     Width="2.5*" Header="Best Lap" IsReadOnly="true" MinWidth="50"
-                    SortMemberPath="AdjustedBestLapMs">
+                    SortMemberPath="AdjustedBestLapMs"
+                    HeaderStyle="{StaticResource DataGridHeaderRight}"
+                    ElementStyle="{StaticResource DataGridCellRight}">
                     <DataGridTextColumn.Binding>
                         <MultiBinding Converter="{StaticResource HandicapAwareTimeConverter}">
                             <Binding Source="{x:Static converters:TimeConversionType.BestLap}" />
@@ -272,22 +231,13 @@
                             <Binding Path="DataContext.IsHandicapMode" RelativeSource="{RelativeSource AncestorType=DataGrid}"/>
                         </MultiBinding>
                     </DataGridTextColumn.Binding>
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                        </Style>
-                    </DataGridTextColumn.HeaderStyle>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Padding" Value="8 0 8 0" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
                 <DataGridTextColumn
                     x:Name="colAverageLap" CanUserResize="False"
-                    Width="2.5*" Header="Average Lap" IsReadOnly="true" MinWidth="50">
+                    Width="2.5*" Header="Average Lap" IsReadOnly="true" MinWidth="50"
+                    HeaderStyle="{StaticResource DataGridHeaderRight}"
+                    ElementStyle="{StaticResource DataGridCellRight}">
                     <DataGridTextColumn.Binding>
                         <MultiBinding Converter="{StaticResource HandicapAwareTimeConverter}">
                             <Binding Source="{x:Static converters:TimeConversionType.AverageLap}" />
@@ -296,17 +246,6 @@
                             <Binding Path="DataContext.IsHandicapMode" RelativeSource="{RelativeSource AncestorType=DataGrid}"/>
                         </MultiBinding>
                     </DataGridTextColumn.Binding>
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                        </Style>
-                    </DataGridTextColumn.HeaderStyle>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Padding" Value="8 0 8 0" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>

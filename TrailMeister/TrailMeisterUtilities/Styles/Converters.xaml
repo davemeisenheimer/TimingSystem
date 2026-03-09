@@ -1,0 +1,14 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:TrailMeisterUtilities.Converters">
+
+    <converters:Laps2TimeConverter         x:Key="Laps2TimeConverter"/>
+    <converters:Laps2DistanceConverter     x:Key="Laps2DistanceConverter"/>
+    <converters:Ms2TimeConverter           x:Key="Ms2TimeConverter"/>
+    <converters:Person2NameConverter       x:Key="Person2NameConverter"/>
+    <converters:HandicapAwareTimeConverter x:Key="HandicapAwareTimeConverter"/>
+    <converters:Bool2VisibilityConverter   x:Key="Bool2VisibilityConverter"/>
+    <converters:Tag2PersonConverter        x:Key="Tag2PersonConverter"/>
+    <converters:InverseBooleanConverter    x:Key="InverseBooleanConverter"/>
+
+</ResourceDictionary>

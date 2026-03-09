@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using TrailMeisterDb;
+using TrailMeisterViewer.Windows.Settings;
 
 namespace TrailMeisterViewer
 {
@@ -12,9 +14,16 @@ namespace TrailMeisterViewer
 
         public MainWindow()
         {
+            AppSettingsService.Load();
             this._viewModel = new MainWindowVM(this);
             this.DataContext = this._viewModel;
             InitializeComponent();
+        }
+
+        private void OnSettingsClick(object sender, RoutedEventArgs e)
+        {
+            var dlg = new SettingsDialog { Owner = this };
+            dlg.ShowDialog();
         }
 
         public void Navigate(UIElement view, Action? onBack = null)

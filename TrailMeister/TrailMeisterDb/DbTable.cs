@@ -28,6 +28,7 @@ namespace TrailMeisterDb
             dbProcess.update(cmdStr);
         }
 
+        /* Originally added to support converting a custom lap length back to a default lap length in the log details view */
         protected void updateColumnValueNullable(long rowId, string columnName, string? columnValue)
         {
             string valueStr = columnValue is null ? "NULL" : $"'{columnValue}'";

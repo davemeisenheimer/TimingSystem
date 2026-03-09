@@ -5,11 +5,6 @@
         xmlns:converters="clr-namespace:TrailMeisterUtilities.Converters;assembly=TrailMeisterUtilities">
 
     <UserControl.Resources>
-        <converters:Person2NameConverter x:Key="Person2NameConverter"/>
-        <converters:Laps2TimeConverter x:Key="Laps2TimeConverter"/>
-        <converters:Ms2TimeConverter x:Key="Ms2TimeConverter"/>
-        <converters:Laps2DistanceConverter x:Key="Laps2DistanceConverter"/>
-
         <DataTemplate x:Key="RacerLapsTooltipTemplate">
             <Border Background="LightYellow" Padding="5" CornerRadius="4">
                 <StackPanel>
@@ -19,17 +14,17 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock>
-                                <Run Text="Lap "/>
-                                <Run Text="{Binding LapCount, Mode=OneWay}"/>
-                                <Run Text=": "/>
-                                <Run>
-                                    <Run.Text>
-                                        <MultiBinding Converter="{StaticResource Ms2TimeConverter}" Mode="OneWay">
+                                    <Run Text="Lap "/>
+                                    <Run Text="{Binding LapCount, Mode=OneWay}"/>
+                                    <Run Text=": "/>
+                                    <Run>
+                                        <Run.Text>
+                                            <MultiBinding Converter="{StaticResource Ms2TimeConverter}" Mode="OneWay">
                                                 <Binding Path="LapTime" />
                                                 <Binding Source="{x:Static converters:TimeConversionPrecision.ToTheHundredth}" />
-                                        </MultiBinding>
-                                    </Run.Text>
-                                </Run>
+                                            </MultiBinding>
+                                        </Run.Text>
+                                    </Run>
                                 </TextBlock>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -52,17 +47,30 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,16,0">
-                <Label FontSize="24" Padding="2">
-                    <Label.Content>
-                        <MultiBinding Converter="{StaticResource Person2NameConverter}">
-                            <Binding Source="{x:Static converters:NameConversionType.FirstAndLast}" />
-                            <Binding Path="Person"/>
-                        </MultiBinding>
-                    </Label.Content>
-                </Label>
-                <Label FontSize="14" Content="{Binding Person.NickName}" Foreground="Gray" Padding="2,0,2,2"/>
-            </StackPanel>
+            <Border Grid.Column="0" CornerRadius="8"
+                    BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1"
+                    Background="{StaticResource CardBackgroundBrush}"
+                    Margin="0,0,16,4" VerticalAlignment="Stretch">
+                <StackPanel>
+                    <Border Background="{StaticResource CardHeaderBrush}" CornerRadius="8,8,0,0" Padding="10,6">
+                        <TextBlock Text="Racer" FontWeight="SemiBold" FontSize="14"
+                                   Foreground="{StaticResource NavyBrush}" TextAlignment="Center"/>
+                    </Border>
+                    <StackPanel Margin="10,6,10,8">
+                        <Label FontSize="24" Padding="2">
+                            <Label.Content>
+                                <MultiBinding Converter="{StaticResource Person2NameConverter}">
+                                    <Binding Source="{x:Static converters:NameConversionType.FirstAndLast}" />
+                                    <Binding Path="Person"/>
+                                </MultiBinding>
+                            </Label.Content>
+                        </Label>
+                        <Label FontSize="14" Content="{Binding Person.NickName}" Foreground="{StaticResource MutedBlueBrush}" Padding="2,0,2,2"/>
+                        <Label FontSize="18" Content="Log of all events" Padding="2"/>
+                        <Label FontSize="14" Content="D-click row to see event details" Foreground="{StaticResource MutedBlueBrush}" Padding="2"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
 
             <ScrollViewer Grid.Column="1"
                           HorizontalScrollBarVisibility="Auto"
@@ -90,7 +98,7 @@
                   CanUserAddRows="False"
                   CanUserSortColumns="True">
             <DataGrid.RowStyle>
-                <Style TargetType="DataGridRow">
+                <Style TargetType="DataGridRow" BasedOn="{StaticResource ThemedDataGridRow}">
                     <EventSetter Event="MouseDoubleClick" Handler="OnEventRowDoubleClick"/>
                     <Setter Property="ToolTip">
                         <Setter.Value>
@@ -101,92 +109,56 @@
             </DataGrid.RowStyle>
             <DataGrid.Columns>
                 <DataGridTextColumn x:Name="colEventName" CanUserResize="True" Width="3*" Header="Name" IsReadOnly="true" MinWidth="50"
-                                    Binding="{Binding Event.EventName}">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Left" />
-                            <Setter Property="Padding" Value="8 0 8 0" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                                    Binding="{Binding Event.EventName}"
+                                    HeaderStyle="{StaticResource DataGridHeaderLeft}"
+                                    ElementStyle="{StaticResource DataGridCellLeft}"/>
 
-                <DataGridTextColumn
-                    x:Name="colLaps" CanUserResize="False"
-                    Width="1.1*" Header="Total Laps" IsReadOnly="true" MinWidth="15"
-                    Binding="{Binding RacerData.Laps.Count}">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Padding" Value="8 0 8 0" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                <DataGridTextColumn x:Name="colLaps" CanUserResize="False" Width="1.1*" Header="Total Laps" IsReadOnly="true" MinWidth="15"
+                                    Binding="{Binding RacerData.Laps.Count}"
+                                    HeaderStyle="{StaticResource DataGridHeaderRight}"
+                                    ElementStyle="{StaticResource DataGridCellRight}"/>
 
-                <DataGridTextColumn
-                    x:Name="colDistance" CanUserResize="False"
-                    Width="2*" Header="Total Distance" IsReadOnly="true" MinWidth="50">
+                <DataGridTextColumn x:Name="colDistance" CanUserResize="False" Width="2*" Header="Total Distance" IsReadOnly="true" MinWidth="50"
+                                    HeaderStyle="{StaticResource DataGridHeaderRight}"
+                                    ElementStyle="{StaticResource DataGridCellRight}">
                     <DataGridTextColumn.Binding>
                         <MultiBinding Converter="{StaticResource Laps2DistanceConverter}">
                             <Binding Path="RacerData.Laps" />
                         </MultiBinding>
                     </DataGridTextColumn.Binding>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Padding" Value="8 0 8 0" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <DataGridTextColumn
-                    x:Name="colTotalTime" CanUserResize="False"
-                    Width="2*" Header="Total Time" IsReadOnly="true" MinWidth="50">
+                <DataGridTextColumn x:Name="colTotalTime" CanUserResize="False" Width="2*" Header="Total Time" IsReadOnly="true" MinWidth="50"
+                                    HeaderStyle="{StaticResource DataGridHeaderRight}"
+                                    ElementStyle="{StaticResource DataGridCellRight}">
                     <DataGridTextColumn.Binding>
                         <MultiBinding Converter="{StaticResource Laps2TimeConverter}">
                             <Binding Source="{x:Static converters:TimeConversionType.TotalTime}" />
                             <Binding Path="RacerData.Laps"/>
                         </MultiBinding>
                     </DataGridTextColumn.Binding>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Padding" Value="8 0 8 0" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <DataGridTextColumn
-                    x:Name="colFastestLap" CanUserResize="False"
-                    Width="2*" Header="Best Lap" IsReadOnly="true" MinWidth="50">
+                <DataGridTextColumn x:Name="colFastestLap" CanUserResize="False" Width="2*" Header="Best Lap" IsReadOnly="true" MinWidth="50"
+                                    HeaderStyle="{StaticResource DataGridHeaderRight}"
+                                    ElementStyle="{StaticResource DataGridCellRight}">
                     <DataGridTextColumn.Binding>
                         <MultiBinding Converter="{StaticResource Laps2TimeConverter}">
                             <Binding Source="{x:Static converters:TimeConversionType.BestLap}" />
                             <Binding Path="RacerData.Laps"/>
                         </MultiBinding>
                     </DataGridTextColumn.Binding>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Padding" Value="8 0 8 0" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <DataGridTextColumn
-                    x:Name="colAverageLap" CanUserResize="False"
-                    Width="2*" Header="Average Lap" IsReadOnly="true" MinWidth="50">
+                <DataGridTextColumn x:Name="colAverageLap" CanUserResize="False" Width="2*" Header="Average Lap" IsReadOnly="true" MinWidth="50"
+                                    HeaderStyle="{StaticResource DataGridHeaderRight}"
+                                    ElementStyle="{StaticResource DataGridCellRight}">
                     <DataGridTextColumn.Binding>
                         <MultiBinding Converter="{StaticResource Laps2TimeConverter}">
                             <Binding Source="{x:Static converters:TimeConversionType.AverageLap}" />
                             <Binding Path="RacerData.Laps"/>
                         </MultiBinding>
                     </DataGridTextColumn.Binding>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Padding" Value="8 0 8 0" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
@@ -197,6 +169,5 @@
                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="48" Width="120"
                 Command="{Binding ExportHtmlCommand}" Margin="0,8,12,8"
                 Style="{StaticResource GlossyBeveledButton}"/>
-
     </Grid>
 </UserControl>

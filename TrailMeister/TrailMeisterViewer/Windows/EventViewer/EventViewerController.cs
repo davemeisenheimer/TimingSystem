@@ -106,6 +106,16 @@ namespace TrailMeisterViewer.Windows.EventViewer
             var eventsById = _dbEventsTable.getEventsByIds(eventsToLoad.ToList())
                 .ToDictionary(e => (long)e.ID);
 
+            // Exclude laps from events that had not yet occurred as of the current event's date,
+            // so that handicap rankings are deterministic — they look the same on the day as in the future.
+            foreach (var racer in _vm.AllRacerData)
+            {
+                racerHistoricalLaps[racer.PersonId] = racerHistoricalLaps[racer.PersonId]
+                    .Where(l => eventsById.TryGetValue(l.EventId, out var ev)
+                                && ev.EventDate <= _event.EventDate)
+                    .ToList();
+            }
+
             // Find the best pace (ms/m) for each racer using laps >= 400m
             var racerHistories = new List<(RacerData Racer, double BestPace, int BestLapLength)>();
 
@@ -118,7 +128,7 @@ namespace TrailMeisterViewer.Windows.EventViewer
                 {
                     int effectiveLength = lap.LapLength
                         ?? (eventsById.TryGetValue(lap.EventId, out var ev) ? ev.LapLength : 0);
-                    if (effectiveLength < 400) continue;
+                    if (effectiveLength < TrailMeisterDb.AppSettings.Current.HandicapMinLapLengthM) continue;
 
                     double pace = (double)lap.LapTime / effectiveLength;
                     if (pace < bestPace)
@@ -142,8 +152,9 @@ namespace TrailMeisterViewer.Windows.EventViewer
 
             foreach (var (racer, bestPace, bestLapLength) in racerHistories)
             {
+                var hs = TrailMeisterDb.AppSettings.Current;
                 double shortness = Math.Max(0, reference.BestLapLength - bestLapLength) / 100.0;
-                double penalty = Math.Min(0.12, shortness * 0.02);
+                double penalty = Math.Min(hs.HandicapMaxPenalty, shortness * hs.HandicapPenaltyPerHundredM);
                 double adjustedPace = bestPace * (1 + penalty);
                 long handicap = (long)Math.Max(0, (adjustedPace - reference.BestPace) * todayLapLength);
                 racer.HandicapPerLapMs = handicap;

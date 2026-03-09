@@ -1,7 +1,8 @@
-﻿using System.Windows;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel;
+using System.Linq;
+using System.Windows;
 
 using TrailMeisterDb;
 using TrailMeisterViewer.Model;
@@ -41,17 +42,10 @@ namespace TrailMeisterViewer.Windows.EventViewer
             RepopulateAllRacerData();
         }
 
-        public void ShowWindow()
+        public EventViewerControl CreateControl()
         {
             RepopulateAllRacerData();
-
-            var window = new EventViewer
-            {
-                DataContext = _vm,
-                Owner = null
-            };
-
-            window.ShowDialog();
+            return new EventViewerControl { DataContext = _vm };
         }
 
         private void RepopulateAllRacerData()
@@ -82,7 +76,78 @@ namespace TrailMeisterViewer.Windows.EventViewer
 
         internal void ExportHtml()
         {
-            RacerDataXmlSerializer.ExportEventToHtml(this._event, this._vm.AllRacerData.ToList());
+            bool hasHandicapData = _vm.IsHandicapMode;
+            var dialog = new ExportOptionsDialog(hasHandicapData)
+            {
+                Owner = System.Windows.Application.Current.MainWindow
+            };
+
+            if (dialog.ShowDialog() != true) return;
+
+            new EventHtmlExporter(this._event, this._vm.AllRacerData.ToList()).Export(dialog.Result!);
+        }
+
+        internal void LoadHandicaps()
+        {
+            // Gather all historical laps (excluding the current event) for each racer
+            var eventsToLoad = new HashSet<long>();
+            var racerHistoricalLaps = new Dictionary<long, List<DbLap>>();
+
+            foreach (var racer in _vm.AllRacerData)
+            {
+                var allLaps = _dbLapsTable.getAllLapsForRacer(racer.PersonId)
+                    .Where(l => l.EventId != _event.ID && l.LapCount > 0)
+                    .ToList();
+                racerHistoricalLaps[racer.PersonId] = allLaps;
+                foreach (var lap in allLaps)
+                    eventsToLoad.Add(lap.EventId);
+            }
+
+            var eventsById = _dbEventsTable.getEventsByIds(eventsToLoad.ToList())
+                .ToDictionary(e => (long)e.ID);
+
+            // Find the best pace (ms/m) for each racer using laps >= 400m
+            var racerHistories = new List<(RacerData Racer, double BestPace, int BestLapLength)>();
+
+            foreach (var racer in _vm.AllRacerData)
+            {
+                double bestPace = double.MaxValue;
+                int bestLapLength = 0;
+
+                foreach (var lap in racerHistoricalLaps[racer.PersonId])
+                {
+                    int effectiveLength = lap.LapLength
+                        ?? (eventsById.TryGetValue(lap.EventId, out var ev) ? ev.LapLength : 0);
+                    if (effectiveLength < 400) continue;
+
+                    double pace = (double)lap.LapTime / effectiveLength;
+                    if (pace < bestPace)
+                    {
+                        bestPace = pace;
+                        bestLapLength = effectiveLength;
+                    }
+                }
+
+                if (bestPace < double.MaxValue)
+                    racerHistories.Add((racer, bestPace, bestLapLength));
+                else
+                    racer.HandicapPerLapMs = 0;
+            }
+
+            if (!racerHistories.Any()) return;
+
+            // Reference = participant with the fastest (lowest) pace
+            var reference = racerHistories.MinBy(r => r.BestPace)!;
+            int todayLapLength = _event.LapLength;
+
+            foreach (var (racer, bestPace, bestLapLength) in racerHistories)
+            {
+                double shortness = Math.Max(0, reference.BestLapLength - bestLapLength) / 100.0;
+                double penalty = Math.Min(0.12, shortness * 0.02);
+                double adjustedPace = bestPace * (1 + penalty);
+                long handicap = (long)Math.Max(0, (adjustedPace - reference.BestPace) * todayLapLength);
+                racer.HandicapPerLapMs = handicap;
+            }
         }
 
         internal void ExecuteOnPersonChanged(RacerData racer)

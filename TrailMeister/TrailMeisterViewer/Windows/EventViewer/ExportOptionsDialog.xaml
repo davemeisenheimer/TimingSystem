@@ -1,0 +1,68 @@
+<Window x:Class="TrailMeisterViewer.Windows.EventViewer.ExportOptionsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Export Options"
+        Width="420" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="SingleBorderWindow"
+        ResizeMode="NoResize">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Results to include -->
+        <GroupBox Grid.Row="0" Header="Include in export" Padding="8,4" Margin="0,0,0,8" FontSize="14">
+            <StackPanel>
+                <CheckBox x:Name="chkRaw" Content="Raw results" IsChecked="True" Margin="0,4" FontSize="14"/>
+                <CheckBox x:Name="chkHandicap" Content="Handicapped results" IsChecked="False" Margin="0,4" FontSize="14"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Lap pruning -->
+        <GroupBox Grid.Row="1" Header="Equal lap count — prune to minimum" Padding="8,4" Margin="0,0,0,8" FontSize="14">
+            <StackPanel>
+                <TextBlock Text="Remove laps from racers who completed more laps than the slowest finisher:"
+                           Margin="0,4,0,6" FontSize="13" Foreground="Gray" TextWrapping="Wrap"/>
+                <CheckBox x:Name="chkPruneEarly"
+                          Content="Prune first laps (keep each racer's final N laps)"
+                          Margin="0,4" FontSize="14"
+                          Checked="OnPruneEarlyChecked" Unchecked="OnPruneEarlyUnchecked"/>
+                <CheckBox x:Name="chkPruneLast"
+                          Content="Prune last laps (keep each racer's opening N laps)"
+                          Margin="0,4" FontSize="14"
+                          Checked="OnPruneLastChecked" Unchecked="OnPruneLastUnchecked"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Sort order -->
+        <GroupBox Grid.Row="2" Header="Sort results by" Padding="8,4" Margin="0,0,0,8" FontSize="14">
+            <StackPanel>
+                <RadioButton x:Name="rdoSortTotalLaps"  Content="Total laps (then total time)" IsChecked="True" Margin="0,4" FontSize="14"/>
+                <RadioButton x:Name="rdoSortTotalTime" Content="Total time"  Margin="0,4" FontSize="14"/>
+                <RadioButton x:Name="rdoSortBestLap"   Content="Best lap"    Margin="0,4" FontSize="14"/>
+                <RadioButton x:Name="rdoSortAvgLap"    Content="Average lap" Margin="0,4" FontSize="14"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Other options -->
+        <GroupBox Grid.Row="3" Header="Other options" Padding="8,4" Margin="0,0,0,8" FontSize="14">
+            <StackPanel>
+                <CheckBox x:Name="chkRanking" Content="Include ranking column" IsChecked="True" Margin="0,4" FontSize="14"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+            <Button Content="Cancel" Width="90" Height="36" Click="OnCancel"
+                    Margin="0,0,8,0" Style="{StaticResource GlossyBeveledButton}"/>
+            <Button Content="Export" Width="90" Height="36" Click="OnExport"
+                    Style="{StaticResource GlossyBeveledButton}"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -36,10 +36,10 @@ namespace TrailMeisterUtilities.Converters
                             e => e.LapLength
                         );
 
-                foreach (var eventId in lapLengthsByEventId)
+                foreach (var lap in laps)
                 {
-                    int lapCountForEvent = laps.Count(l => l.EventId == eventId.Key);
-                    distanceMetres += (ulong)(lapCountForEvent * eventId.Value);
+                    int eventDefault = lapLengthsByEventId.TryGetValue((uint)lap.EventId, out int def) ? def : 0;
+                    distanceMetres += lap.LapLength ?? eventDefault;
                 }
 
                 formattedDistance = distanceMetres.ToString() + "m";

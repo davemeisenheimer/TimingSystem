@@ -102,8 +102,15 @@
             <Slider x:Name="Antenna_Gain" Value="{Binding AntennaPower}" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="349" Height="41" Maximum="27" Minimum="5" TickPlacement="TopLeft"/>
             <Label x:Name="lblAntennaPowerSlider" Content="{Binding AntennaPowerLabel}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="349" Height="40" FontSize="18" Margin="0,16,0,0"/>
             <!--<CheckBox Content="Start lap logging on 1st read" IsChecked="{Binding LogOnFirstRead}" HorizontalAlignment="Left" Margin="584,599,0,0" VerticalAlignment="Top" Height="32" Width="206" FontSize="18" VerticalContentAlignment="Center" Padding="4,-1,0,-4"/>-->
-            
-            <Button x:Name="btnDone" Content="Done" Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="82" Width="226" Click="btnDone_Click"/>
+
+            <StackPanel Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="0 0 0 16">
+                <Label Content="Lap Length (m)" FontSize="18" VerticalAlignment="Center"/>
+                <TextBox x:Name="tbLapLength"
+                         Text="{Binding LapLength, UpdateSourceTrigger=LostFocus}"
+                         FontSize="24" Width="92" VerticalAlignment="Center" Margin="8,0,0,0"/>
+            </StackPanel>
+
+            <Button x:Name="btnDone" Content="Done" Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="82" Width="226" Click="btnDone_Click" Style="{StaticResource GlossyBeveledButton}"/>
 
         </Grid>
 

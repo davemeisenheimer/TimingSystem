@@ -1,155 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-	<xsl:output method="html" indent="yes"/>
-	
-	<xsl:template name="formatTime">
-		<xsl:param name="ms" />
+    <xsl:output method="html" indent="yes"/>
 
-		<!-- total seconds -->
-		<xsl:variable name="totalSeconds" select="floor($ms div 1000)"/>
-		<!-- minutes -->
-		<xsl:variable name="minutes" select="floor($totalSeconds div 60)"/>
-		<!-- seconds (0-59) -->
-		<xsl:variable name="seconds" select="$totalSeconds mod 60"/>
-		<!-- remaining milliseconds -->
-		<xsl:variable name="milliseconds" select="$ms mod 1000"/>
+    <!-- ── Utility: format milliseconds as MM:SS.hh ── -->
+    <xsl:template name="formatTime">
+        <xsl:param name="ms"/>
+        <xsl:variable name="totalSeconds" select="floor($ms div 1000)"/>
+        <xsl:variable name="minutes"      select="floor($totalSeconds div 60)"/>
+        <xsl:variable name="seconds"      select="$totalSeconds mod 60"/>
+        <xsl:variable name="hundredths"   select="floor($ms mod 1000 div 10)"/>
+        <xsl:value-of select="format-number($minutes,    '00')"/>
+        <xsl:text>:</xsl:text>
+        <xsl:value-of select="format-number($seconds,    '00')"/>
+        <xsl:text>.</xsl:text>
+        <xsl:value-of select="format-number($hundredths, '00')"/>
+    </xsl:template>
 
-		<xsl:value-of select="format-number($minutes,'00')"/>
-		<xsl:text>:</xsl:text>
-		<xsl:value-of select="format-number($seconds,'00')"/>
-		<xsl:text>.</xsl:text>
-		<xsl:value-of select="format-number($milliseconds,'000')"/>
-	</xsl:template>
+    <!-- ── Root ── -->
+    <xsl:template match="/Event">
+        <html>
+            <head>
+                <title><xsl:value-of select="EventName"/> — Results</title>
+                <style>
+                    body  { font-family: Arial, sans-serif; margin: 20px; color: #222; }
+                    h1, h2, h3 { color: #2F4F4F; }
+                    h2 { margin-top: 32px; }
+                    h3 { margin-top: 24px; }
+                    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                    th { background-color: #e8f0fe; color: #003366; }
+                    tr:nth-child(even) { background-color: #f9f9f9; }
+                    td.left { text-align: left; }
+                    .nickname { color: #888; font-size: 0.85em; display: block; }
+                    .rank { color: #555; font-weight: bold; }
+                </style>
+            </head>
+            <body>
+                <h1><xsl:value-of select="EventName"/></h1>
+                <p style="color:#666;margin-top:-12px"><xsl:value-of select="EventDate"/></p>
 
-	<!-- Root -->
-	<xsl:template match="/Event">
-		<html>
-			<head>
-				<title>
-					<xsl:value-of select="EventName"/> Results
-				</title>
-				<style>
-					body { font-family: Arial, sans-serif; margin: 20px; }
-					h1, h2, h3 { color: #2F4F4F; }
-					table { border-collapse: collapse; width: 100%; margin-bottom: 25px; }
-					th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-					th { background-color: #f2f2f2; }
-					tr:nth-child(even) { background-color: #f9f9f9; }
-				</style>
-			</head>
+                <!-- ── One summary table per ResultSet ── -->
+                <xsl:for-each select="ResultSets/ResultSet">
+                    <h2><xsl:value-of select="@Label"/></h2>
+                    <table>
+                        <tr>
+                            <xsl:if test="@IncludeRanking='true'">
+                                <th>#</th>
+                            </xsl:if>
+                            <th class="left">Name</th>
+                            <th>Laps</th>
+                            <th>Total Time</th>
+                            <th>Best Lap</th>
+                            <th>Avg Lap</th>
+                        </tr>
+                        <xsl:for-each select="Racers/Racer">
+                            <tr>
+                                <xsl:if test="../../@IncludeRanking='true'">
+                                    <td class="rank"><xsl:value-of select="Rank"/></td>
+                                </xsl:if>
+                                <td class="left">
+                                    <xsl:value-of select="FirstName"/>
+                                    <xsl:text> </xsl:text>
+                                    <xsl:value-of select="LastName"/>
+                                    <xsl:if test="NickName != ''">
+                                        <span class="nickname">(<xsl:value-of select="NickName"/>)</span>
+                                    </xsl:if>
+                                </td>
+                                <td><xsl:value-of select="LapCount"/></td>
+                                <td>
+                                    <xsl:call-template name="formatTime">
+                                        <xsl:with-param name="ms" select="TotalTimeMs"/>
+                                    </xsl:call-template>
+                                </td>
+                                <td>
+                                    <xsl:call-template name="formatTime">
+                                        <xsl:with-param name="ms" select="BestLapMs"/>
+                                    </xsl:call-template>
+                                </td>
+                                <td>
+                                    <xsl:call-template name="formatTime">
+                                        <xsl:with-param name="ms" select="AvgLapMs"/>
+                                    </xsl:call-template>
+                                </td>
+                            </tr>
+                        </xsl:for-each>
+                    </table>
+                </xsl:for-each>
 
-			<body>
-				<h1>
-					<xsl:value-of select="EventName"/>
-				</h1>
-				<h2>
-					Date: <xsl:value-of select="EventDate"/>
-				</h2>
+                <!-- ── Per-racer lap detail (from the first ResultSet) ── -->
+                <xsl:if test="ResultSets/ResultSet[1]/Racers/Racer[1]/Laps/Lap">
+                    <h2>Lap Detail</h2>
+                    <xsl:for-each select="ResultSets/ResultSet[1]/Racers/Racer">
+                        <h3>
+                            <xsl:value-of select="FirstName"/>
+                            <xsl:text> </xsl:text>
+                            <xsl:value-of select="LastName"/>
+                            <xsl:if test="NickName != ''">
+                                <xsl:text> (</xsl:text>
+                                <xsl:value-of select="NickName"/>
+                                <xsl:text>)</xsl:text>
+                            </xsl:if>
+                        </h3>
+                        <xsl:if test="Association != ''">
+                            <p style="margin-top:-8px;color:#666"><xsl:value-of select="Association"/></p>
+                        </xsl:if>
+                        <table>
+                            <tr><th>Lap</th><th>Lap Time</th></tr>
+                            <xsl:for-each select="Laps/Lap">
+                                <tr>
+                                    <td><xsl:value-of select="LapNumber"/></td>
+                                    <td>
+                                        <xsl:call-template name="formatTime">
+                                            <xsl:with-param name="ms" select="LapTimeMs"/>
+                                        </xsl:call-template>
+                                    </td>
+                                </tr>
+                            </xsl:for-each>
+                        </table>
+                    </xsl:for-each>
+                </xsl:if>
 
-				<!-- ================= Race Summary ================= -->
-				<h2>Race Summary</h2>
-
-				<table>
-					<tr>
-						<th>Name</th>
-						<th>Total Laps</th>
-						<th>Total Time</th>
-						<th>Best Lap Time</th>
-						<th>Average Lap Time</th>
-					</tr>
-
-					<xsl:for-each select="Racers/Racer[count(EventLaps/Lap) &gt; 0]">
-						<!-- sort by lap count desc, then total time asc -->
-						<xsl:sort select="count(EventLaps/Lap)" data-type="number" order="descending"/>
-						<xsl:sort select="sum(EventLaps/Lap/LapTime)" data-type="number" order="ascending"/>
-
-						<xsl:variable name="lapCount" select="count(EventLaps/Lap)"/>
-						<xsl:variable name="totalTime" select="sum(EventLaps/Lap/LapTime)"/>
-						<xsl:variable name="totalTimeFormatted">
-								<xsl:call-template name="formatTime">
-									<xsl:with-param name="ms" select="sum(EventLaps/Lap/LapTime)"/>
-								</xsl:call-template>
-						</xsl:variable>
-
-						<!-- best lap = first after sorting by LapTime -->
-						<xsl:variable name="bestLap">
-							<xsl:for-each select="EventLaps/Lap">
-								<xsl:sort select="LapTime" data-type="number" order="ascending"/>
-								<xsl:if test="position() = 1">
-									<xsl:call-template name="formatTime">
-										<xsl:with-param name="ms" select="LapTime"/>
-									</xsl:call-template>
-								</xsl:if>
-							</xsl:for-each>
-						</xsl:variable>
-
-						<tr>
-							<td>
-								<xsl:value-of select="FirstName"/>
-								<xsl:text> </xsl:text>
-								<xsl:value-of select="LastName"/>
-							</td>
-
-							<td>
-								<xsl:value-of select="$lapCount"/>
-							</td>
-							<td>
-								<xsl:value-of select="$totalTimeFormatted"/>
-							</td>
-							<td>
-								<xsl:value-of select="$bestLap"/>
-							</td>
-							<td>
-								<xsl:call-template name="formatTime">
-									<xsl:with-param name="ms" select="$totalTime div $lapCount"/>
-								</xsl:call-template>
-							</td>
-						</tr>
-					</xsl:for-each>
-				</table>
-
-				<!-- ============== Per-racer Lap Data ============== -->
-				<h2>Per-racer Lap Data</h2>
-
-				<xsl:for-each select="Racers/Racer[count(EventLaps/Lap) &gt; 0]">
-					<h3>
-						<xsl:value-of select="FirstName"/>
-						<xsl:text> </xsl:text>
-						<xsl:value-of select="LastName"/>
-						<xsl:text> (</xsl:text>
-						<xsl:value-of select="NickName"/>
-						<xsl:text>)</xsl:text>
-					</h3>
-
-					<p>
-						Association: <xsl:value-of select="Association"/>
-					</p>
-
-					<table>
-						<tr>
-							<th>Lap Number</th>
-							<th>Lap Time</th>
-						</tr>
-
-						<xsl:for-each select="EventLaps/Lap">
-							<tr>
-								<td>
-									<xsl:value-of select="LapNumber"/>
-								</td>
-								<td>
-									<xsl:call-template name="formatTime">
-										<xsl:with-param name="ms" select="LapTime"/>
-									</xsl:call-template>
-								</td>
-							</tr>
-						</xsl:for-each>
-					</table>
-				</xsl:for-each>
-
-			</body>
-		</html>
-	</xsl:template>
+            </body>
+        </html>
+    </xsl:template>
 
 </xsl:stylesheet>

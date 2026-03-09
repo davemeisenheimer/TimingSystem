@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "TrailMeisterViewer (Debug)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-viewer",
+            "program": "${workspaceFolder}/TrailMeisterViewer/bin/Debug/net6.0-windows/TrailMeisterViewer.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/TrailMeisterViewer",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "name": "TrailMeister (Debug)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-app",
+            "program": "${workspaceFolder}/TrailMeister/bin/Debug/net6.0-windows/TrailMeister.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/TrailMeister",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "internalConsoleOptions": "neverOpen"
+        }
+    ]
+}

@@ -5,14 +5,14 @@ using System.Collections.ObjectModel;
 using TrailMeisterUtilities;
 using TrailMeisterDb;
 using TrailMeisterViewer.Model;
+using System.Collections.Generic;
 
 namespace TrailMeisterViewer.Windows.PersonalLog
 {
     public class PersonalLogVM : ViewModelBase
     {
         private ObservableCollection<RacerEventRow> _allEventRows = new ObservableCollection<RacerEventRow>();
-        private ObservableCollection<RacerData> _allRacerData = new ObservableCollection<RacerData>();
-        private PersonalLogController controller;
+private PersonalLogController controller;
 
         public PersonalLogVM(PersonalLogController c, DbPerson dbPerson)
         {
@@ -49,15 +49,7 @@ namespace TrailMeisterViewer.Windows.PersonalLog
             }
         }
 
-        public RacerData RacerDataAll
-        {
-            get; set;
-        }
-
-        public RacerData RacerDataSeason
-        {
-            get; set;
-        }
+        public List<SeasonSummary> Summaries { get; set; } = new();
 
         public ButtonCommand ExportHtmlCommand { get; set; }
     }

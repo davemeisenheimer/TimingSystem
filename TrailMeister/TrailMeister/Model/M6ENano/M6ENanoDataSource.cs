@@ -245,7 +245,7 @@ namespace TrailMeister.Model.M6ENano
                         "Tag read from M6ENano",
                         data.Data)
                     );
-                //BackgroundBeep.Beep(800);
+                BackgroundBeep.Beep(800);
             }
         }
 

@@ -17,21 +17,37 @@ namespace TrailMeisterViewer.Windows.EventViewer
             controller = c;
             ExportHtmlCommand = new ButtonCommand(ExecuteExportHtml, CanExecuteExportHtml);
             SelectedPersonChangedCommand = new RelayCommand(o => controller.ExecuteOnPersonChanged((RacerData)o), CanExecuteOnPersonChanged);
+            ToggleHandicapCommand = new ButtonCommand(ExecuteToggleHandicap, _ => true);
         }
 
-        private bool CanExecuteExportHtml(object? obj)
-        {
-            return true;
-        }
+        private bool CanExecuteExportHtml(object? obj) => true;
 
-        private void ExecuteExportHtml(object obj)
+        private void ExecuteExportHtml(object obj) => controller.ExportHtml();
+
+        private void ExecuteToggleHandicap(object obj)
         {
-            controller.ExportHtml();
+            // IsHandicapMode is already updated by the TwoWay IsChecked binding before this fires
+            if (IsHandicapMode)
+                controller.LoadHandicaps();
         }
 
         private bool CanExecuteOnPersonChanged(object? obj)
         {
             return true;
+        }
+
+        private bool _isHandicapMode;
+        public bool IsHandicapMode
+        {
+            get => _isHandicapMode;
+            set
+            {
+                if (_isHandicapMode != value)
+                {
+                    _isHandicapMode = value;
+                    OnPropertyChanged(nameof(IsHandicapMode));
+                }
+            }
         }
 
         public DbEvent Event { get; private set; }
@@ -69,6 +85,7 @@ namespace TrailMeisterViewer.Windows.EventViewer
         }
 
         public ButtonCommand ExportHtmlCommand { get; set; }
+        public ButtonCommand ToggleHandicapCommand { get; set; }
         public RelayCommand SelectedPersonChangedCommand { get; set; }
     }
 }

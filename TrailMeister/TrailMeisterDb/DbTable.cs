@@ -27,6 +27,13 @@ namespace TrailMeisterDb
             string cmdStr = string.Format("UPDATE {0} SET {1} = '{2}' WHERE id = {3}", _tableName, columnName, columnValue, rowId);
             dbProcess.update(cmdStr);
         }
+
+        protected void updateColumnValueNullable(long rowId, string columnName, string? columnValue)
+        {
+            string valueStr = columnValue is null ? "NULL" : $"'{columnValue}'";
+            string cmdStr = $"UPDATE {_tableName} SET {columnName} = {valueStr} WHERE id = {rowId}";
+            dbProcess.update(cmdStr);
+        }
         protected long addRow(Hashtable columnData)
         {
             int columnCount = 0;

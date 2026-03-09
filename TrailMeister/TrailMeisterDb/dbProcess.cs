@@ -132,7 +132,7 @@ namespace TrailMeisterDb
             string queryParams = "";
             foreach (DictionaryEntry param in searchParams)
             {
-                if (paramCount > 1)
+                if (paramCount > 0)
                 {
                     queryParams += " AND ";
                 } else

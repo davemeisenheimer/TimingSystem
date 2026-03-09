@@ -1,42 +1,58 @@
-﻿<Window x:Name="ViewerMain" x:Class="TrailMeisterViewer.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TrailMeisterViewer"
-        xmlns:utils="clr-namespace:TrailMeisterUtilities;assembly=TrailMeisterUtilities"
-        xmlns:convertersUtils="clr-namespace:TrailMeisterUtilities.Converters;assembly=TrailMeisterUtilities"
-        xmlns:converters="clr-namespace:TrailMeisterViewer.Converters"
-        xmlns:mainWindow="clr-namespace:TrailMeisterViewer.Windows.MainWindow"
-        mc:Ignorable="d"
-        Title="3 Corner Nordic Viewer" Width="1420" Height="800" WindowStartupLocation="CenterScreen"
-        WindowState="Maximized">
+<Window x:Name="ViewerMain" x:Class="TrailMeisterViewer.MainWindow"
+       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+       xmlns:local="clr-namespace:TrailMeisterViewer"
+       xmlns:utils="clr-namespace:TrailMeisterUtilities;assembly=TrailMeisterUtilities"
+       xmlns:convertersUtils="clr-namespace:TrailMeisterUtilities.Converters;assembly=TrailMeisterUtilities"
+       xmlns:converters="clr-namespace:TrailMeisterViewer.Converters"
+       xmlns:mainWindow="clr-namespace:TrailMeisterViewer.Windows.MainWindow"
+       mc:Ignorable="d"
+       Title="3 Corner Nordic Viewer" Width="1420" Height="800" WindowStartupLocation="CenterScreen"
+       WindowState="Maximized">
 
     <Window.Resources>
         <converters:CanDeleteEventToVisibilityConverter x:Key="CanDeleteEventToVisibilityConverter"/>
         <convertersUtils:Bool2VisibilityConverter x:Key="Bool2VisibilityConverter"/>
         <convertersUtils:Tag2PersonConverter x:Key="Tag2PersonConverter"/>
-        
     </Window.Resources>
-    
-    <Grid>
-        <TabControl x:Name="tbcViewer">
-            <TabItem Header="Events">
-                <Grid Background="#FFE5E5E5">
-                    <mainWindow:EventsTab DataContext="{Binding .}" RefreshCommand="{Binding DataContext.RelayCommand_Refresh, ElementName=tbcViewer}"/>
-                </Grid>
-            </TabItem>
-            
-            <TabItem Header="People">
-                <mainWindow:PeopleTab DataContext="{Binding .}" />
-            </TabItem>
-            
-            <TabItem Header="Tags">
-                <Grid Background="#FFE5E5E5">
-                    <mainWindow:TagsTab DataContext="{Binding .}" />
-                </Grid>
-            </TabItem>
-        </TabControl>
 
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Button x:Name="btnBack"
+                Grid.Row="0"
+                Content="← Back"
+                Visibility="Collapsed"
+                HorizontalAlignment="Left"
+                Height="36" Padding="12,0"
+                Width="86"
+                Margin="8,4"
+                Click="OnBackClick"
+                Style="{StaticResource GlossyBeveledButton}"/>
+
+        <ContentControl Grid.Row="1" x:Name="mainContent">
+            <TabControl x:Name="tbcViewer">
+                <TabItem Header="Events">
+                    <Grid Background="#FFE5E5E5">
+                        <mainWindow:EventsTab DataContext="{Binding .}" RefreshCommand="{Binding DataContext.RelayCommand_Refresh, ElementName=tbcViewer}"/>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="People">
+                    <mainWindow:PeopleTab DataContext="{Binding .}" />
+                </TabItem>
+
+                <TabItem Header="Tags">
+                    <Grid Background="#FFE5E5E5">
+                        <mainWindow:TagsTab DataContext="{Binding .}" />
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </ContentControl>
     </Grid>
 </Window>

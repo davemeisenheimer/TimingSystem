@@ -1,0 +1,125 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Beveled Blue Gradient -->
+    <LinearGradientBrush x:Key="BevelGradient" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="#5BA9FF" Offset="0.0" />
+        <GradientStop Color="#0046A0" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <!-- Glossy Top Highlight -->
+    <LinearGradientBrush x:Key="GlossHighlight" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="#CCFFFFFF" Offset="0.0" />
+        <GradientStop Color="#00FFFFFF" Offset="0.5" />
+    </LinearGradientBrush>
+
+    <Style x:Key="GlossyBeveledButton" TargetType="Button">
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <!-- Outer 3D Bevel/Base -->
+                        <Border CornerRadius="10" Background="#002D66" Margin="0,2,0,-2"/>
+
+                        <!-- Main Body Gradient -->
+                        <Border x:Name="Body" CornerRadius="8" Background="{DynamicResource BevelGradient}"
+                                BorderBrush="#44FFFFFF" BorderThickness="1.5" Margin="2">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="0.45*"/>
+                                    <RowDefinition Height="0.55*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Glossy Overlay — top 45% of button height -->
+                                <Border Grid.Row="0" CornerRadius="5,5,0,0"
+                                        Background="{DynamicResource GlossHighlight}"
+                                        Margin="2,1,2,0"/>
+
+                                <!-- Content -->
+                                <ContentPresenter Grid.RowSpan="2"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center">
+                                    <ContentPresenter.Effect>
+                                        <DropShadowEffect BlurRadius="2" ShadowDepth="1" Opacity="0.5"/>
+                                    </ContentPresenter.Effect>
+                                </ContentPresenter>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Body" Property="Opacity" Value="0.9"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="RenderTransform">
+                                <Setter.Value>
+                                    <TranslateTransform Y="2"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Beveled Green Gradient (Toggle ON) -->
+    <LinearGradientBrush x:Key="BevelGradientGreen" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="#5BD97A" Offset="0.0" />
+        <GradientStop Color="#1A6B30" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <Style x:Key="GlossyBeveledToggleButton" TargetType="ToggleButton">
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Grid>
+                        <Border CornerRadius="10" Background="#002D66" Margin="0,2,0,-2"/>
+                        <Border x:Name="Body" CornerRadius="8" Background="{DynamicResource BevelGradient}"
+                                BorderBrush="#44FFFFFF" BorderThickness="1.5" Margin="2">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="0.45*"/>
+                                    <RowDefinition Height="0.55*"/>
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" CornerRadius="5,5,0,0"
+                                        Background="{DynamicResource GlossHighlight}"
+                                        Margin="2,1,2,0"/>
+                                <ContentPresenter Grid.RowSpan="2"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center">
+                                    <ContentPresenter.Effect>
+                                        <DropShadowEffect BlurRadius="2" ShadowDepth="1" Opacity="0.5"/>
+                                    </ContentPresenter.Effect>
+                                </ContentPresenter>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Body" Property="Opacity" Value="0.9"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="RenderTransform">
+                                <Setter.Value>
+                                    <TranslateTransform Y="2"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Body" Property="Background" Value="{DynamicResource BevelGradientGreen}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

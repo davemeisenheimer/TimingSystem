@@ -1,24 +1,44 @@
-﻿<Window x:Class="TrailMeisterViewer.Windows.EventViewer.EventViewer"
+<UserControl x:Class="TrailMeisterViewer.Windows.EventViewer.EventViewerControl"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:converters="clr-namespace:TrailMeisterUtilities.Converters;assembly=TrailMeisterUtilities"
-        Title="Event Results" 
-        Height="800" Width="1200"
-        WindowStartupLocation="CenterOwner"
-        ResizeMode="CanResize">
+        xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase">
 
-    <Window.Resources>
+    <UserControl.Resources>
         <converters:Person2NameConverter x:Key="Person2NameConverter"/>
         <converters:Laps2TimeConverter x:Key="Laps2TimeConverter"/>
         <converters:Ms2TimeConverter x:Key="Ms2TimeConverter"/>
         <converters:Laps2DistanceConverter x:Key="Laps2DistanceConverter"/>
+        <converters:HandicapAwareTimeConverter x:Key="HandicapAwareTimeConverter"/>
 
         <DataTemplate x:Key="RacerLapsTooltipTemplate">
             <Border Background="LightYellow" Padding="5" CornerRadius="4">
                 <StackPanel>
-                    <TextBlock Text="Times for all laps" FontWeight="Bold" Margin="0,0,0,5"/>
-                    <TextBlock Text="{Binding Person.NickName}" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBlock Text="{Binding Person.NickName}" FontWeight="Bold" Margin="0,0,0,2"/>
+                    <!-- Handicap info (visible when handicap is non-zero) -->
+                    <TextBlock Margin="0,0,0,5">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HandicapPerLapMs}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        <Run Text="Handicap: "/>
+                        <Run>
+                            <Run.Text>
+                                <MultiBinding Converter="{StaticResource Ms2TimeConverter}" Mode="OneWay">
+                                    <Binding Path="HandicapPerLapMs"/>
+                                    <Binding Source="{x:Static converters:TimeConversionPrecision.ToTheHundredth}"/>
+                                </MultiBinding>
+                            </Run.Text>
+                        </Run>
+                        <Run Text=" per lap"/>
+                    </TextBlock>
+                    <TextBlock Text="Raw lap times:" FontStyle="Italic" Margin="0,0,0,3"/>
                     <ItemsControl ItemsSource="{Binding Laps}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -41,7 +61,7 @@
                 </StackPanel>
             </Border>
         </DataTemplate>
-    </Window.Resources>
+    </UserControl.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -59,26 +79,35 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBox x:Name="tbNameEdit" 
+            <TextBox x:Name="tbNameEdit"
                 Grid.Row="0" Grid.Column="0"
-                FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" 
-                Text="{Binding Event.EventName, UpdateSourceTrigger=LostFocus}" 
+                FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
+                Text="{Binding Event.EventName, UpdateSourceTrigger=LostFocus}"
                 BorderThickness="0"
                 FontSize="24" Width="650" HorizontalAlignment="Center" />
 
-            <CheckBox x:Name="chkEventFinished"  
-                      Content="Event finished:" 
+            <CheckBox x:Name="chkEventFinished"
+                      Content="Event finished:"
                       IsChecked="{Binding Event.EventFinished, Mode=TwoWay}"
                       Grid.Row="0" Grid.Column="1" VerticalAlignment="Center"/>
 
-            <Label x:Name="lblLapLength" Content="Lap Length (m)" 
-                   Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right"/>
-            <TextBox x:Name="tbLapLength" 
-                    Grid.Row="0" Grid.Column="3"
-                    FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" 
-                    Text="{Binding Event.LapLength, UpdateSourceTrigger=LostFocus}" 
+            <ToggleButton x:Name="btnHandicap"
+                          Grid.Row="0" Grid.Column="3"
+                          Content="Handicap"
+                          Height="32" Width="120"
+                          IsChecked="{Binding IsHandicapMode, Mode=TwoWay}"
+                          Command="{Binding ToggleHandicapCommand}"
+                          Style="{StaticResource GlossyBeveledToggleButton}"
+                          Margin="0,0,8,0" VerticalAlignment="Center"/>
+            <Label x:Name="lblLapLength" Content="Lap Length (m)"
+                   Grid.Row="0" Grid.Column="4" VerticalAlignment="Center"/>
+            <TextBox x:Name="tbLapLength"
+                    Grid.Row="0" Grid.Column="5"
+                    Text="{Binding Event.LapLength, UpdateSourceTrigger=LostFocus}"
                     BorderThickness="0" Margin="0,0,10,0"
                     FontSize="24" HorizontalAlignment="Right" Width="92" />
         </Grid>
@@ -89,7 +118,7 @@
                   IsSynchronizedWithCurrentItem="False"
                   FontSize="24" AutoGenerateColumns="False" GridLinesVisibility="All" HorizontalAlignment="Stretch"
                   CanUserSortColumns="True"
-                  CanUserAddRows="False">
+                  CanUserAddRows="False" Margin="0,8,0,0">
 
                 <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
@@ -125,7 +154,7 @@
                                       SelectedValuePath="PersonId"
                                       SelectedValue="{Binding PersonId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                       StaysOpenOnEdit="True">
-                           
+
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="SelectionChanged">
                                         <i:InvokeCommandAction Command="{Binding DataContext.SelectedPersonChangedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
@@ -151,7 +180,7 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
 
                 </DataGridTemplateColumn>
-                
+
                 <DataGridTextColumn x:Name="colName" CanUserResize="False" Width="5*" Header="Association" IsReadOnly="true" MinWidth="50"
                                     SortMemberPath="Person.FirstName"
                                     Binding="{Binding Person.Association}">
@@ -168,8 +197,8 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <DataGridTextColumn 
-                    x:Name="colLaps" CanUserResize="False" 
+                <DataGridTextColumn
+                    x:Name="colLaps" CanUserResize="False"
                     Width="2*" Header="Total Laps" IsReadOnly="true" MinWidth="50"
                     Binding="{Binding Laps.Count}"
                     SortMemberPath="Laps.Count">
@@ -186,8 +215,8 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <DataGridTextColumn 
-                    x:Name="colDistance" CanUserResize="False" 
+                <DataGridTextColumn
+                    x:Name="colDistance" CanUserResize="False"
                     Width="2*" Header="Total Dist" IsReadOnly="true" MinWidth="50">
                     <DataGridTextColumn.Binding>
                         <MultiBinding Converter="{StaticResource Laps2DistanceConverter}">
@@ -207,13 +236,15 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <DataGridTextColumn 
-                    x:Name="colTotalTime" CanUserResize="False" 
+                <DataGridTextColumn
+                    x:Name="colTotalTime" CanUserResize="False"
                     Width="2.5*" Header="Total Time" IsReadOnly="true" MinWidth="50">
                     <DataGridTextColumn.Binding>
-                        <MultiBinding Converter="{StaticResource Laps2TimeConverter}">
+                        <MultiBinding Converter="{StaticResource HandicapAwareTimeConverter}">
                             <Binding Source="{x:Static converters:TimeConversionType.TotalTime}" />
                             <Binding Path="Laps"/>
+                            <Binding Path="HandicapPerLapMs"/>
+                            <Binding Path="DataContext.IsHandicapMode" RelativeSource="{RelativeSource AncestorType=DataGrid}"/>
                         </MultiBinding>
                     </DataGridTextColumn.Binding>
                     <DataGridTextColumn.HeaderStyle>
@@ -229,13 +260,16 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <DataGridTextColumn 
-                    x:Name="colFastestLap" CanUserResize="False" 
-                    Width="2.5*" Header="Best Lap" IsReadOnly="true" MinWidth="50">
+                <DataGridTextColumn
+                    x:Name="colFastestLap" CanUserResize="False"
+                    Width="2.5*" Header="Best Lap" IsReadOnly="true" MinWidth="50"
+                    SortMemberPath="AdjustedBestLapMs">
                     <DataGridTextColumn.Binding>
-                        <MultiBinding Converter="{StaticResource Laps2TimeConverter}">
+                        <MultiBinding Converter="{StaticResource HandicapAwareTimeConverter}">
                             <Binding Source="{x:Static converters:TimeConversionType.BestLap}" />
                             <Binding Path="Laps"/>
+                            <Binding Path="HandicapPerLapMs"/>
+                            <Binding Path="DataContext.IsHandicapMode" RelativeSource="{RelativeSource AncestorType=DataGrid}"/>
                         </MultiBinding>
                     </DataGridTextColumn.Binding>
                     <DataGridTextColumn.HeaderStyle>
@@ -251,13 +285,15 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <DataGridTextColumn 
-                    x:Name="colAverageLap" CanUserResize="False" 
+                <DataGridTextColumn
+                    x:Name="colAverageLap" CanUserResize="False"
                     Width="2.5*" Header="Average Lap" IsReadOnly="true" MinWidth="50">
                     <DataGridTextColumn.Binding>
-                        <MultiBinding Converter="{StaticResource Laps2TimeConverter}">
+                        <MultiBinding Converter="{StaticResource HandicapAwareTimeConverter}">
                             <Binding Source="{x:Static converters:TimeConversionType.AverageLap}" />
                             <Binding Path="Laps"/>
+                            <Binding Path="HandicapPerLapMs"/>
+                            <Binding Path="DataContext.IsHandicapMode" RelativeSource="{RelativeSource AncestorType=DataGrid}"/>
                         </MultiBinding>
                     </DataGridTextColumn.Binding>
                     <DataGridTextColumn.HeaderStyle>
@@ -275,12 +311,12 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <Button x:Name="btnExportHtml" 
-                Content="Export HTML" 
-                Grid.Row="2" 
-                HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="48" Width="120" 
+        <Button x:Name="btnExportHtml"
+                Content="Export HTML"
+                Grid.Row="2"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="48" Width="120"
                 Command="{Binding ExportHtmlCommand}" Margin="0,8,12,8"
-                />
+                Style="{StaticResource GlossyBeveledButton}"/>
 
     </Grid>
-</Window>
+</UserControl>

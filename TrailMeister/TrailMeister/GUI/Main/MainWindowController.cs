@@ -262,7 +262,7 @@ namespace TrailMeister.GUI.Main
         public virtual void StartEvent()
         {
             SetAntennaPower();
-            _dbEventsTable.updateEvent(this._eventId, this._vm.EventName, 800);
+            _dbEventsTable.updateEvent(this._eventId, this._vm.EventName, this._vm.LapLength);
             _vm.EventStarted = true;
         }
 

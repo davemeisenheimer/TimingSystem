@@ -59,10 +59,10 @@
 
         <!-- Buttons -->
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
-            <Button Content="Cancel" Width="90" Height="36" Click="OnCancel"
-                    Margin="0,0,8,0" Style="{StaticResource GlossyBeveledButton}"/>
-            <Button Content="Export" Width="90" Height="36" Click="OnExport"
-                    Style="{StaticResource GlossyBeveledButton}"/>
+            <Button Content="Cancel" Width="70" Click="OnCancel"
+                    Margin="0,0,8,0" Style="{StaticResource DialogButton}"/>
+            <Button Content="Export" Width="70" Click="OnExport"
+                    Style="{StaticResource DialogButton}"/>
         </StackPanel>
     </Grid>
 </Window>

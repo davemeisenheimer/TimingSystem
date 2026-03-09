@@ -31,16 +31,17 @@ namespace TrailMeisterViewer.Windows.PersonalLog
             var eventLookup = _dbEventsTable.getEventsByIds(eventIds)
                                             .ToDictionary(e => e.ID);
 
-            _vm.Summaries = buildAllSummaries(eventLookup, personLaps);
+            var eventLapLengths = eventLookup.ToDictionary(kvp => (long)kvp.Key, kvp => kvp.Value.LapLength);
+
+            _vm.Summaries = buildAllSummaries(eventLookup, personLaps, eventLapLengths);
 
             var eventRows = personLaps.GroupBy(lap => lap.EventId)
-                .Select(group => new RacerEventRow
+                .Select(group =>
                 {
-                    Event = eventLookup.TryGetValue((uint)group.Key, out var ev) ? ev : null,
-                    RacerData = new RacerData(
-                                    _person,
-                                    group.Where(x => x.LapCount > 0).ToList()
-                                )
+                    var ev = eventLookup.TryGetValue((uint)group.Key, out var e) ? e : null;
+                    var rd = new RacerData(_person, group.Where(x => x.LapCount > 0).ToList());
+                    rd.SetEventDefaults(eventLapLengths);
+                    return new RacerEventRow { Event = ev, RacerData = rd };
                 })
                 .OrderByDescending(row => row.Event?.EventDate ?? DateTime.MinValue)
                 .ToList();
@@ -53,25 +54,28 @@ namespace TrailMeisterViewer.Windows.PersonalLog
             return new PersonalLogControl { DataContext = _vm };
         }
 
-        private List<SeasonSummary> buildAllSummaries(Dictionary<uint, DbEvent> allEvents, List<DbLap> personLaps)
+        private List<SeasonSummary> buildAllSummaries(Dictionary<uint, DbEvent> allEvents, List<DbLap> personLaps, Dictionary<long, int> eventLapLengths)
         {
+            var allTimeData = new RacerData(_person, personLaps);
+            allTimeData.SetEventDefaults(eventLapLengths);
             var summaries = new List<SeasonSummary>
             {
-                new SeasonSummary { Label = "All Time", RacerData = new RacerData(_person, personLaps) }
+                new SeasonSummary { Label = "All Time", RacerData = allTimeData }
             };
 
             if (!allEvents.Any() || !personLaps.Any())
                 return summaries;
 
             DateTime today = DateTime.Today;
-            int currentSeasonYear = today.Month >= 9 ? today.Year : today.Year - 1;
+            int sm = TrailMeisterDb.AppSettings.Current.SeasonStartMonth;
+            int currentSeasonYear = today.Month >= sm ? today.Year : today.Year - 1;
             int earliestSeasonYear = allEvents.Values.Min(e =>
-                e.EventDate.Month >= 9 ? e.EventDate.Year : e.EventDate.Year - 1);
+                e.EventDate.Month >= sm ? e.EventDate.Year : e.EventDate.Year - 1);
 
             for (int year = currentSeasonYear; year >= earliestSeasonYear; year--)
             {
-                DateTime start = new DateTime(year, 9, 1);
-                DateTime end = new DateTime(year + 1, 9, 1);
+                DateTime start = new DateTime(year, sm, 1);
+                DateTime end = new DateTime(year + 1, sm, 1);
 
                 var seasonEventIds = new HashSet<long>(
                     allEvents.Values
@@ -85,7 +89,9 @@ namespace TrailMeisterViewer.Windows.PersonalLog
                     ? "This Season"
                     : $"{year}/{(year + 1) % 100:D2}";
 
-                summaries.Add(new SeasonSummary { Label = label, RacerData = new RacerData(_person, seasonLaps) });
+                var seasonData = new RacerData(_person, seasonLaps);
+                seasonData.SetEventDefaults(eventLapLengths);
+                summaries.Add(new SeasonSummary { Label = label, RacerData = seasonData });
             }
 
             return summaries;

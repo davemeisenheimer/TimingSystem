@@ -6,7 +6,10 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/TrailMeisterUtilities;component/Styles/Colors.xaml" />
                 <ResourceDictionary Source="/TrailMeisterUtilities;component/Styles/ButtonStyles.xaml" />
+                <ResourceDictionary Source="/TrailMeisterUtilities;component/Styles/DataGridStyles.xaml" />
+                <ResourceDictionary Source="/TrailMeisterUtilities;component/Styles/Converters.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

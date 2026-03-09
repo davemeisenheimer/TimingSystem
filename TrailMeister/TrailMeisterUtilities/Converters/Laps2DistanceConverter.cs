@@ -36,7 +36,7 @@ namespace TrailMeisterUtilities.Converters
                             e => e.LapLength
                         );
 
-                foreach (var lap in laps)
+                foreach (var lap in laps.Where(l => l.LapCount > 0))
                 {
                     int eventDefault = lapLengthsByEventId.TryGetValue((uint)lap.EventId, out int def) ? def : 0;
                     distanceMetres += lap.LapLength ?? eventDefault;

@@ -242,7 +242,7 @@ namespace TrailMeister.GUI.Main.Testing
                     }),
                     false);
                 this._vmTest.AddTestData(
-                    4000,
+                    8000,
                     new Action(() =>
                     {
                         OnTagDataSourceEvent(
@@ -254,7 +254,7 @@ namespace TrailMeister.GUI.Main.Testing
                     }),
                     false);
                 this._vmTest.AddTestData(
-                    4000,
+                    24000,
                     new Action(() =>
                     {
                         OnTagDataSourceEvent(

@@ -5,15 +5,11 @@
        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
        xmlns:local="clr-namespace:TrailMeisterViewer"
        xmlns:utils="clr-namespace:TrailMeisterUtilities;assembly=TrailMeisterUtilities"
-       xmlns:converters="clr-namespace:TrailMeisterViewer.Converters"
        xmlns:mainWindow="clr-namespace:TrailMeisterViewer.Windows.MainWindow"
        mc:Ignorable="d"
        Title="3 Corner Nordic Viewer" Width="1420" Height="800" WindowStartupLocation="CenterScreen"
        WindowState="Maximized">
 
-    <Window.Resources>
-        <converters:CanDeleteEventToVisibilityConverter x:Key="CanDeleteEventToVisibilityConverter"/>
-    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -47,7 +43,7 @@
             <TabControl x:Name="tbcViewer">
                 <TabItem Header="Events">
                     <Grid Background="#FFE5E5E5">
-                        <mainWindow:EventsTab DataContext="{Binding .}" RefreshCommand="{Binding DataContext.RelayCommand_Refresh, ElementName=tbcViewer}"/>
+                        <mainWindow:EventsTab DataContext="{Binding .}"/>
                     </Grid>
                 </TabItem>
 

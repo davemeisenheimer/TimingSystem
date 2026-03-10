@@ -1,4 +1,5 @@
 #include "SocketListener.h"
+#include "SocketListenerProtocol.h"
 #include "SocketClient.h"
 #include "Config.h"
 
@@ -11,7 +12,6 @@ SocketListener::SocketListener(
             rfidReader(rfidReader),
             socketClient(socketClient)
 {
-    rfidReader = rfidReader;
 }
 
 void SocketListener::init()
@@ -28,7 +28,7 @@ bool SocketListener::check()
     handleClient(client);
 
     client.stop();
-    this->sendDebugMessage("SocketListener: client disconnected");
+    socketClient->sendDebugMessage("SocketListener: client disconnected");
     return true;
 }
 
@@ -64,7 +64,7 @@ void SocketListener::handleClient(WiFiClient& client)
         }
     }
 
-    this->sendDebugMessage("SocketListener command: " + command);
+    socketClient->sendDebugMessage("SocketListener command: " + command);
 
     handleCommand(command);
 }
@@ -96,7 +96,7 @@ void SocketListener::handleCommand(const String& command)
     }
     else
     {
-        this->sendDebugMessage("Unknown command: " + command);
+        socketClient->sendDebugMessage("Unknown command: " + command);
     }
 }
 
@@ -107,7 +107,7 @@ int SocketListener::getCommandValue(String command)
   String valueStr = getCommandValueStr(command);
 
   if (valueStr.length() == 0) {
-    this->sendDebugMessage("No value found in command: " + command);
+    socketClient->sendDebugMessage("No value found in command: " + command);
     return -1;
   }
 
@@ -121,7 +121,7 @@ String SocketListener::getCommandValueStr(String command)
   int comma = command.indexOf(',');
   if (comma < 0 || comma == command.length() - 1)
   {
-    this->sendDebugMessage("No value found in command: " + command);
+    socketClient->sendDebugMessage("No value found in command: " + command);
     return "";
   }
 

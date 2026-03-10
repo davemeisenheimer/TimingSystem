@@ -43,7 +43,7 @@ void setup()
 bool setupRfidAndRaceClient() {
 #ifndef USE_TEST_DATA
   // Initialize RFID reader
-  if (!rfid.begin(rfidBaudLow)) // Setup and start reading
+  if (!rfid.begin(rfidBaudLow)) // Setup rfid
   {
     Serial.println(F("RFID reader failed to respond. Please check wiring."));
     // Adding this log statement and removing the infinite loop (eg. code) to
@@ -56,12 +56,15 @@ bool setupRfidAndRaceClient() {
 #endif
 
   waitForRaceClient();
+  socketClient.sendDebugMessage("Found race client");
   return true;
 }
 
 void waitForRaceClient() {
   socketClient.waitForRaceClient();
-  rfid.StartReader();
+#ifndef USE_TEST_DATA
+  rfid.startReading();
+#endif
 }
 
 void loop()
@@ -70,17 +73,16 @@ void loop()
       delay(3000);
       isRfidSetup = setupRfidAndRaceClient();
     }
-    
+
+  // Handle incoming config / control commands (runs in both normal and test mode)
+  listener.check();
+
 #ifdef USE_TEST_DATA
-  delay(5000);
+  delay(2000);
   Serial.println("Sending test data");
   socketClient.sendTestData();
-#else 
- 
-  // 1. Handle incoming config / control commands
-  bool remoteClientActive = listener.check(); // Check for incoming configuration commands
-  if (!remoteClientActive) 
-  
+#else
+
       // Poll reader for new data
       switch (rfid.poll())
       {

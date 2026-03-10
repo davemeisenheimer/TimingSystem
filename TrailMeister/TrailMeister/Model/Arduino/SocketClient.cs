@@ -5,23 +5,21 @@ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using System.Diagnostics;
+using TrailMeisterDb;
 
 namespace TrailMeister.Model.Arduino
 {
     internal class SocketClient
     {
-        internal static IPAddress RemoteIP = new IPAddress(new byte[] { 192, 168, 0, 94 });
-        internal static int RemotePort = 13001;
-
         internal static void SendCommand(string command)
         {
             byte[] bytes = new byte[1024];
 
             try
             {
-                IPAddress ipAddress = RemoteIP;
-                IPEndPoint remoteEP = new IPEndPoint(RemoteIP, RemotePort);
-
+                IPAddress ipAddress = IPAddress.Parse(AppSettings.Current.ArduinoIpAddress);
+                IPEndPoint remoteEP = new IPEndPoint(ipAddress, AppSettings.Current.ArduinoPort);
+                
                 // Create a TCP/IP  socket.
                 Socket sender = new Socket(ipAddress.AddressFamily,
                     SocketType.Stream, ProtocolType.Tcp);
@@ -31,10 +29,11 @@ namespace TrailMeister.Model.Arduino
                 {
                     // Connect to Remote EndPoint
                     sender.Connect(remoteEP);
+                    sender.ReceiveTimeout = 8000;
 
                     if (sender.RemoteEndPoint != null)
                     {
-                        Debug.WriteLine("Socket connected to {0}", sender.RemoteEndPoint.ToString());
+                        Debug.WriteLine($"Socket connected to {sender.RemoteEndPoint}");
                     }
 
                     // Encode the data string into a byte array.

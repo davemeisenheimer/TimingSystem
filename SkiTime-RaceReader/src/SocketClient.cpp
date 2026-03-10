@@ -6,64 +6,52 @@ SocketClient::SocketClient()
 {
 }
 
+bool SocketClient::ensureConnected()
+{
+    if (client.connected())
+        return true;
+
+    if (DO_SERIAL) Serial.println("SocketClient: reconnecting...");
+    client.stop();
+    return client.connect(SOCKET_SERVER_IP, SOCKET_SERVER_PORT);
+}
+
 bool SocketClient::sendTag(const Tag& tag)
 {
-    this->sendDebugMessage("sendTag: Connecting to client");
-
-    // Don't use sendDebugMessage after client.connect, or we get a recursive loop!
-    if (!client.connect(SOCKET_SERVER_IP, SOCKET_SERVER_PORT))
+    if (!ensureConnected())
         return false;
 
     client.println(tag.epcBytes);
-    
+
     for (int i = 0; i < tag.epcBytes; i++) {
-      byte b = tag.epc[i];
-      client.print((b >> 4) & 0x0F, HEX);  // high nibble
-      client.print(b & 0x0F, HEX);         // low nibble
+        byte b = tag.epc[i];
+        client.print((b >> 4) & 0x0F, HEX);  // high nibble
+        client.print(b & 0x0F, HEX);         // low nibble
     }
 
-    // for (int i = 0; i < tag.epcBytes; i++)
-    //     client.println(tag.epc[i], HEX);
-
-
     client.println();
-
     client.println(tag.timestamp);
-
     client.println(END_TIMING_MESSAGE);
-
     client.println();
-
     client.flush();
-    client.stop();
 
-    // Now we can use sendDebugMessage again
-    this->sendDebugMessage("Connected to client");
-    this->sendDebugMessage("EPC bytes: " + String(tag.epcBytes));
+    if (DO_SERIAL) Serial.println("sendTag: sent EPC bytes: " + String(tag.epcBytes));
     return true;
 }
 
 bool SocketClient::sendReady()
 {
-  this->sendDebugMessage("waitForRaceClient");
-  
-  bool raceClientReady = false;
+    if (!ensureConnected())
+        return false;
 
-  if (client.connect(SOCKET_SERVER_IP, SOCKET_SERVER_PORT))
-  {
-      // Next debug msg can just use Serial, since client is getting this message anyway
-      if (DO_SERIAL) Serial.println("waitForRaceClient: client connected");
-      client.println(END_READY_MESSAGE);
-      client.println(); 
-      client.flush();
-      client.stop();
-      raceClientReady = true;
-  }
-
-  this->sendDebugMessage("Found race client: " + String(raceClientReady ? "yes" : "no"));
-  return raceClientReady;
+    if (DO_SERIAL) Serial.println("sendReady: connected");
+    client.println(END_READY_MESSAGE);
+    client.println();
+    client.flush();
+    return true;
 }
 
+// #define DO_SEND_DEBUG_MSG
 void SocketClient::sendDebugMessage(const String& message)
 {
   #ifdef DO_SEND_DEBUG_MSG
@@ -89,6 +77,7 @@ void SocketClient::sendDebugMessage(const String& message)
 
 void SocketClient::waitForRaceClient()
 {
+  sendDebugMessage("Waiting for race client");
   while (true)
   {
     if (this->sendReady())
@@ -98,48 +87,31 @@ void SocketClient::waitForRaceClient()
 }
 
 void SocketClient::sendTestData()
-{   
-  int rssi = -44; // Get the RSSI for this tag read
-  unsigned long timeStamp = millis();
+{
+    const char hexStr[] = "2019112911861A01101001D8";
+    byte tagEPC[64];
+    memset(tagEPC, 0, sizeof(tagEPC));
+    int tagEPCBytes = hexStringToByteArray(hexStr, tagEPC, sizeof(tagEPC));
+    unsigned long timeStamp = millis();
 
-  byte tagEPC[64];
-  const char hexStr[] = "2019112911861A01101001D8";
-  memset(tagEPC, 0, sizeof(tagEPC));
-
-  int tagEPCBytes = hexStringToByteArray(hexStr, tagEPC, sizeof(tagEPC));
-
-  bool success = false;
-  if (client.connect(SOCKET_SERVER_IP, SOCKET_SERVER_PORT))
-  {
-    if (DO_SERIAL) Serial.println("Connected to client");
+    if (!ensureConnected())
+        return;
 
     client.println(tagEPCBytes);
-    if (DO_SERIAL) Serial.println(String(tagEPCBytes));
 
     for (byte y = 0; y < tagEPCBytes; y++) {
-      byte b = tagEPC[y];
-      client.print((b >> 4) & 0x0F, HEX);  // high nibble
-      client.print(b & 0x0F, HEX);         // low nibble
-
-      if (DO_SERIAL) {
-        Serial.println(String((b >> 4) & 0x0F, HEX) + String(b & 0x0F, HEX));
-      }
+        byte b = tagEPC[y];
+        client.print((b >> 4) & 0x0F, HEX);
+        client.print(b & 0x0F, HEX);
     }
 
     client.println();
-    if (DO_SERIAL) Serial.println("");
-
     client.println(timeStamp);
-    if (DO_SERIAL) Serial.println(String(timeStamp));
-
     client.println(END_TIMING_MESSAGE);
-    if (DO_SERIAL) Serial.println(END_TIMING_MESSAGE);
-
     client.println();
-    if (DO_SERIAL) Serial.println("");
     client.flush();
-    client.stop();
-  }
+
+    if (DO_SERIAL) Serial.println("sendTestData: sent test tag");
 }
 
 byte SocketClient::hexCharToNibble(char c)

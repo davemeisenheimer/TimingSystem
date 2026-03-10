@@ -42,7 +42,7 @@ bool RfidReader::begin(long rfidBaud)
     {
         //This happens if the baud rate is correct but the module is doing a ccontinuous read
         reader.stopReading();
-        this->sendDebugMessage(F("Module continuously reading. Asking it to stop..."));
+        socketClient->sendDebugMessage(F("Module continuously reading. Asking it to stop..."));
         delay(1500);
     }
     else
@@ -95,7 +95,7 @@ RfidEvent RfidReader::poll()
 
     if (lastResponse == ERROR_CORRUPT_RESPONSE)
     {
-        this->sendDebugMessage("RfidReader::poll: Bad CRC returned from reader.parseResponse()");
+        socketClient->sendDebugMessage("RfidReader::poll: Bad CRC returned from reader.parseResponse()");
         return RfidEvent::Error;
     }
 
@@ -152,7 +152,9 @@ bool RfidReader::getLastTag(Tag& tag)
     byte epcLen = reader.getTagEPCBytes();
     tag.epcBytes = epcLen;
 
-    for (byte i = 0; i < epcLen; i++)
+    int bytesToRead = min((int)epcLen, (int)sizeof(reader.msg) - 31);
+
+    for (byte i = 0; i < bytesToRead; i++)
         tag.epc[i] = reader.msg[31 + i];
 
     tag.rssi = reader.getTagRSSI();
@@ -169,7 +171,7 @@ bool RfidReader::getLastTag(Tag& tag)
             msg = msg + " ";
         }
         msg = msg + "]";
-        this->sendDebugMessage(msg);
+        socketClient->sendDebugMessage(msg);
     }
 
     return true;
@@ -189,13 +191,13 @@ void RfidReader::getAbsoluteTimestamp(Tag &tag)
 void RfidReader::getReadPower() {
   reader.getReadPower();
   int powerCdBm = (reader.msg[6] << 8) | reader.msg[7]; 
-  this->sendDebugMessage("RfidReader: Antenna currently set to: " + String(powerCdBm) + " dBm");
+  socketClient->sendDebugMessage("RfidReader: Antenna currently set to: " + String(powerCdBm) + " dBm");
 
-  String msg = msg + " Bytes: ";
+  String msg = " Bytes: ";
   for (int i = 0; i < 8; i++) {
     msg = msg + String(reader.msg[i], HEX) + " ";
   }
-  this->sendDebugMessage(msg);
+  socketClient->sendDebugMessage(msg);
 }
 
 void RfidReader::setAntennaGain(const int gain)

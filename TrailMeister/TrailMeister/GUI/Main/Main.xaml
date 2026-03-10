@@ -9,13 +9,14 @@
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
         Title="Trail Meister" Closing="mainWindow_Closing" Loaded="mainWindow_Loaded"
-        WindowState="Maximized">
+        WindowState="Maximized"
+        Background="{StaticResource AppBackgroundBrush}">
     <Window.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <converters:EnumEqualConverter x:Key="EnumEqualConverter" />
     </Window.Resources>
     <Grid HorizontalAlignment="Center">
-        <Frame x:Name="framePages" Content="Frame" Grid.ColumnSpan="4" DataContextChanged="framePages_DataContextChanged" Navigated="framePages_Navigated">
+        <Frame x:Name="framePages" Content="" Grid.ColumnSpan="4" DataContextChanged="framePages_DataContextChanged" Navigated="framePages_Navigated">
             <Frame.Style>
                 <Style TargetType="Frame">
                     <Setter Property="Visibility" Value="Hidden"/>
@@ -48,16 +49,18 @@
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
-            <Label x:Name="lblWaiting" Content="Waiting for tag reader to connect..." VerticalAlignment="Top" HorizontalAlignment="Center" FontSize="48" Margin="0,240,0,0">
-            </Label>
-            <Button x:Name="btnConnect" Content="Poke it!" Command="{Binding Path=ButtonCommand_ConnectReader}" 
+            <Label x:Name="lblWaiting" Content="Waiting for tag reader to connect..."
+                   VerticalAlignment="Top" HorizontalAlignment="Center"
+                   FontSize="48" Margin="0,240,0,0"
+                   Foreground="{StaticResource NavyBrush}"/>
+            <Button x:Name="btnConnect" Content="Poke it!" Command="{Binding Path=ButtonCommand_ConnectReader}"
                     HorizontalAlignment="Center" VerticalAlignment="Top" Height="54" Width="141" Margin="0,445,0,0">
                 <Button.Style>
-                    <Style TargetType="Button">
+                    <Style TargetType="Button" BasedOn="{StaticResource GlossyBeveledButton}">
                         <Setter Property="IsEnabled" Value="False"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{
-                                        Binding ReaderStatus, 
+                                        Binding ReaderStatus,
                                         Converter={StaticResource EnumEqualConverter},
                                         ConverterParameter={x:Static model:ReaderStatus.Disconnected}
                                      }"
@@ -68,7 +71,10 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <Label x:Name="lblHint" Content="Do you have a reader running?" HorizontalAlignment="Left" Margin="252,341,0,0" VerticalAlignment="Top" FontSize="18" FontStyle="Italic"/>
+            <Label x:Name="lblHint" Content="Do you have a reader running?"
+                   HorizontalAlignment="Left" Margin="252,341,0,0" VerticalAlignment="Top"
+                   FontSize="18" FontStyle="Italic"
+                   Foreground="{StaticResource MutedBlueBrush}"/>
         </Grid>
 
         <Grid x:Name="gridConnectingSpinner" HorizontalAlignment="Center">

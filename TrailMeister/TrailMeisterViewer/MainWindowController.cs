@@ -30,6 +30,7 @@ namespace TrailMeisterViewer
         protected virtual void init()
         {
             List<DbEvent> events = _dbEventsTable.getEvents();
+            events.Sort((x, y) => y.EventDate.CompareTo(x.EventDate));
 
             foreach (DbEvent e in events)
             {
@@ -48,24 +49,6 @@ namespace TrailMeisterViewer
             foreach (DbPerson person in people)
             {
                 this.AddPerson(person);
-            }
-        }
-
-        // When EventViewer window is closed we refresh the events, in case any were updated
-        // This could be more targeted toward the event that was being viewed
-        internal void refresh(object? commandParameter)
-        {
-            DbEvent? oldEvent = commandParameter as DbEvent;
-
-            if (oldEvent != null)
-            {
-                DbEvent? newEvent = _dbEventsTable.getEvent(oldEvent.ID);
-
-                if (newEvent != null)
-                {
-                    this._vm.AllEvents.Remove(oldEvent.ID);
-                    this._vm.AllEvents.Add(newEvent);
-                }
             }
         }
 

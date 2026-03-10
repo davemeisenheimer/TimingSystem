@@ -16,6 +16,7 @@ public:
 private:
     WiFiClient client;
 
+    bool ensureConnected();
     byte hexCharToNibble(char c);
     int hexStringToByteArray(const char* hex, byte* output, size_t maxLen);
 };

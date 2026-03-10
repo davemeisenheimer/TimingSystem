@@ -18,8 +18,6 @@ namespace TrailMeisterViewer
         {
             _mainWindow = mainWindow;
             this._controller = initController();
-            RelayCommand_Refresh = new RelayCommand(o => this._controller.refresh(o));
-
             ButtonCommand_AddPerson = new ButtonCommand(o => this._controller.AddNewPerson());
 
             DeleteEventCommand = new ButtonCommand(
@@ -31,7 +29,6 @@ namespace TrailMeisterViewer
         {
             return new MainWindowController(this);
         }
-        public ICommand RelayCommand_Refresh { get; set; }
         public ICommand ButtonCommand_AddPerson { get; set; }
         public ICommand DeleteEventCommand { get; set; }
 

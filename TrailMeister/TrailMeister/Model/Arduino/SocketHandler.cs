@@ -56,42 +56,43 @@ namespace TrailMeister.Model.Arduino {
 
                     while (_isListening)
                     {
-                        // Save received bytes
                         byte[] buffer = new byte[1024];
                         int bytesRec = 0;
 
-                        //if (handlerSocket.Connected && listeningSocket.Connected)
                         if (handlerSocket.Connected)
                         {
-                            bytesRec = handlerSocket.Receive(buffer);
-
-                            //if (bytesRec > 0) Debug.WriteLine("bytesRec: " + bytesRec);
+                            try
+                            {
+                                bytesRec = handlerSocket.Receive(buffer);
+                            }
+                            catch (SocketException se) when (se.SocketErrorCode == SocketError.TimedOut)
+                            {
+                                // No data within the receive timeout — Arduino is still connected, keep waiting
+                                continue;
+                            }
                         }
+
+                        // bytesRec == 0 means the Arduino closed the connection cleanly
+                        if (bytesRec == 0) break;
 
                         message += Encoding.ASCII.GetString(buffer, 0, bytesRec);
 
                         if (message.EndsWith(Environment.NewLine))
                         {
-                            // Message completed? Parse it...
-                            
                             if (message.Contains(ITagDataSource.END_READY_MESSAGE))
                             {
-                                //Debug.WriteLine("Socket message received: " + message);
                                 TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.ReaderReady, message));
                                 message = "";
-                                break;
                             }
                             else if (message.Contains(ITagDataSource.END_TAG_DATA))
                             {
-                                //Debug.WriteLine("Socket message received: " + message);
                                 TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.LapData, message));
                                 message = "";
-                                break;
                             }
                             else if (message.Contains(ITagDataSource.END_DEBUG_MESSAGE))
                             {
                                 Debug.WriteLine(message.Trim());
-                                break;
+                                message = "";
                             }
                         }
                         Debug.Flush();

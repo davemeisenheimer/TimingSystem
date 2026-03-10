@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using TrailMeisterDb;
 
 namespace TrailMeister.GUI.Main
 {
@@ -35,6 +36,7 @@ namespace TrailMeister.GUI.Main
         private Page _pageAllData;
         public Main()
         {
+            AppSettingsService.Load();
             this._viewModel = new MainWindowVM(this);
             //this._viewModel = new Testing.MainWindowVmTest(this);
 

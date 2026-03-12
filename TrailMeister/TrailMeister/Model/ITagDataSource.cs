@@ -35,6 +35,7 @@ namespace TrailMeister.Model
         const string END_TAG_DATA = "TAG_DATA_##$$##";
         const string END_READY_MESSAGE = "READER_READY_##$$##";
         const string END_DEBUG_MESSAGE = "DEBUG_##$$##";
+        const string END_HEARTBEAT_MESSAGE = "HEARTBEAT_##$$##";
 
         internal TagReaderDataSourceType DataSourceType { get; }
 

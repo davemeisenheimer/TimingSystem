@@ -278,7 +278,7 @@ namespace TrailMeister.GUI.Main
 
         internal void SetAntennaPower()
         {
-            _tagReader.Config.StartReader(_vm.AntennaPower * 100);
+            _tagReader.Config.SetAntennaPower(_vm.AntennaPower * 100);
         }
 
         private RecentLapData? AddNewReaderData(ReaderData data)
@@ -342,6 +342,12 @@ namespace TrailMeister.GUI.Main
             {
                 _uiFactory.StartNew(() => HandleNewLapEvent(args));
             }
+            else if (args.Type == TagDataSourceEventType.ReaderReady)
+            {
+                // Arduino is connected and initialised — start the reader at its current power.
+                // Antenna power is configured separately when the user starts the event.
+                _tagReader.Config.StartReader();
+            }
             else if (args.Type == TagDataSourceEventType.Connected && _vm.ReaderStatus != ReaderStatus.Connected)
             {
                 // Putting this here instead of the init function, so that the connection screens can do their thing.
@@ -352,7 +358,8 @@ namespace TrailMeister.GUI.Main
             }
             else if (args.Type == TagDataSourceEventType.Disconnected)
             {
-                _vm.AllTags.Clear();
+                // Don't clear AllTags or AllParticipants — the Arduino reconnects automatically
+                // and the event should carry on seamlessly from where it left off.
             }
 
             _vm.ReaderStatus = args.ReaderStatus;

@@ -8,7 +8,9 @@ namespace TrailMeister.Model
 {
     public interface ITagReaderConfig
     {
-        public void StartReader(int power);
+        public void StartReader();
+
+        public void SetAntennaPower(int power);
 
         public void StopReader();
 

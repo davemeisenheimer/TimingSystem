@@ -13,7 +13,25 @@ bool SocketClient::ensureConnected()
 
     if (DO_SERIAL) Serial.println("SocketClient: reconnecting...");
     client.stop();
-    return client.connect(SOCKET_SERVER_IP, SOCKET_SERVER_PORT);
+    delay(250); // Give C# time to process the disconnect and return to Accept()
+    client.connect(SOCKET_SERVER_IP, SOCKET_SERVER_PORT);
+    // Return false even if connect succeeded: don't send immediately after reconnect.
+    // The caller will retry on the next opportunity (e.g. next KeepAlive).
+    return false;
+}
+
+void SocketClient::reconnectIfNeeded()
+{
+    if (client.connected())
+        return;
+
+    if (DO_SERIAL) Serial.println("SocketClient: periodic reconnect...");
+    client.stop();
+    delay(250);
+    if (client.connect(SOCKET_SERVER_IP, SOCKET_SERVER_PORT))
+    {
+        if (DO_SERIAL) Serial.println("SocketClient: periodic reconnect succeeded");
+    }
 }
 
 bool SocketClient::sendTag(const Tag& tag)
@@ -51,29 +69,29 @@ bool SocketClient::sendReady()
     return true;
 }
 
-// #define DO_SEND_DEBUG_MSG
 void SocketClient::sendDebugMessage(const String& message)
 {
   #ifdef DO_SEND_DEBUG_MSG
-  if (DO_SERIAL) Serial.println("sendDebugMessage sending: " + message);
-  
-  bool messageSent = false;
+  if (!client.connected())
+      return;
 
-  if (client.connect(SOCKET_SERVER_IP, SOCKET_SERVER_PORT))
-  {
-      if (DO_SERIAL) Serial.println("sendDebugMessage: client connected");
-      client.println(message);
-      client.println(END_DEBUG_MESSAGE);
-      client.println(); 
-      client.flush();
-      client.stop();
-      messageSent = true;
-  }
-
-  if (DO_SERIAL) Serial.println("Debug message sent: " + String(messageSent ? "yes" : "no"));
+  client.println(message);
+  client.println(END_DEBUG_MESSAGE);
+  client.println();
+  client.flush();
   #endif
 }
 
+
+void SocketClient::sendHeartbeat()
+{
+    if (!client.connected())
+        return;
+
+    client.println(END_HEARTBEAT_MESSAGE);
+    client.println();
+    client.flush();
+}
 
 void SocketClient::waitForRaceClient()
 {

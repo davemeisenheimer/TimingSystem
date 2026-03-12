@@ -12,6 +12,8 @@ public:
     void sendTestData();
     void waitForRaceClient();
     void sendDebugMessage(const String& message);
+    void sendHeartbeat();
+    void reconnectIfNeeded();
 
 private:
     WiFiClient client;

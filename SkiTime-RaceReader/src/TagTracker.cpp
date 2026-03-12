@@ -98,7 +98,8 @@ bool TagTracker::shouldSend(Tag& tag)
     if (millis() > tag.nextStateTime &&
         tag.state == LINE_DATA_GATHERING)
     {
-        tag.state = LINE_DATA_SENT;
+        // Don't transition state here — markSent() does it on confirmed send.
+        // This allows the caller to retry on the next KeepAlive if the send fails.
         return true;
     }
 

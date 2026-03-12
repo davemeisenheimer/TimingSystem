@@ -2,6 +2,7 @@
 #include "SocketListenerProtocol.h"
 #include "SocketClient.h"
 #include "Config.h"
+#include "esp32s3/rom/rtc.h"
 
 SocketListener::SocketListener(
     WifiHelper *wifiHelper, 
@@ -93,6 +94,13 @@ void SocketListener::handleCommand(const String& command)
         this->server.stop();
         rfidReader->stopReading();
         ESP.restart();
+    }
+    else if (command == CMD_ENTER_BOOTLOADER)
+    {
+        this->server.stop();
+        rfidReader->stopReading();
+        REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
+        esp_restart();
     }
     else
     {

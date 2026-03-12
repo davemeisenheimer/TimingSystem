@@ -138,7 +138,8 @@ void WifiHelper::validateWifiConnection()
         return;
 
     lastWdogCheckSecs = nowSecs;
-    socketClient->sendDebugMessage("."); // heartbeat
+    socketClient->reconnectIfNeeded(); // restore connection if lost
+    socketClient->sendHeartbeat();
 
     // Check WiFi connection first (authoritative on ESP32)
     if (WiFi.status() != WL_CONNECTED)

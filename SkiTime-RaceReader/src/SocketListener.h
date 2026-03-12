@@ -17,6 +17,7 @@ public:
 
     void init();
     bool check();
+    void handleCommand(const String& command);
 
 private:
     // Core collaborators
@@ -27,7 +28,6 @@ private:
 
     // ---- Internal helpers ----
     void handleClient(WiFiClient& client);
-    void handleCommand(const String& command);
 
     int getCommandValue(String command);
     String getCommandValueStr(String command);

@@ -78,10 +78,7 @@ bool RfidReader::begin(long rfidBaud)
     reader.setRegion(REGION_NORTHAMERICA);
     reader.setTagProtocol();
     reader.setAntennaPort();
-
-    // Try taking this out in favour of
-    // starting/stopping the reader when race client connects/disconnects
-    // reader.startReading();
+    reader.startReading();
 
     return true;
 }
@@ -202,23 +199,26 @@ void RfidReader::getReadPower() {
 
 void RfidReader::setAntennaGain(const int gain)
 {
+    if (gain < 500 || gain > 2700)
+    {
+        socketClient->sendDebugMessage("RfidReader: Ignoring out-of-range gain: " + String(gain));
+        return;
+    }
+
     reader.stopReading();
-    delay(100);
+    delay(1500);
 
     if (DO_SERIAL) {
         getReadPower();
         socketClient->sendDebugMessage("RfidReader: Setting antenna gain to: " + String(gain) + " cdBm");
     }
 
-    if (gain < 2700 && gain > 500)
-    {
-        reader.setReadPower((gain));
-        reader.setWritePower((gain));
+    reader.setReadPower(gain);
+    reader.setWritePower(gain);
 
-        if(DO_SERIAL) {
-            socketClient->sendDebugMessage("NOW: ");
-            getReadPower();
-        }
+    if (DO_SERIAL) {
+        socketClient->sendDebugMessage("NOW: ");
+        getReadPower();
     }
 
     reader.startReading();
@@ -232,4 +232,6 @@ void RfidReader::startReading()
 void RfidReader::stopReading()
 {
     reader.stopReading();
+    reader.setReadPower(RFID_ANTENNA_POWER_MIN);
+    reader.setWritePower(RFID_ANTENNA_POWER_MIN);
 }

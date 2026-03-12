@@ -39,12 +39,13 @@ namespace TrailMeister.Model.Arduino {
                     handlerSocket = listeningSocket.Accept();
 
                     if (handlerSocket == null) { break; }
-                    handlerSocket.ReceiveTimeout = 5000;
+                    handlerSocket.ReceiveTimeout = 31000;
 
                     IPEndPoint? endPoint = handlerSocket.RemoteEndPoint as IPEndPoint;
-                    if (endPoint == null) { break; }
+                    if (endPoint == null) { Debug.WriteLine("[SOCK] Accepted connection had null endpoint, skipping"); continue; }
 
                     IPAddress clientAddress = endPoint.Address;
+                    Debug.WriteLine($"[SOCK] Connection accepted from {clientAddress}");
 
                     if (!_isListening)
                     {
@@ -67,7 +68,13 @@ namespace TrailMeister.Model.Arduino {
                             }
                             catch (SocketException se) when (se.SocketErrorCode == SocketError.TimedOut)
                             {
-                                // No data within the receive timeout — Arduino is still connected, keep waiting
+                                // If the Arduino has already reconnected, a new connection is pending in the backlog.
+                                // The old connection is a half-open zombie — abandon it and accept the new one.
+                                if (listeningSocket.Poll(0, SelectMode.SelectRead))
+                                {
+                                    Debug.WriteLine("[SOCK] Stale connection detected — new Arduino connection pending, reconnecting");
+                                    break;
+                                }
                                 continue;
                             }
                         }
@@ -77,22 +84,31 @@ namespace TrailMeister.Model.Arduino {
 
                         message += Encoding.ASCII.GetString(buffer, 0, bytesRec);
 
-                        if (message.EndsWith(Environment.NewLine))
+                        // Each Arduino message ends with a blank line (\r\n\r\n).
+                        // Process all complete messages individually so that a debug message
+                        // and tag data arriving in the same Receive() buffer are handled separately.
+                        string terminator = Environment.NewLine + Environment.NewLine;
+                        int idx;
+                        while ((idx = message.IndexOf(terminator)) >= 0)
                         {
-                            if (message.Contains(ITagDataSource.END_READY_MESSAGE))
+                            string singleMessage = message.Substring(0, idx + terminator.Length);
+                            message = message.Substring(idx + terminator.Length);
+
+                            if (singleMessage.Contains(ITagDataSource.END_READY_MESSAGE))
                             {
-                                TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.ReaderReady, message));
-                                message = "";
+                                TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.ReaderReady, singleMessage));
                             }
-                            else if (message.Contains(ITagDataSource.END_TAG_DATA))
+                            else if (singleMessage.Contains(ITagDataSource.END_TAG_DATA))
                             {
-                                TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.LapData, message));
-                                message = "";
+                                TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.LapData, singleMessage));
                             }
-                            else if (message.Contains(ITagDataSource.END_DEBUG_MESSAGE))
+                            else if (singleMessage.Contains(ITagDataSource.END_DEBUG_MESSAGE))
                             {
-                                Debug.WriteLine(message.Trim());
-                                message = "";
+                                Debug.WriteLine(singleMessage.Trim());
+                            }
+                            else if (singleMessage.Contains(ITagDataSource.END_HEARTBEAT_MESSAGE))
+                            {
+                                // Heartbeat — no action needed, receiving it resets the receive timeout
                             }
                         }
                         Debug.Flush();
@@ -103,9 +119,10 @@ namespace TrailMeister.Model.Arduino {
                     handlerSocket.Close();
                     handlerSocket.Dispose();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                   TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.Disconnected, "Client disconnected due to exception"));
+                    Debug.WriteLine($"[SOCK] Exception in handler: {ex.GetType().Name} {(ex is SocketException se ? se.SocketErrorCode.ToString() : ex.Message)}");
+                    TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.Disconnected, "Client disconnected due to exception"));
                 }
             }
 

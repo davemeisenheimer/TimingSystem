@@ -14,20 +14,22 @@ namespace TrailMeister.Model.Arduino
             SocketClient.SendCommand("Reset");
         }
 
-        public void StartReader(int power)
+        public void StartReader()
         {
-            SetAntennaPower(power);
+            SocketClient.SendCommand("StartReader");
         }
-        public void StopReader()
-        {
-            SocketClient.SendCommand(String.Format("StopReader"));
-        }
-        internal void SetAntennaPower(int power)
+
+        public void SetAntennaPower(int power)
         {
             if (power < 0 || power > 27000) { throw new ArgumentException("power is outside range of 0-27000"); }
 
-            // SetAntennaGain will automatically stop and restart the reader
+            // SetAntennaGain will automatically stop and restart the reader at the new power level
             SocketClient.SendCommand(String.Format("SetAntennaGain,{0}", power));
+        }
+
+        public void StopReader()
+        {
+            SocketClient.SendCommand("StopReader");
         }
     }
 }

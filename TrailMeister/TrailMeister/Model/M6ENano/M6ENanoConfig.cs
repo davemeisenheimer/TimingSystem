@@ -28,17 +28,19 @@ namespace TrailMeister.Model.M6ENano
             this._reader = reader;
         }
 
-        public void StartReader(int antennaPower)
+        public void StartReader()
         {
-            if (antennaPower < 0 || antennaPower > 2700) { throw new ArgumentException("power is outside range of 0-2700"); }
-            if (_reader == null)
-            {
-                return;
-            }
-
-            _reader.ParamSet("/reader/radio/readPower", antennaPower);
-            _reader.ParamSet("/reader/radio/writePower", antennaPower); 
+            if (_reader == null) return;
             _reader.StartReading();
+        }
+
+        public void SetAntennaPower(int power)
+        {
+            if (power < 0 || power > 2700) { throw new ArgumentException("power is outside range of 0-2700"); }
+            if (_reader == null) return;
+
+            _reader.ParamSet("/reader/radio/readPower", power);
+            _reader.ParamSet("/reader/radio/writePower", power);
         }
 
         public void StopReader()

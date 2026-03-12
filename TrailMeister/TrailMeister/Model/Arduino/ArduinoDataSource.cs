@@ -9,6 +9,7 @@ using System.Threading;
 using TrailMeister.Model.Data;
 using TrailMeisterUtilities;
 using System.Windows.Threading;
+using System.Diagnostics;
 
 namespace TrailMeister.Model.Arduino
 {
@@ -95,7 +96,6 @@ namespace TrailMeister.Model.Arduino
                 if (e.Type == TagDataSourceEventType.LapData)
                 {
                     List<ReaderData> data = TagDataArduino.getReaderData(e.Message);
-
                     foreach (ReaderData d in data)
                     {
                         TagDataSourceEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.LapData, e.Message, d));
@@ -118,7 +118,7 @@ namespace TrailMeister.Model.Arduino
                 }
             }
             //dispose unmanaged resources
-            _config.SetAntennaPower(500);
+            _config.StopReader();
             _config.Reset();
 
             if (_socketHandler != null)

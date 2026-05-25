@@ -29,16 +29,50 @@ namespace TrailMeister.Model.Arduino {
         {
             TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.Connecting, "Client connecting"));
             Socket? handlerSocket = null;
+            bool hasConnected = false;
             while (true)
             {
                 if (!_isRunning) break;
 
                 try
                 {
-                    // Wait for incoming connection
-                    handlerSocket = listeningSocket.Accept();
+                    // Before the first connection: time out after 10 seconds so the UI can show
+                    // a helpful message and re-enable "Poke it!".
+                    // After connecting once: wait indefinitely — the Arduino reconnects automatically
+                    // and the event should carry on seamlessly from where it left off.
+                    handlerSocket = null;
+                    if (!hasConnected)
+                    {
+                        var deadline = DateTime.UtcNow.AddSeconds(10);
+                        while (_isRunning && DateTime.UtcNow < deadline)
+                        {
+                            if (listeningSocket.Poll(1_000_000, SelectMode.SelectRead))
+                            {
+                                handlerSocket = listeningSocket.Accept();
+                                break;
+                            }
+                        }
+                        if (handlerSocket == null)
+                        {
+                            if (_isRunning)
+                                TagReadEvent?.Invoke(this, new TagDataEventArgs(TagDataSourceEventType.Disconnected, "No reader connected"));
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        while (_isRunning)
+                        {
+                            if (listeningSocket.Poll(1_000_000, SelectMode.SelectRead))
+                            {
+                                handlerSocket = listeningSocket.Accept();
+                                break;
+                            }
+                        }
+                        if (handlerSocket == null) break; // _isRunning was set false by Dispose
+                    }
 
-                    if (handlerSocket == null) { break; }
+                    hasConnected = true;
                     handlerSocket.ReceiveTimeout = 31000;
 
                     IPEndPoint? endPoint = handlerSocket.RemoteEndPoint as IPEndPoint;

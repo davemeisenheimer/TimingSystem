@@ -11,7 +11,7 @@ namespace TrailMeister.Model.Arduino
 {
     internal class SocketClient
     {
-        internal static void SendCommand(string command)
+        internal static void SendCommand(string command, int connectTimeoutMs = 5000)
         {
             byte[] bytes = new byte[1024];
 
@@ -27,8 +27,14 @@ namespace TrailMeister.Model.Arduino
                 // Connect the socket to the remote endpoint. Catch any errors.
                 try
                 {
-                    // Connect to Remote EndPoint
-                    sender.Connect(remoteEP);
+                    // Connect to Remote EndPoint with a 5-second timeout.
+                    IAsyncResult connectResult = sender.BeginConnect(remoteEP, null, null);
+                    if (!connectResult.AsyncWaitHandle.WaitOne(connectTimeoutMs, true))
+                    {
+                        sender.Close();
+                        throw new SocketException((int)SocketError.TimedOut);
+                    }
+                    sender.EndConnect(connectResult);
                     sender.ReceiveTimeout = 8000;
 
                     if (sender.RemoteEndPoint != null)
@@ -59,12 +65,17 @@ namespace TrailMeister.Model.Arduino
                 catch (SocketException se)
                 {
                     Debug.WriteLine("SocketException : {0}", se.ToString());
+                    throw;
                 }
                 catch (Exception e)
                 {
                     Debug.WriteLine("Unexpected exception : {0}", e.ToString());
                 }
 
+            }
+            catch (SocketException)
+            {
+                throw;
             }
             catch (Exception e)
             {

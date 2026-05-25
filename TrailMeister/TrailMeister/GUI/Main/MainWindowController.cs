@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using TrailMeister.Model;
 using TrailMeisterDb;
 using TrailMeister.Model.Data;
@@ -256,6 +257,7 @@ namespace TrailMeister.GUI.Main
 
         public void ConnectReader()
         {
+            _vm.HintText = "Do you have a reader running?";
             _tagReader.init();
         }
 
@@ -346,7 +348,16 @@ namespace TrailMeister.GUI.Main
             {
                 // Arduino is connected and initialised — start the reader at its current power.
                 // Antenna power is configured separately when the user starts the event.
-                _tagReader.Config.StartReader();
+                try
+                {
+                    _tagReader.Config.StartReader();
+                }
+                catch (SocketException)
+                {
+                    _vm.HintText = "Connection failed. Please check the Arduino/reader device and try poking it again.";
+                    _vm.ReaderStatus = ReaderStatus.Disconnected;
+                    return;
+                }
             }
             else if (args.Type == TagDataSourceEventType.Connected && _vm.ReaderStatus != ReaderStatus.Connected)
             {
@@ -360,6 +371,7 @@ namespace TrailMeister.GUI.Main
             {
                 // Don't clear AllTags or AllParticipants — the Arduino reconnects automatically
                 // and the event should carry on seamlessly from where it left off.
+                _vm.HintText = "Connection failed. Please check the Arduino/reader device and try poking it again.";
             }
 
             _vm.ReaderStatus = args.ReaderStatus;

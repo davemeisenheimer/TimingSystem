@@ -42,18 +42,26 @@ namespace TrailMeister.Model.Arduino
 
         public void init()
         {
-            // Create listening socket and bind it to Any:PORT
-            IPAddress listeningIp = IPAddress.Any;
-            IPEndPoint listeningEndPoint = new IPEndPoint(listeningIp, listeningPort);
-            //log("IP Address" + listeningIp.ToString());
-            _listeningSocket = new Socket(listeningIp.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            _listeningSocket.Bind(listeningEndPoint);
-            _listeningSocket.Listen(10);
+            // Clean up any previous handler so "Poke it!" can retry.
+            if (_socketHandler != null)
+            {
+                _socketHandler.TagReadEvent -= OnTagReadEvent;
+                _socketHandler.Dispose();
+                _socketHandler = null;
+            }
 
-            // Start thread to handle incoming connections
+            // Create the listening socket only once — reuse it across retries.
+            if (_listeningSocket == null)
+            {
+                IPAddress listeningIp = IPAddress.Any;
+                IPEndPoint listeningEndPoint = new IPEndPoint(listeningIp, listeningPort);
+                _listeningSocket = new Socket(listeningIp.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                _listeningSocket.Bind(listeningEndPoint);
+                _listeningSocket.Listen(10);
+            }
+
             _socketHandler = new SocketHandler(_listeningSocket);
             _socketHandler.TagReadEvent += OnTagReadEvent;
-            //_serverThread = new Thread(new ThreadStart(_socketHandler.startListening));
             _serverThread = new Thread(_socketHandler.startListening)
             {
                 IsBackground = true
@@ -118,8 +126,9 @@ namespace TrailMeister.Model.Arduino
                 }
             }
             //dispose unmanaged resources
-            _config.StopReader();
-            _config.Reset();
+            // Best-effort shutdown commands — short timeout so closing the app stays fast.
+            try { _config.StopReader(connectTimeoutMs: 500); } catch (SocketException) { }
+            try { _config.Reset(connectTimeoutMs: 500); } catch (SocketException) { }
 
             if (_socketHandler != null)
             {

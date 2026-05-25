@@ -71,8 +71,8 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <Label x:Name="lblHint" Content="Do you have a reader running?"
-                   HorizontalAlignment="Left" Margin="252,341,0,0" VerticalAlignment="Top"
+            <Label x:Name="lblHint" Content="{Binding HintText}"
+                   HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,341,0,0"
                    FontSize="18" FontStyle="Italic"
                    Foreground="{StaticResource MutedBlueBrush}"/>
         </Grid>

@@ -22,6 +22,7 @@ namespace TrailMeister.GUI.Main
         protected readonly MainWindowController _controller;
 
         private string _eventName = "Event " + DateOnly.FromDateTime(DateTime.Today).ToString("yyyy/MM/dd");
+        private string _hintText = "Do you have a reader running?";
         private int _antennaPower = 5;
         private int _lapLength = 800;
         bool _eventStarted = false;
@@ -68,6 +69,19 @@ namespace TrailMeister.GUI.Main
                 }
             }
         }
+        public string HintText
+        {
+            get => _hintText;
+            set
+            {
+                if (_hintText != value)
+                {
+                    _hintText = value;
+                    OnPropertyChanged(nameof(HintText));
+                }
+            }
+        }
+
         public ReaderStatus ReaderStatus
         {
             get

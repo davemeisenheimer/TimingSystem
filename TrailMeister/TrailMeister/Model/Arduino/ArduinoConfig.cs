@@ -9,10 +9,8 @@ namespace TrailMeister.Model.Arduino
     internal class ArduinoConfig: ITagReaderConfig
     {
 
-        public void Reset()
-        {
-            SocketClient.SendCommand("Reset");
-        }
+        public void Reset() => Reset(connectTimeoutMs: 5000);
+        public void Reset(int connectTimeoutMs) => SocketClient.SendCommand("Reset", connectTimeoutMs);
 
         public void StartReader()
         {
@@ -27,9 +25,7 @@ namespace TrailMeister.Model.Arduino
             SocketClient.SendCommand(String.Format("SetAntennaGain,{0}", power));
         }
 
-        public void StopReader()
-        {
-            SocketClient.SendCommand("StopReader");
-        }
+        public void StopReader() => StopReader(connectTimeoutMs: 5000);
+        public void StopReader(int connectTimeoutMs) => SocketClient.SendCommand("StopReader", connectTimeoutMs);
     }
 }
